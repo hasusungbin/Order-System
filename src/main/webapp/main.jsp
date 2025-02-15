@@ -202,18 +202,18 @@
             </div>
         </div>
 	</div>
-	<%-- <div class="container">
+	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">화물등록 일반</div>
+            <div class="panel-heading">화물등록 상세</div>
             <div class="panel-body">
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">운송요청일:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
                         <div class="col-sm-4">
-                            <input type="date" name="orderDate" id="orderDate" class="form-control" required>
+                            <input type="date" name="startDate" id="startDate" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">담당자명:</label>
+                        <label class="col-sm-2 control-label">출발지명:</label>
                         <div class="col-sm-3">
                             <select name="userName" class="form-control" required>
                             	<%
@@ -231,10 +231,10 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">차량톤급:</label>
+                        <label class="col-sm-2 control-label">* 시/도:</label>
                         <div class="col-sm-3">
                             <select name="carWeight" class="form-control" required>
-                                <option value="2wheeler">이륜차</option>
+                                <option value="서울특별시">서울특별시</option>
                                 <option value="1Ton">1톤</option>
                                 <option value="1.4Ton">1.4톤</option>
                                 <option value="2.5Ton">2.5톤</option>
@@ -291,7 +291,7 @@
 	                </div>
             </div>
         </div>
-	</div> --%>
+	</div>
 </form>
 	<%
 		}	

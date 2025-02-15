@@ -1,10 +1,12 @@
 package insertOrder;
 
+import java.util.Date;
+
 public class Order {
 	
 	private String oderNumber;
 	private String userName;
-	private String orderDate;
+	private Date orderDate;
 	private String carWeight;
 	private String kindOfCar;
 	private int refNumber;
@@ -33,11 +35,11 @@ public class Order {
 		this.userName = userName;
 	}
 
-	public String getOrderDate() {
+	public Date getOrderDate() {
 		return orderDate;
 	}
 
-	public void setOrderDate(String orderDate) {
+	public void setOrderDate(Date orderDate) {
 		this.orderDate = orderDate;
 	}
 

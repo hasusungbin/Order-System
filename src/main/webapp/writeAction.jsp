@@ -43,12 +43,12 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
-				int result = orderDAO.write( order.getUserName(), order.getCarWeight(), order.getKindOfCar(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc() );
+				int result = orderDAO.write( order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getKindOfCar(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc() );
 				if( result == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('오더 작성을 실패했습니다.');" );
-					script.println( "history.back()" );
+					script.println( "history.back()" ); 
 					script.println( "</script>" );
 				} else {
 					PrintWriter script = response.getWriter();
