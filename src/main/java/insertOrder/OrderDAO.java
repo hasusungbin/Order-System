@@ -35,15 +35,12 @@ public class OrderDAO {
 				rs = pstmt.executeQuery();
 				while (rs.next()) {
 					Order order = new Order();
-					order.setOrder // 여기서 부터 다시하기
-					return rs.getInt(1) + 1;
+					//order.setOrder // 여기서 부터 다시하기
 				}
-				return 1;
 			} catch ( Exception e ) {
 				e.printStackTrace();
 			}
-			return -1; // 데이터베이스 오류
-		 
+		 return list;
 	 }
 	
 	
