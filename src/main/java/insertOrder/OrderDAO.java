@@ -4,8 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class OrderDAO {
 	
@@ -25,11 +26,26 @@ public class OrderDAO {
 		}
 	}
 	
-	/*
-	 * public ArrayList<Order> getOrderList() {
-	 * 
-	 * }
-	 */
+	 public ArrayList<Order> getOrderList(int pageNumber) {
+		 String SQL = "SELECT * FROM cargoorder WHERE cargoorderID < ? AND cargoorder = 1 ORDER BY orderNumber DESC LIMIT 10";
+		 ArrayList<Order> list = new ArrayList<Order>();
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(SQL);
+				pstmt.setInt(1, getNext() - (pageNumber -1) * 10);
+				rs = pstmt.executeQuery();
+				while (rs.next()) {
+					Order order = new Order();
+					order.setOrder // 여기서 부터 다시하기
+					return rs.getInt(1) + 1;
+				}
+				return 1;
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+			return -1; // 데이터베이스 오류
+		 
+	 }
+	
 	
 	public String getDate() { 
 		String SQL = "SELECT NOW()";
@@ -60,29 +76,63 @@ public class OrderDAO {
 		return -1; // 데이터베이스 오류
 	}
 	
-	public int write( String userName, Date orderDate, String carWeight, String kindOfCar, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc ) {
-		String SQL1 = "INSERT INTO cargoorder VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		String SQL2 = "INSERT INTO carinfo VALUES(NOW()+1, '강예진', ?, null, null)";
+	public int writeOrder( String userName, String orderDate, String carWeight, String kindOfCar, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
+							String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum ) {
+		String SQL = "INSERT INTO cargoorder VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		java.util.Date sqlOrderDate = null;
 		try {
-			PreparedStatement pstmt = conn.prepareStatement(SQL1);
-			pstmt.setString(1, userName);
-			pstmt.setDate(2, (java.sql.Date)orderDate);
-			pstmt.setString(3, carWeight);
-			pstmt.setString(4, kindOfCar);
+			sqlOrderDate = sdf.parse(orderDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        java.sql.Date resultOrderDate = new java.sql.Date(sqlOrderDate.getTime());
+        java.util.Date sqlStartDate = null;
+		try {
+			sqlStartDate = sdf.parse(startDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        java.sql.Date resultStartDate = new java.sql.Date(sqlStartDate.getTime());
+        java.util.Date sqlEndDate = null;
+		try {
+			sqlEndDate = sdf.parse(endDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        java.sql.Date resultEndDate = new java.sql.Date(sqlEndDate.getTime());
+		try {
+			if( userName == null || orderDate == null || carWeight == null || kindOfCar == null || startDate == null || endDate == null || departureCities == null 
+				|| arrivalCities == null || departureTown == null || arrivalTown == null ) return -2;
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, kindOfCar);
+			pstmt.setString(2, userName);
+			pstmt.setDate(3, resultOrderDate);
+			pstmt.setString(4, carWeight);
 			pstmt.setInt(5, refNumber);
 			pstmt.setString(6, userPhoneNumber);
 			pstmt.setString(7, fixedCarNumber);
 			pstmt.setString(8, upDown);
 			pstmt.setString(9, item);
 			pstmt.setString(10, etc);
+			pstmt.setDate(11, resultStartDate);
+			pstmt.setDate(12, resultEndDate);
+			pstmt.setString(13, departureName);
+			pstmt.setString(14, arrivalName);
+			pstmt.setString(15, departureCities);
+			pstmt.setString(16, arrivalCities);
+			pstmt.setString(17, departureTown);
+			pstmt.setString(18, arrivalTown);
+			pstmt.setString(19, departureDetailedAddress);
+			pstmt.setString(20, arrivalDetailedAddress);
+			pstmt.setString(21, departureManager);
+			pstmt.setString(22, arrivalManager);
+			pstmt.setString(23, departureManagerPhoneNum);
+			pstmt.setString(24, arrivalManagerPhoneNum);
 			int resultRows = pstmt.executeUpdate();
-			
-			PreparedStatement pstmt2 = conn.prepareStatement(SQL2);
-			pstmt2.setString(1, userPhoneNumber);
-			int resultRows2 = pstmt2.executeUpdate();
-			
-			return resultRows + resultRows2;
+
+			return resultRows;
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}

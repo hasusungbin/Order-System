@@ -15,6 +15,16 @@
             var today = new Date().toISOString().split('T')[0];
             document.getElementById("orderDate").value = today;
         });
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("startDate").value = today;
+        });
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("endDate").value = today;
+        });
 </script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
@@ -204,7 +214,7 @@
 	</div>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">화물등록 상세</div>
+            <div class="panel-heading">화물등록 상세(출발지 등록)</div>
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
@@ -215,7 +225,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">출발지명:</label>
                         <div class="col-sm-3">
-                            <select name="userName" class="form-control" required>
+                            <select name="departureName" class="form-control" required>
                             	<%
 		                        	for( int i = 0; i < userList.size(); i++ ) {
 		                        %>
@@ -225,70 +235,122 @@
                                 %>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
+                        <div class="col-sm-3">
+                            <select name="departureCities" class="form-control" required>
+                                <option value="서울특별시">서울특별시</option>
+                                <option value="경기도">경기도</option>
+                                <option value="인천광역시">인천광역시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대전광역시">대전광역시</option>
+                                <option value="광주광역시">광주광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="울산광역시">울산광역시</option>
+                                <option value="충청북도">충청북도</option>
+                                <option value="충청남도">충청남도</option>
+                                <option value="경상북도">경상북도</option>
+                                <option value="경상남도">경상남도</option>
+                                <option value="전라북도">전라북도</option>
+                                <option value="전라북도">전라남도</option>
+                                <option value="전라북도">강원도</option>
+                                <option value="전라북도">제주도</option>
+                                <option value="세종특별자치시">세종특별자치시</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
+                        <div class="col-sm-3">
+                        	<input type="text" name="departureTown" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 control-label">상세주소:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="departureDetailedAddress" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">담당자:</label>
+                        <div class="col-sm-3">
+                        	<input type="text" name="departureManager" class="form-control">
+                        </div>
                         <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="userPhoneNumber" class="form-control">
+                        	<input type="text" name="departureManagerPhoneNum" class="form-control">
+                        </div>
+                    </div>
+            </div>
+        </div>
+	</div>
+	<div class="container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">화물등록 상세(도착지 등록)</div>
+            <div class="panel-body">
+                    <div class="form-group row">
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 도착지 도착일시:</a></label>
+                        <div class="col-sm-4">
+                            <input type="date" name="endDate" id="endDate" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">* 시/도:</label>
+                        <label class="col-sm-2 control-label">도착지명:</label>
                         <div class="col-sm-3">
-                            <select name="carWeight" class="form-control" required>
+                            <select name="arrivalName" class="form-control" required>
+                            	<%
+		                        	for( int i = 0; i < userList.size(); i++ ) {
+		                        %>
+                                <option><%= userList.get(i).getUserName() %></option>
+                                <%
+		                        	}
+                                %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
+                        <div class="col-sm-3">
+                            <select name="arrivalCities" class="form-control" required>
                                 <option value="서울특별시">서울특별시</option>
-                                <option value="1Ton">1톤</option>
-                                <option value="1.4Ton">1.4톤</option>
-                                <option value="2.5Ton">2.5톤</option>
-                                <option value="3.5Ton">3.5톤</option>
-                                <option value="5Ton">5톤</option>
-                                <option value="5TonAxis">5톤 축</option>
-                                <option value="8Ton">8톤</option>
-                                <option value="11Ton">11톤</option>
-                                <option value="11TonAxis">11톤 축</option>
-                                <option value="15Ton">15톤</option>
-                                <option value="18Ton">18톤</option>
-                                <option value="25Ton">25톤</option>
+                                <option value="경기도">경기도</option>
+                                <option value="인천광역시">인천광역시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대전광역시">대전광역시</option>
+                                <option value="광주광역시">광주광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="울산광역시">울산광역시</option>
+                                <option value="충청북도">충청북도</option>
+                                <option value="충청남도">충청남도</option>
+                                <option value="경상북도">경상북도</option>
+                                <option value="경상남도">경상남도</option>
+                                <option value="전라북도">전라북도</option>
+                                <option value="전라북도">전라남도</option>
+                                <option value="전라북도">강원도</option>
+                                <option value="전라북도">제주도</option>
+                                <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label">고정차량:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                            <select name="carNumber" class="form-control">
-                                <option value="">Master data</option>
-                            </select>
+                        	<input type="text" name="arrivalTown" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">상하차 방식:</label>
-                        <div class="col-sm-3">
-                            <select name="upDown" class="form-control" required>
-                                <option value="forklift">지게차</option>
-                                <option value="handwork">수작업</option>
-                                <option value="someHandwork">일부 수작업</option>
-                                <option value="hoist">호이스트</option>
-                            </select>
-                        </div>
-                        <label class="col-sm-2 control-label">품목:</label>
-                        <div class="col-sm-5">
-                        	<input type="text" name="item" class="form-control">
+                        <label class="col-sm-2 control-label">상세주소:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="arrivalDetailedAddress" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">도착지 시/도:</label>
+                    	<label class="col-sm-2 control-label">담당자:</label>
                         <div class="col-sm-3">
-                            <select name="arrivalCity" class="form-control">
-                                <option value="">Code data</option>
-                            </select>
+                        	<input type="text" name="arrivalManager" class="form-control">
                         </div>
-                        <label class="col-sm-2 control-label">오더번호:</label>
+                        <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="orderNumber" class="form-control">
+                        	<input type="text" name="arrivalManagerPhoneNum" class="form-control">
                         </div>
                     </div>
-                    <div class="form-group row">
-	                    <label class="col-sm-2 control-label">참조번호:</label>
-	                        <div class="col-sm-3">
-	                            <input type="text" name="referenceNumber" class="form-control">
-	                        </div>
-	                </div>
             </div>
         </div>
 	</div>

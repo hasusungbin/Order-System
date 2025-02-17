@@ -17,6 +17,9 @@
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
+<script>
+	search.btn();
+</script>
 	<%
 		String userID = null;
 		if (session.getAttribute("userID") != null) {
@@ -96,7 +99,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">화물조회</div>
             <div class="panel-body">
-                <form action="searchCargo.jsp" method="get">
+                <form method="post" id="frmBody">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">운송요청일:</label>
                         <div class="col-sm-4">
@@ -145,7 +148,8 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">조회</button>
+                        <button type="submit" class="btn btn-primary" id="btnSearch">조회</button>
+                        <input type="hidden" name="nowPage" />
                     </div>
                 </form>
             </div>
@@ -203,5 +207,6 @@
 	
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
+	<script src="js/search.js"></script>
 </body>
 </html>
