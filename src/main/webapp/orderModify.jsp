@@ -4,6 +4,7 @@
 <%@ page import="insertOrder.OrderDAO" %>
 <%@ page import="insertOrder.Order" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
 <!DOCTYPE html>
@@ -30,10 +31,44 @@
 		if (session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
 		}
+		
 		int pageNumber = 1;
 		if (request.getParameter("pageNumber") != null ) {
 			pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
 		}
+		
+		OrderDAO orderDAO = new OrderDAO();
+		
+		String startDate = request.getParameter("startDate");
+	    String endDate = request.getParameter("endDate");
+	    String refNumberStr = request.getParameter("refNumber");
+	    int refNumber = 0;
+	    String userName = request.getParameter("userName");
+	    String departureName = request.getParameter("departureName");
+	    String arrivalName = request.getParameter("arrivalName");
+	    String arrivalCities = request.getParameter("arrivalCities");
+	    String orderNumber = request.getParameter("orderNumber");
+	    
+	    try {
+	        if (refNumberStr != null && !refNumberStr.isEmpty()) {
+	            refNumber = Integer.parseInt(refNumberStr);
+	        }
+	    } catch (NumberFormatException e) {
+	        refNumber = 0; // 숫자가 아닌 값이 들어오면 무시
+	    }
+		
+	    List<Order> orderList;
+	    if (startDate != null || endDate != null || refNumber != 0 ||
+	        (userName != null && !userName.isEmpty()) ||
+	        (departureName != null && !departureName.isEmpty()) ||
+	        (arrivalName != null && !arrivalName.isEmpty()) ||
+	        (arrivalCities != null && !arrivalCities.isEmpty()) ||
+	        (orderNumber != null && !orderNumber.isEmpty())) {
+	        
+	        orderList = orderDAO.getSearchList(startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, pageNumber, orderNumber);
+	    } else {
+	        orderList = orderDAO.getOrderList(pageNumber); // 검색 조건이 없으면 전체 리스트 조회
+	    }
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -63,7 +98,6 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li><a href="carModify.jsp">차량정보 수정</a></li>
 				<li><a href="carModify.jsp">담당자 등록</a></li>
 				<li><a href="carModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carModify.jsp">고정차량 등록</a></li>
@@ -110,7 +144,7 @@
             <div class="panel-body">
                 <form id="frmBody" action="./orderModify.jsp">
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">운송요청일:</label>
+                        <label class="col-sm-2 control-label" style="font-size:12px;">운송요청일(출발일 ~ 도착일):</label>
                         <div class="col-sm-4">
                             <input type="date" name="startDate" id="startDate" class="form-control" required>
                         </div>
@@ -121,7 +155,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="refNumber" class="form-control">
+                            <input type="number" name="refNumber" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">담당자명:</label>
                         <div class="col-sm-3">
@@ -212,31 +246,29 @@
                     </thead>
                     <tbody>
 	                <%
-	                	OrderDAO orderDAO = new OrderDAO();
-	                	ArrayList<Order> list = orderDAO.getOrderList( pageNumber );
-	                	for( int i = 0; i < list.size(); i++ ) {
+	                	for( int i = 0; i < orderList.size(); i++ ) {
 	                %>
                         <tr style="font-size:10px;">
-                        	<% if( list.get(i).getCarNumber() == null ) { %>
+                        	<% if( orderList.get(i).getCarNumber() == null ) { %>
                             	<td><input type="checkbox"></td>
                             <% } else { %>
                             	<td style="font-color:red;">배차완료</td>
                             <% } %>
-                            <td><%= list.get(i).getOrderNumber() %></td>
-                            <td><%= list.get(i).getOrderDate() %></td>
-                            <td><%= list.get(i).getRefNumber() %></td>
-                            <td><%= list.get(i).getDepartureName() %></td>
-                            <td><%= list.get(i).getDepartureCities() + " " + list.get(i).getDepartureTown() %></td>
-                            <td><%= list.get(i).getArrivalName() %></td>
-                            <td><%= list.get(i).getArrivalCities() + " " + list.get(i).getArrivalTown() %></td>
-                            <td><%= list.get(i).getCarWeight() %></td>
-                            <td><%= list.get(i).getKindOfCar() %></td>
-                            <td><% out.print( list.get(i).getCarNumber() == null ? "" : list.get(i).getCarNumber() ); %></td>
-                            <td><% out.print( list.get(i).getDriverName() == null ? "" : list.get(i).getDriverName() ); %></td>
-	                        <td><% out.print( list.get(i).getDriverPhoneNum() == null ? "" : list.get(i).getDriverPhoneNum() ); %></td>
-	                        <td><%= list.get(i).getBasicFare() + list.get(i).getAddFare() %></td>
-                            <td><%= list.get(i).getUserName() %></td>
-                            <td><%= list.get(i).getRegDate() %></td>
+                            <td><%= orderList.get(i).getOrderNumber() %></td>
+                            <td><%= orderList.get(i).getOrderDate() %></td>
+                            <td><%= orderList.get(i).getRefNumber() %></td>
+                            <td><%= orderList.get(i).getDepartureName() %></td>
+                            <td><%= orderList.get(i).getDepartureCities() + " " + orderList.get(i).getDepartureTown() %></td>
+                            <td><%= orderList.get(i).getArrivalName() %></td>
+                            <td><%= orderList.get(i).getArrivalCities() + " " + orderList.get(i).getArrivalTown() %></td>
+                            <td><%= orderList.get(i).getCarWeight() %></td>
+                            <td><%= orderList.get(i).getKindOfCar() %></td>
+                            <td><% out.print( orderList.get(i).getCarNumber() == null ? "" : orderList.get(i).getCarNumber() ); %></td>
+                            <td><% out.print( orderList.get(i).getDriverName() == null ? "" : orderList.get(i).getDriverName() ); %></td>
+	                        <td><% out.print( orderList.get(i).getDriverPhoneNum() == null ? "" : orderList.get(i).getDriverPhoneNum() ); %></td>
+	                        <td><%= orderList.get(i).getBasicFare() + orderList.get(i).getAddFare() %></td>
+                            <td><%= orderList.get(i).getUserName() %></td>
+                            <td><%= orderList.get(i).getRegDate() %></td>
                         </tr>
 	                <%
 	                	}
@@ -246,11 +278,11 @@
                 <%
                 	if( pageNumber != 1 ) {
                 %>
-                	<a href="order.jsp?pageNumber=<%=pageNumber -1 %>" class="btn btn-success btn-arraw-left">이전</a>
+                	<a href="orderModify.jsp?pageNumber=<%=pageNumber -1 %>" class="btn btn-success btn-arraw-left">이전</a>
                 <% 
                 	} if( orderDAO.nextPage(pageNumber + 1) ) {
                 %>
-                	<a href="order.jsp?pageNumber=<%=pageNumber +1 %>" class="btn btn-success btn-arraw-light">다음</a>
+                	<a href="orderModify.jsp?pageNumber=<%=pageNumber +1 %>" class="btn btn-success btn-arraw-light">다음</a>
                 <%
                 	}
                 %>

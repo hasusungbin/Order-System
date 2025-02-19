@@ -81,7 +81,6 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li><a href="carModify.jsp">차량정보 수정</a></li>
 				<li><a href="carModify.jsp">담당자 등록</a></li>
 				<li><a href="carModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carModify.jsp">고정차량 등록</a></li>
@@ -196,7 +195,7 @@
                    <div class="form-group row">
                     <label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="refNumber" class="form-control">
+                            <input type="number" name="refNumber" class="form-control">
                         </div>
                     <label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
@@ -259,7 +258,9 @@
                                 <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
+                    </div>
+                    <div class="form-group row">
+                    	 <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
                         	<input type="text" name="departureTown" class="form-control">
                         </div>
@@ -330,7 +331,9 @@
                                 <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
                         	<input type="text" name="arrivalTown" class="form-control">
                         </div>

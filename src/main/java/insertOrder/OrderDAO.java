@@ -7,6 +7,11 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSession;
 
 public class OrderDAO {
 	
@@ -25,6 +30,12 @@ public class OrderDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public List<Order> getAllList() {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            return session.selectList("insertOrder.OrderDAO.getAllList");
+        }
+    }
 	
 	 public ArrayList<Order> getOrderList( int pageNumber ) {
 		 String SQL = "SELECT * FROM cargoorder WHERE orderID < ? ORDER BY orderID DESC LIMIT 10";
@@ -77,7 +88,6 @@ public class OrderDAO {
 	 
 	 public boolean nextPage( int pageNumber ) {
 		 String SQL = "SELECT * FROM cargoorder WHERE orderID < ? ORDER BY orderID DESC LIMIT 10";
-		 ArrayList<Order> list = new ArrayList<Order>();
 			try {
 				PreparedStatement pstmt = conn.prepareStatement( SQL );
 				pstmt.setInt(1, getNext() - (pageNumber -1) * 10);
@@ -190,55 +200,26 @@ public class OrderDAO {
 		return -1; // 데이터베이스 오류
 	}
 	
-	public ArrayList<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber ) {
-		ArrayList<Order> searchList = new ArrayList<Order>();
-		
-		try {
-			String SQL = "SELECT * FROM cargoorder WHERE BETWEEN startDate <= ? AND endDate >= ? AND refNumber LIKE ? AND userName LIKE ? AND departureName LIKE ? "
-					+ "AND arrivalName LIKE ? AND arrivalCities = ?";
-			PreparedStatement pstmt = conn.prepareStatement( SQL );
-			// 이메일 변경 테스트 주석
-			rs = pstmt.executeQuery();
-			
-			while ( rs.next() ) {
-				Order order = new Order();
-				order.setOrderNumber( rs.getString(1) );
-				order.setKindOfCar( rs.getString(2) );
-				order.setUserName( rs.getString(3) );
-				order.setOrderDate( rs.getString(4) );
-				order.setCarWeight( rs.getString(5) );
-				order.setRefNumber( rs.getInt(6) );
-				order.setUserPhoneNumber( rs.getString(7) );
-				order.setFixedCarNumber( rs.getString(8) );
-				order.setUpDown( rs.getString(9) );
-				order.setItem( rs.getString(10) );
-				order.setEtc( rs.getString(11) );
-				order.setStartDate( rs.getString(12) );
-				order.setEndDate( rs.getString(13) );
-				order.setDepartureName( rs.getString(14) );
-				order.setArrivalName( rs.getString(15) );
-				order.setDepartureCities( rs.getString(16) );
-				order.setArrivalCities( rs.getString(17) );
-				order.setDepartureTown( rs.getString(18) );
-				order.setArrivalTown( rs.getString(19) );
-				order.setDepartureDetailedAddress( rs.getString(20) );
-				order.setArrivalDetailedAddress( rs.getString(21) );
-				order.setDepartureManager( rs.getString(22) );
-				order.setArrivalManager( rs.getString(23) );
-				order.setDepartureManagerPhoneNum( rs.getString(24) );
-				order.setArrivalManagerPhoneNum( rs.getString(25) );
-				order.setOrderID( rs.getInt(26) );
-				order.setCarNumber( rs.getString(27) );
-				order.setDriverName( rs.getString(28) );
-				order.setDriverPhoneNum( rs.getString(29) );
-				order.setBasicFare( rs.getInt(30) );
-				order.setAddFare( rs.getInt(31) );
-				order.setRegDate( rs.getDate(32) );
-				searchList.add( order );
+	public List<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
+		int pageSize = 10;
+		System.out.println(pageNumber);
+		try (SqlSession session = MybatisUtil.getSession()) {
+			Map<String, Object> params = new HashMap<>();
+            params.put("startDate", startDate);
+            params.put("endDate", endDate);
+            params.put("refNumber", refNumber);
+            params.put("userName", userName);
+            params.put("departureName", departureName);
+            params.put("arrivalName", arrivalName);
+            params.put("arrivalCities", arrivalCities);
+            params.put("pageNumber", (pageNumber -1) * pageSize);
+            params.put("pageSize", pageSize);
+            params.put("orderNumber", orderNumber);
+
+            return session.selectList("insertOrder.OrderDAO.getSearchList", params);
 			}
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-		return searchList;
 	}
+	
+	//public int updateSelect( String orderNumber, )
 }
+
