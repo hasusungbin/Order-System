@@ -197,6 +197,7 @@ public class OrderDAO {
 			String SQL = "SELECT * FROM cargoorder WHERE BETWEEN startDate <= ? AND endDate >= ? AND refNumber LIKE ? AND userName LIKE ? AND departureName LIKE ? "
 					+ "AND arrivalName LIKE ? AND arrivalCities = ?";
 			PreparedStatement pstmt = conn.prepareStatement( SQL );
+			// 이메일 변경 테스트 주석
 			rs = pstmt.executeQuery();
 			
 			while ( rs.next() ) {
