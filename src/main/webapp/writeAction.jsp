@@ -57,7 +57,7 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
-				int result = orderDAO.writeOrder( order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getKindOfCar(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
+				int result = orderDAO.writeOrder( order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum() );
 				if( result == -1 ) {

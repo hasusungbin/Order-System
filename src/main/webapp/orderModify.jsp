@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="insertOrder.OrderDAO" %>
+<%@ page import="insertOrder.Order" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="user.UserDAO" %>
+<%@ page import="user.User" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,6 +29,10 @@
 		String userID = null;
 		if (session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
+		}
+		int pageNumber = 1;
+		if (request.getParameter("pageNumber") != null ) {
+			pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
 		}
 	%>
 	<nav class="navbar navbar-default">
@@ -99,7 +108,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">화물조회</div>
             <div class="panel-body">
-                <form method="post" id="frmBody">
+                <form id="frmBody" action="./orderModify.jsp">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">운송요청일:</label>
                         <div class="col-sm-4">
@@ -112,25 +121,33 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="referenceNumber" class="form-control">
+                            <input type="text" name="refNumber" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">담당자명:</label>
                         <div class="col-sm-3">
-                            <select name="personInCharge" class="form-control">
-                                <option value="">Master data</option>
+                            <select name="userName" class="form-control">
+                                <%
+	                                UserDAO userDAO = new UserDAO();
+		                        	ArrayList<User> userList = userDAO.getUserList();
+		                        	for( int i = 0; i < userList.size(); i++ ) {
+		                        %>
+                                	<option><%= userList.get(i).getUserName() %></option>
+                                <%
+		                        	}
+                                %>
                             </select>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">출발지 명:</label>
                         <div class="col-sm-3">
-                            <select name="personInCharge" class="form-control">
+                            <select name="departureName" class="form-control">
                                 <option value="">Master data</option>
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">도착지 명:</label>
                         <div class="col-sm-3">
-                            <select name="arrival" class="form-control">
+                            <select name="arrivalName" class="form-control">
                                 <option value="">Master data</option>
                             </select>
                         </div>
@@ -138,8 +155,24 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">도착지 시/도:</label>
                         <div class="col-sm-3">
-                            <select name="arrivalCity" class="form-control">
-                                <option value="">Code data</option>
+							<select name="arrivalCities" class="form-control" required>
+                                <option value="서울특별시">서울특별시</option>
+                                <option value="경기도">경기도</option>
+                                <option value="인천광역시">인천광역시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대전광역시">대전광역시</option>
+                                <option value="광주광역시">광주광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="울산광역시">울산광역시</option>
+                                <option value="충청북도">충청북도</option>
+                                <option value="충청남도">충청남도</option>
+                                <option value="경상북도">경상북도</option>
+                                <option value="경상남도">경상남도</option>
+                                <option value="전라북도">전라북도</option>
+                                <option value="전라북도">전라남도</option>
+                                <option value="전라북도">강원도</option>
+                                <option value="전라북도">제주도</option>
+                                <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">오더번호:</label>
@@ -149,7 +182,6 @@
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary" id="btnSearch">조회</button>
-                        <input type="hidden" name="nowPage" />
                     </div>
                 </form>
             </div>
@@ -159,8 +191,9 @@
             <div class="panel-body">
                 <table class="table table-bordered table-hover">
                     <thead>
-                        <tr>
+                        <tr style="font-size: 10px;">
                             <th>체크</th>
+                        	<th>오더번호</th>
                             <th>운송요청일</th>
                             <th>참조번호</th>
                             <th>출발지명</th>
@@ -178,25 +211,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>2025-02-08</td>
-                            <td>123456</td>
-                            <td>우리은행</td>
-                            <td>경기도 화성시</td>
-                            <td>산업은행</td>
-                            <td>경기도 파주시</td>
-                            <td>5톤</td>
-                            <td>윙바디</td>
-                            <td>12가1234</td>
-                            <td>김길동</td>
-                            <td>010-1234-1234</td>
-                            <td>130,000</td>
-                            <td>김기찬</td>
-                            <td>2025-02-07</td>
+	                <%
+	                	OrderDAO orderDAO = new OrderDAO();
+	                	ArrayList<Order> list = orderDAO.getOrderList( pageNumber );
+	                	for( int i = 0; i < list.size(); i++ ) {
+	                %>
+                        <tr style="font-size:10px;">
+                        	<% if( list.get(i).getCarNumber() == null ) { %>
+                            	<td><input type="checkbox"></td>
+                            <% } else { %>
+                            	<td style="font-color:red;">배차완료</td>
+                            <% } %>
+                            <td><%= list.get(i).getOrderNumber() %></td>
+                            <td><%= list.get(i).getOrderDate() %></td>
+                            <td><%= list.get(i).getRefNumber() %></td>
+                            <td><%= list.get(i).getDepartureName() %></td>
+                            <td><%= list.get(i).getDepartureCities() + " " + list.get(i).getDepartureTown() %></td>
+                            <td><%= list.get(i).getArrivalName() %></td>
+                            <td><%= list.get(i).getArrivalCities() + " " + list.get(i).getArrivalTown() %></td>
+                            <td><%= list.get(i).getCarWeight() %></td>
+                            <td><%= list.get(i).getKindOfCar() %></td>
+                            <td><% out.print( list.get(i).getCarNumber() == null ? "" : list.get(i).getCarNumber() ); %></td>
+                            <td><% out.print( list.get(i).getDriverName() == null ? "" : list.get(i).getDriverName() ); %></td>
+	                        <td><% out.print( list.get(i).getDriverPhoneNum() == null ? "" : list.get(i).getDriverPhoneNum() ); %></td>
+	                        <td><%= list.get(i).getBasicFare() + list.get(i).getAddFare() %></td>
+                            <td><%= list.get(i).getUserName() %></td>
+                            <td><%= list.get(i).getRegDate() %></td>
                         </tr>
+	                <%
+	                	}
+	                %>
                     </tbody>
                 </table>
+                <%
+                	if( pageNumber != 1 ) {
+                %>
+                	<a href="order.jsp?pageNumber=<%=pageNumber -1 %>" class="btn btn-success btn-arraw-left">이전</a>
+                <% 
+                	} if( orderDAO.nextPage(pageNumber + 1) ) {
+                %>
+                	<a href="order.jsp?pageNumber=<%=pageNumber +1 %>" class="btn btn-success btn-arraw-light">다음</a>
+                <%
+                	}
+                %>
                 <div class="text-center">
                     <button class="btn btn-success">엑셀다운</button>
                     <button class="btn btn-danger">요청취소</button>

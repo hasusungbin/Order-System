@@ -47,7 +47,7 @@ public class UserDAO {
 		String SQL = "SELECT * FROM USER WHERE userType <> 'admin'";
 		ArrayList<User> userList = new ArrayList<User>();
 		try {
-			pstmt = conn.prepareStatement(SQL);
+			pstmt = conn.prepareStatement( SQL );
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {
 				User user = new User();
@@ -58,9 +58,9 @@ public class UserDAO {
 				user.setUserEmail( rs.getString(5) );
 				user.setUserType( rs.getString(6) );
 				user.setUserPhoneNumber( rs.getString(7) );
-				userList.add(user);
+				userList.add( user );
 			}
-		} catch (Exception e) {
+		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
 		return userList;

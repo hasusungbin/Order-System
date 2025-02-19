@@ -1,10 +1,10 @@
 package insertOrder;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Order {
 	
-	private String oderNumber;
+	private String orderNumber;
 	private String userName;
 	private String orderDate;
 	private String carWeight;
@@ -29,16 +29,23 @@ public class Order {
 	private String arrivalManager;
 	private String departureManagerPhoneNum;
 	private String arrivalManagerPhoneNum;
+	private int orderID;
+	private String carNumber;
+	private String driverName;
+	private	String driverPhoneNum;
+	private int basicFare;
+	private int addFare;
+	private Date regDate;
 	
 	public Order() {
 	}
 
-	public String getOderNumber() {
-		return oderNumber;
+	public String getOrderNumber() {
+		return orderNumber;
 	}
 
-	public void setOderNumber(String oderNumber) {
-		this.oderNumber = oderNumber;
+	public void setOrderNumber(String oderNumber) {
+		this.orderNumber = oderNumber;
 	}
 
 	public String getUserName() {
@@ -231,6 +238,62 @@ public class Order {
 
 	public void setArrivalManagerPhoneNum(String arrivalManagerPhoneNum) {
 		this.arrivalManagerPhoneNum = arrivalManagerPhoneNum;
+	}
+
+	public int getOrderID() {
+		return orderID;
+	}
+
+	public void setOrderID(int orderID) {
+		this.orderID = orderID;
+	}
+
+	public String getCarNumber() {
+		return carNumber;
+	}
+
+	public void setCarNumber(String carNumber) {
+		this.carNumber = carNumber;
+	}
+
+	public String getDriverName() {
+		return driverName;
+	}
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+
+	public String getDriverPhoneNum() {
+		return driverPhoneNum;
+	}
+
+	public void setDriverPhoneNum(String driverPhoneNum) {
+		this.driverPhoneNum = driverPhoneNum;
+	}
+
+	public int getBasicFare() {
+		return basicFare;
+	}
+
+	public void setBasicFare(int basicFare) {
+		this.basicFare = basicFare;
+	}
+
+	public int getAddFare() {
+		return addFare;
+	}
+
+	public void setAddFare(int addFare) {
+		this.addFare = addFare;
+	}
+
+	public Date getRegDate() {
+		return regDate;
+	}
+
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
 	}
 	
 	
