@@ -32,22 +32,23 @@
 			userID = (String) session.getAttribute("userID");
 		}
 		
-		int pageNumber = 1;
-		if (request.getParameter("pageNumber") != null ) {
-			pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
-		}
-		
 		OrderDAO orderDAO = new OrderDAO();
+		
+		String pageNumberStr = request.getParameter("pageNumber");
+	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
+	    int pageSize = 10;
 		
 		String startDate = request.getParameter("startDate");
 	    String endDate = request.getParameter("endDate");
 	    String refNumberStr = request.getParameter("refNumber");
-	    int refNumber = 0;
+	    Integer refNumber = (refNumberStr != null && !refNumberStr.isEmpty()) ? Integer.parseInt(refNumberStr) : null;
 	    String userName = request.getParameter("userName");
 	    String departureName = request.getParameter("departureName");
 	    String arrivalName = request.getParameter("arrivalName");
 	    String arrivalCities = request.getParameter("arrivalCities");
 	    String orderNumber = request.getParameter("orderNumber");
+	    
+	    
 	    
 	    try {
 	        if (refNumberStr != null && !refNumberStr.isEmpty()) {
@@ -56,19 +57,11 @@
 	    } catch (NumberFormatException e) {
 	        refNumber = 0; // 숫자가 아닌 값이 들어오면 무시
 	    }
+	    
+	    int totalCount = orderDAO.getTotalCount( startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
+	    int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 		
-	    List<Order> orderList;
-	    if (startDate != null || endDate != null || refNumber != 0 ||
-	        (userName != null && !userName.isEmpty()) ||
-	        (departureName != null && !departureName.isEmpty()) ||
-	        (arrivalName != null && !arrivalName.isEmpty()) ||
-	        (arrivalCities != null && !arrivalCities.isEmpty()) ||
-	        (orderNumber != null && !orderNumber.isEmpty())) {
-	        
-	        orderList = orderDAO.getSearchList(startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, pageNumber, orderNumber);
-	    } else {
-	        orderList = orderDAO.getOrderList(pageNumber); // 검색 조건이 없으면 전체 리스트 조회
-	    }
+	    List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -142,7 +135,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">화물조회</div>
             <div class="panel-body">
-                <form id="frmBody" action="./orderModify.jsp">
+                <form id="searchForm" action="./orderModify.jsp">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" style="font-size:12px;">운송요청일(출발일 ~ 도착일):</label>
                         <div class="col-sm-4">
@@ -212,16 +205,38 @@
                         <label class="col-sm-2 control-label">오더번호:</label>
                         <div class="col-sm-3">
                             <input type="text" name="orderNumber" class="form-control">
+                            <input type="hidden" name="pageNumber" class="form-control" value="1">
                         </div>
                     </div>
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary" id="btnSearch">조회</button>
+                    	<button type="submit" class="btn btn-primary" onclick="submitForm('orderModify.jsp')">조회</button>
                     </div>
+                    <div class="text-center" style="margin-top:5%;">
+	                	<%-- <%
+	                		for( int i = 0; i < orderList.size(); i++ ) {
+	               		%>
+		                	<input type="hidden" name="startDate" value="<%= orderList.get(i).getStartDate() != null ? orderList.get(i).getStartDate() : "" %>">
+		                	<input type="hidden" name="endDate" value="<%= orderList.get(i).getEndDate() != null ? orderList.get(i).getEndDate() : "" %>">
+						    <input type="hidden" name="refNumber" value="<%= orderList.get(i).getRefNumber() != 0 ? orderList.get(i).getRefNumber() : "" %>">
+						    <input type="hidden" name="userName" value="<%= orderList.get(i).getUserName() != null ? orderList.get(i).getUserName() : "" %>">
+						    <input type="hidden" name="departureName" value="<%= orderList.get(i).getDepartureName() != null ? orderList.get(i).getDepartureName() : "" %>">
+						    <input type="hidden" name="arrivalName" value="<%= orderList.get(i).getArrivalName() != null ? orderList.get(i).getArrivalName() : "" %>">
+						    <input type="hidden" name="arrivalCities" value="<%= orderList.get(i).getArrivalCities() != null ? orderList.get(i).getArrivalCities() : "" %>">
+						    <input type="hidden" name="orderNumber" value="<%= orderList.get(i).getOrderNumber() != null ? orderList.get(i).getOrderNumber() : "" %>">
+						<%
+	                		}
+	                	%> --%>					    
+					    <button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
+                </div>
                 </form>
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">조회 결과</div>
+            <div class="panel-heading">조회 결과
+	            <div class="text-right">
+					<button class="btn btn-danger">요청취소</button>
+	            </div>
+            </div>
             <div class="panel-body">
                 <table class="table table-bordered table-hover">
                     <thead>
@@ -275,20 +290,14 @@
 	                %>
                     </tbody>
                 </table>
-                <%
-                	if( pageNumber != 1 ) {
-                %>
-                	<a href="orderModify.jsp?pageNumber=<%=pageNumber -1 %>" class="btn btn-success btn-arraw-left">이전</a>
-                <% 
-                	} if( orderDAO.nextPage(pageNumber + 1) ) {
-                %>
-                	<a href="orderModify.jsp?pageNumber=<%=pageNumber +1 %>" class="btn btn-success btn-arraw-light">다음</a>
-                <%
-                	}
-                %>
                 <div class="text-center">
-                    <button class="btn btn-success">엑셀다운</button>
-                    <button class="btn btn-danger">요청취소</button>
+	                <% if (pageNumber > 1) { %>
+	    				<a href="orderModify.jsp?pageNumber=<%= pageNumber - 1 %>" class="btn btn-success btn-arraw-left">이전</a>
+					<% } %>
+						Page <%= pageNumber %> of <%= totalPages %>
+					<% if (pageNumber < totalPages) { %>
+	    				<a href="orderModify.jsp?pageNumber=<%= pageNumber + 1 %>" class="btn btn-success btn-arraw-light">다음</a>
+					<% } %>
                 </div>
             </div>
         </div>
@@ -297,5 +306,11 @@
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
 	<script src="js/search.js"></script>
+	<script>
+	    function submitForm(action) {
+	        document.getElementById('searchForm').action = action;
+	        document.getElementById('searchForm').submit();
+	    }
+	</script>
 </body>
 </html>

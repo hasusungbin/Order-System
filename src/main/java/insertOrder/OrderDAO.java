@@ -220,6 +220,40 @@ public class OrderDAO {
 			}
 	}
 	
-	//public int updateSelect( String orderNumber, )
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber) {
+		 try (SqlSession session = MybatisUtil.getSession()) {
+			 Map<String, Object> params = new HashMap<>();
+	            int offset = (pageNumber - 1) * pageSize;
+	            params.put("offset", offset);
+	            params.put("pageSize", pageSize);
+	            params.put("startDate", startDate);
+	            params.put("endDate", endDate);
+	            params.put("refNumber", refNumber);
+	            params.put("managerName", userName);
+	            params.put("departureName", departureName);
+	            params.put("arrivalName", arrivalName);
+	            params.put("arrivalCity", arrivalCities);
+	            params.put("orderNumber", orderNumber);
+
+	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
+	        }
+	}
+	
+	public int getTotalCount( String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+        	Map<String, Object> params = new HashMap<>();
+        	params.put("startDate", startDate);
+            params.put("endDate", endDate);
+            params.put("refNumber", refNumber);
+            params.put("managerName", userName);
+            params.put("departureName", departureName);
+            params.put("arrivalName", arrivalName);
+            params.put("arrivalCity", arrivalCities);
+            params.put("orderNumber", orderNumber);
+
+            return session.selectOne("insertOrder.OrderDAO.getTotalCount", params);
+        	
+        }
+    }
 }
 
