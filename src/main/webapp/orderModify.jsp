@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" session="true"%>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="insertOrder.OrderDAO" %>
 <%@ page import="insertOrder.Order" %>
@@ -196,9 +196,9 @@
                                 <option value="경상북도">경상북도</option>
                                 <option value="경상남도">경상남도</option>
                                 <option value="전라북도">전라북도</option>
-                                <option value="전라북도">전라남도</option>
-                                <option value="전라북도">강원도</option>
-                                <option value="전라북도">제주도</option>
+                                <option value="전라남도">전라남도</option>
+                                <option value="강원도">강원도</option>
+                                <option value="제주도">제주도</option>
                                 <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
@@ -210,6 +210,7 @@
                     </div>
                     <div class="text-center">
                     	<button type="submit" class="btn btn-primary" onclick="submitForm('orderModify.jsp')">조회</button>
+                    	<button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
                     </div>
                     <div class="text-center" style="margin-top:5%;">
 	                	<%-- <%
@@ -226,7 +227,6 @@
 						<%
 	                		}
 	                	%> --%>					    
-					    <button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
                 </div>
                 </form>
             </div>
@@ -264,12 +264,10 @@
 	                	for( int i = 0; i < orderList.size(); i++ ) {
 	                %>
                         <tr style="font-size:10px;">
-                        	<% if( orderList.get(i).getCarNumber() == null ) { %>
-                            	<td><input type="checkbox"></td>
-                            <% } else { %>
-                            	<td style="font-color:red;">배차완료</td>
-                            <% } %>
-                            <td><%= orderList.get(i).getOrderNumber() %></td>
+                           	<td><input type="checkbox"></td>
+                            <td>
+                            	<a href="orderUpdate.jsp?orderNumber=<%= orderList.get(i).getOrderNumber() %>" class="order-link"><%= orderList.get(i).getOrderNumber() %></a>
+                            </td>
                             <td><%= orderList.get(i).getOrderDate() %></td>
                             <td><%= orderList.get(i).getRefNumber() %></td>
                             <td><%= orderList.get(i).getDepartureName() %></td>

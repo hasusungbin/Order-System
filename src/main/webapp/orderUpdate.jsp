@@ -1,9 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" session="true"%>
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="insertOrder.OrderDAO" %>
+<%@ page import="insertOrder.Order" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
-<%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,6 +36,7 @@
 		String userID = null;
 		if (session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
+			System.out.println(userID);
 		}
 	%>
 	
@@ -66,7 +70,7 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="main.jsp">운송오더 등록</a></li>
+				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
@@ -75,7 +79,7 @@
 						aria-expanded="false">운송오더 조회<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
+						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
 						<li><a href="carInfo.jsp">차량정보 등록</a></li>
 					</ul>
 				</li>
@@ -109,21 +113,25 @@
 			f.reset();
 		}
 	</script>
-<form action="writeAction.jsp" method="post" name="f">
+<form action="updateAction.jsp" method="post" name="f">
+		<%
+            String orderNumber = request.getParameter("orderNumber");
+            OrderDAO orderDAO = new OrderDAO();
+            Order order = orderDAO.getOrderById( orderNumber );
+        %>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">화물등록 일반</div>
+            <div class="panel-heading">화물등록 수정</div>
             <div class="panel-body">
 	            <div class="text-right">
 	            	<div class="btn-group">
-		                <input type="button" class="btn btn-primary" onclick="rtn();" value="신규">
 		                <button type="submit" class="btn btn-primary" style="margin-left: 10px;">저장</button>
 	            	</div>
 	            </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
-                           <input type="date" name="orderDate" id="orderDate" class="form-control" required>
+                           <input type="date" name="orderDate" id="orderDate" class="form-control" required value="<%= order.getOrderDate() %>">
                        </div>
                    </div>
                    <div class="form-group row">
@@ -136,14 +144,14 @@
 	                        	for( int i = 0; i < userList.size(); i++ ) {
 	                        %>
                                <option><%= userList.get(i).getUserName() %></option>
-                               <%
+                            <%
 	                        	}
-                               %>
+                            %>
                            </select>
                        </div>
                        <label class="col-sm-2 control-label">연락처:</label>
                        <div class="col-sm-3">
-                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요.">
+                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getArrivalManagerPhoneNum() %>">
                        </div>
                    </div>
                    <div class="form-group row">
@@ -193,13 +201,13 @@
                        </div>
                    </div>
                    <div class="form-group row">
-                    <label class="col-sm-2 control-label">참조번호:</label>
+                    	<label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="number" name="refNumber" class="form-control">
+                            <input type="number" name="refNumber" class="form-control" value="<%= order.getRefNumber() %>">
                         </div>
-                    <label class="col-sm-2 control-label">품목:</label>
+                    	<label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
-                       	<input type="text" name="item" class="form-control">
+                       		<input type="text" name="item" class="form-control" value="<%= order.getItem() %>">
                        </div>
                 </div>
                 <div class="form-group row">
@@ -213,7 +221,7 @@
 	</div>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">화물등록 상세(출발지 등록)</div>
+            <div class="panel-heading">화물수정 상세(출발지 수정)</div>
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
@@ -239,23 +247,23 @@
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">
                             <select name="departureCities" class="form-control" required>
-                                <option value="서울특별시">서울특별시</option>
-                                <option value="경기도">경기도</option>
-                                <option value="인천광역시">인천광역시</option>
-                                <option value="부산광역시">부산광역시</option>
-                                <option value="대전광역시">대전광역시</option>
-                                <option value="광주광역시">광주광역시</option>
-                                <option value="대구광역시">대구광역시</option>
-                                <option value="울산광역시">울산광역시</option>
-                                <option value="충청북도">충청북도</option>
-                                <option value="충청남도">충청남도</option>
-                                <option value="경상북도">경상북도</option>
-                                <option value="경상남도">경상남도</option>
-                                <option value="전라북도">전라북도</option>
-                                <option value="전라남도">전라남도</option>
-                                <option value="강원도">강원도</option>
-                                <option value="제주도">제주도</option>
-                                <option value="세종특별자치시">세종특별자치시</option>
+                                <option value="서울특별시" <%= "서울특별시".equals(order.getDepartureCities()) ? "selected" : "" %>>서울특별시</option>
+                                <option value="경기도" <%= "경기도".equals(order.getDepartureCities()) ? "selected" : "" %>>경기도</option>
+                                <option value="인천광역시" <%= "인천광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>인천광역시</option>
+                                <option value="부산광역시" <%= "부산광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>부산광역시</option>
+                                <option value="대전광역시" <%= "대전광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>대전광역시</option>
+                                <option value="광주광역시" <%= "광주광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>광주광역시</option>
+                                <option value="대구광역시" <%= "대구광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>대구광역시</option>
+                                <option value="울산광역시" <%= "울산광역시".equals(order.getDepartureCities()) ? "selected" : "" %>>울산광역시</option>
+                                <option value="충청북도" <%= "충청북도".equals(order.getDepartureCities()) ? "selected" : "" %>>충청북도</option>
+                                <option value="충청남도" <%= "충청남도".equals(order.getDepartureCities()) ? "selected" : "" %>>충청남도</option>
+                                <option value="경상북도" <%= "경상북도".equals(order.getDepartureCities()) ? "selected" : "" %>>경상북도</option>
+                                <option value="경상남도" <%= "경상남도".equals(order.getDepartureCities()) ? "selected" : "" %>>경상남도</option>
+                                <option value="전라북도" <%= "전라북도".equals(order.getDepartureCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="전라남도" <%= "전라남도".equals(order.getDepartureCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="강원도" <%= "강원도".equals(order.getDepartureCities()) ? "selected" : "" %>>강원도</option>
+                                <option value="제주도" <%= "제주도".equals(order.getDepartureCities()) ? "selected" : "" %>>제주도</option>
+                                <option value="세종특별자치시" <%= "세종특별자치시".equals(order.getDepartureCities()) ? "selected" : "" %>>세종특별자치시</option>
                             </select>
                         </div>
                     </div>
@@ -286,7 +294,7 @@
 	</div>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">화물등록 상세(도착지 등록)</div>
+            <div class="panel-heading">화물수정 상세(도착지 수정)</div>
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 도착지 도착일시:</a></label>
@@ -301,7 +309,7 @@
                             	<%
 		                        	for( int i = 0; i < userList.size(); i++ ) {
 		                        %>
-                                <option><%= userList.get(i).getUserName() %></option>
+                                <option <%= userList.get(i).equals(order.getUserName()) ? "selected" : "" %>><%= userList.get(i).getUserName() %></option>
                                 <%
 		                        	}
                                 %>
@@ -312,23 +320,23 @@
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">
                             <select name="arrivalCities" class="form-control" required>
-                                <option value="서울특별시">서울특별시</option>
-                                <option value="경기도">경기도</option>
-                                <option value="인천광역시">인천광역시</option>
-                                <option value="부산광역시">부산광역시</option>
-                                <option value="대전광역시">대전광역시</option>
-                                <option value="광주광역시">광주광역시</option>
-                                <option value="대구광역시">대구광역시</option>
-                                <option value="울산광역시">울산광역시</option>
-                                <option value="충청북도">충청북도</option>
-                                <option value="충청남도">충청남도</option>
-                                <option value="경상북도">경상북도</option>
-                                <option value="경상남도">경상남도</option>
-                                <option value="전라북도">전라북도</option>
-                                <option value="전라남도">전라남도</option>
-                                <option value="강원도">강원도</option>
-                                <option value="제주도">제주도</option>
-                                <option value="세종특별자치시">세종특별자치시</option>
+                                <option value="서울특별시" <%= "서울특별시".equals(order.getArrivalCities()) ? "selected" : "" %>>서울특별시</option>
+                                <option value="경기도" <%= "경기도".equals(order.getArrivalCities()) ? "selected" : "" %>>경기도</option>
+                                <option value="인천광역시" <%= "인천광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>인천광역시</option>
+                                <option value="부산광역시" <%= "부산광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>부산광역시</option>
+                                <option value="대전광역시" <%= "대전광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>대전광역시</option>
+                                <option value="광주광역시" <%= "광주광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>광주광역시</option>
+                                <option value="대구광역시" <%= "대구광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>대구광역시</option>
+                                <option value="울산광역시" <%= "울산광역시".equals(order.getArrivalCities()) ? "selected" : "" %>>울산광역시</option>
+                                <option value="충청북도" <%= "충청북도".equals(order.getArrivalCities()) ? "selected" : "" %>>충청북도</option>
+                                <option value="충청남도" <%= "충청남도".equals(order.getArrivalCities()) ? "selected" : "" %>>충청남도</option>
+                                <option value="경상북도" <%= "경상북도".equals(order.getArrivalCities()) ? "selected" : "" %>>경상북도</option>
+                                <option value="경상남도" <%= "경상남도".equals(order.getArrivalCities()) ? "selected" : "" %>>경상남도</option>
+                                <option value="전라북도" <%= "전라북도".equals(order.getArrivalCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="전라남도" <%= "전라남도".equals(order.getArrivalCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="강원도" <%= "강원도".equals(order.getArrivalCities()) ? "selected" : "" %>>강원도</option>
+                                <option value="제주도" <%= "제주도".equals(order.getArrivalCities()) ? "selected" : "" %>>제주도</option>
+                                <option value="세종특별자치시" <%= "세종특별자치시".equals(order.getArrivalCities()) ? "selected" : "" %>>세종특별자치시</option>
                             </select>
                         </div>
                     </div>
@@ -359,7 +367,7 @@
 	</div>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">옵션</div>
+            <div class="panel-heading">옵션 수정</div>
             <div class="panel-body">
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">이착지 주소:</label>
@@ -372,6 +380,41 @@
 		                    왕복 : <input type="checkbox" name="option3" value="왕복">
 		                    착불 : <input type="checkbox" name="option4" value="착불">
 	                    </div>
+	            </div>
+            </div>
+        </div>
+	</div>
+	<%	
+		UserDAO userDAO2 = new UserDAO();
+		System.out.println(userID + "이거 왜아노대 ㅡㅡ");
+		User userType = userDAO2.getAdminUser(userID);
+		System.out.println(userType + "이거 왜아노대 ㅡㅡ2222");
+	%>
+	<div class="container" <%= "admin".equals( userType ) ? "" : "style='display:none;'" %>>
+        <div class="panel panel-primary">
+            <div class="panel-heading">차량정보</div>
+            <div class="panel-body">
+	            <div class="form-group row">
+                	<label class="col-sm-2 control-label">차량번호: </label>
+	                	<div class="col-sm-3">
+		                    <input type="text" name="carNumber" class="form-control">          	
+	                	</div>
+	                <label class="col-sm-2 control-label">기사명: </label>
+	                	<div class="col-sm-3">
+		                    <input type="text" name="driverName" class="form-control">            	
+	                	</div>
+	                <label class="col-sm-2 control-label">기사연락처: </label>
+	                	<div class="col-sm-3">
+		                    <input type="text" name="carNumber" class="form-control">            	
+	                	</div>
+	                <label class="col-sm-2 control-label">기본운임: </label>
+	                	<div class="col-sm-3">
+		                    <input type="text" name="basicFare" class="form-control">            	
+	                	</div>
+	                <label class="col-sm-2 control-label">추가운임: </label>
+	                	<div class="col-sm-3">
+		                    <input type="text" name="addFare" class="form-control">            	
+	                	</div>
 	            </div>
             </div>
         </div>

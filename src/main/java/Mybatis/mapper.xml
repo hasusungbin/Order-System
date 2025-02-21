@@ -72,7 +72,7 @@
 		<if test="startDate != null and endDate != null">
 			AND orderDate BETWEEN #{startDate} AND #{endDate}
 		</if>
-        <if test="refNumber != null">
+        <if test="refNumber != 0">
             AND refNumber = #{refNumber}
         </if>
         <if test="userName != null and userName != ''">
@@ -92,7 +92,7 @@
         </if>
     </select>
 	
-	<select id="getAllOrders" resultType="inserOrder.Order">
+	<select id="getAllOrders" resultType="insertOrder.Order">
     SELECT * FROM cargoorder
     WHERE 1=1
     <if test="refNumber != null">
@@ -115,6 +115,52 @@
     </if>
     ORDER BY orderID DESC
     LIMIT #{pageSize} OFFSET #{offset}
-</select>
+	</select>
+	
+	<select id="getOrderById" resultType="insertOrder.Order">
+        SELECT * FROM cargoorder WHERE orderNumber = #{orderNumber}
+    </select>
+	
+	<update id="updateOrder">
+        UPDATE cargoorder
+        <set>
+			<if test="kindOfCar != null"> kindOfCar = #{kindOfCar}, </if>
+			userName = #{userName},
+			<if test="orderDate != null"> orderDate = #{orderDate}, </if>
+			<if test="carWeight != null"> carWeight = #{carWeight}, </if>
+			<if test="refNumber != 0"> refNumber = #{refNumber}, </if>
+			<if test="userPhoneNumber != null"> userPhoneNumber = #{userPhoneNumber}, </if>
+			<if test="fixedCarNumber != null"> fixedCarNumber = #{fixedCarNumber}, </if>
+			upDown = #{upDown},
+			<if test="item != null"> item = #{item}, </if>
+			<if test="etc != null"> etc = #{etc}, </if>
+			startDate = #{startDate},
+			endDate = #{endDate},
+			departureName = #{departureName},
+			arrivalName = #{arrivalName},
+			departureCities = #{departureCities},
+			arrivalCities = #{arrivalCities},
+			departureTown = #{departureTown},
+			arrivalTown = #{arrivalTown},
+			<if test="departureDetailedAddress != null"> departureDetailedAddress = #{departureDetailedAddress}, </if>
+			<if test="arrivalDetailedAddress != null"> arrivalDetailedAddress = #{arrivalDetailedAddress}, </if>
+			<if test="departureManager != null"> departureManager = #{departureManager}, </if>
+			<if test="arrivalManager != null"> arrivalManager = #{arrivalManager}, </if>
+			<if test="departureManagerPhoneNum != null"> departureManagerPhoneNum = #{departureManagerPhoneNum}, </if>
+			<if test="arrivalManagerPhoneNum != null"> arrivalManagerPhoneNum = #{arrivalManagerPhoneNum}, </if>
+			<if test="carNumber != null"> carNumber = #{carNumber}, </if>
+			<if test="driverName != null"> driverName = #{driverName}, </if>
+			<if test="driverPhoneNum != null"> driverPhoneNum = #{driverPhoneNum}, </if>
+			<if test="basicFare != null"> basicFare = #{basicFare}, </if>
+			<if test="addFare != null"> addFare = #{addFare}, </if>
+			<if test="option1 != null"> option1 = #{option1}, </if>
+			<if test="option2 != null"> option2 = #{option2}, </if>
+			<if test="option3 != null"> option3 = #{option3}, </if>
+			<if test="option4 != null"> option4 = #{option4}, </if>
+			<if test="destinationAddress != null"> destinationAddress = #{destinationAddress} </if>
+		</set>
+        WHERE orderNumber = #{orderNumber}
+    </update>
+
 	
 </mapper>

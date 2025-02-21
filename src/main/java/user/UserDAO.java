@@ -58,11 +58,56 @@ public class UserDAO {
 				user.setUserEmail( rs.getString(5) );
 				user.setUserType( rs.getString(6) );
 				user.setUserPhoneNumber( rs.getString(7) );
+				user.setUserCompany( rs.getString(7) );
 				userList.add( user );
 			}
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
 		return userList;
+	}
+	
+	public ArrayList<User> getAdminUserList() {
+		String SQL = "SELECT * FROM USER WHERE userType = 'admin'";
+		ArrayList<User> userList = new ArrayList<User>();
+		try {
+			pstmt = conn.prepareStatement( SQL );
+			rs = pstmt.executeQuery();
+			while( rs.next() ) {
+				User user = new User();
+				user.setUserID( rs.getString(1) );
+				user.setUserPassword( rs.getString(2) );
+				user.setUserName( rs.getString(3) );
+				user.setUserGendder( rs.getString(4) );
+				user.setUserEmail( rs.getString(5) );
+				user.setUserType( rs.getString(6) );
+				user.setUserPhoneNumber( rs.getString(7) );
+				user.setUserCompany( rs.getString(7) );
+				userList.add( user );
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		return userList;
+	}
+	
+	public User getAdminUser(String userID) {
+	    User user = null;
+	    try {
+	        String SQL = "SELECT userID, userPassword, userType FROM user WHERE userID = ?";
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, userID);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            user = new User();
+	            user.setUserID(rs.getString("userID"));
+	            user.setUserPassword(rs.getString("userPassword"));
+	            user.setUserType(rs.getString("userType"));  // userType 저장
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return user;
 	}
 }

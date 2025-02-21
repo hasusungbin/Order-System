@@ -9,6 +9,7 @@ public class User {
 	private String userEmail;
 	private String userType;
 	private String userPhoneNumber;
+	private String userCompany;
 	
 	public User() {
 	}
@@ -53,5 +54,11 @@ public class User {
 	}
 	public void setUserPhoneNumber(String userPhoneNumber) {
 		this.userPhoneNumber = userPhoneNumber;
+	}
+	public String getUserCompany() {
+		return userCompany;
+	}
+	public void setUserCompany(String userCompany) {
+		this.userCompany = userCompany;
 	}
 }

@@ -6,6 +6,7 @@
 <jsp:useBean id="user" class="user.User" scope="page" />
 <jsp:setProperty name="user" property="userID" />
 <jsp:setProperty name="user" property="userPassword" />
+<jsp:setProperty name="user" property="userType" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,18 +19,12 @@
 		if( session.getAttribute("userID" ) != null) {
 			userID = (String) session.getAttribute("userID");
 		}
-/* 		if( userID != null ) {
-			PrintWriter script = response.getWriter();
-			script.println( "<script>" );
-			script.println( "alert('이미 로그인이 되어있습니다.') ;" );
-			script.println( "location.href = 'main.jsp'" );
-			script.println( "</script>" );
-		} */
-		
+		System.out.println("userType 값 확인: " + user.getUserType());
 		UserDAO userDAO = new UserDAO();
 		int result = userDAO.login(user.getUserID(), user.getUserPassword());
 		if ( result == 1 ) {
 			session.setAttribute( "userID", user.getUserID() );
+			session.setAttribute( "userType", user.getUserType() );
 			PrintWriter script = response.getWriter();
 			script.println( "<script>" );
 			script.println( "location.href = 'main.jsp'" );

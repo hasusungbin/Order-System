@@ -27,6 +27,13 @@
 <jsp:setProperty name="order" property="arrivalManager" />
 <jsp:setProperty name="order" property="departureManagerPhoneNum" />
 <jsp:setProperty name="order" property="arrivalManagerPhoneNum" />
+<jsp:setProperty name="order" property="orderID" />
+<jsp:setProperty name="order" property="carNumber" />
+<jsp:setProperty name="order" property="driverName" />
+<jsp:setProperty name="order" property="driverPhoneNum" />
+<jsp:setProperty name="order" property="basicFare" />
+<jsp:setProperty name="order" property="addFare" />
+<jsp:setProperty name="order" property="regDate" />
 <jsp:setProperty name="order" property="option1" />
 <jsp:setProperty name="order" property="option2" />
 <jsp:setProperty name="order" property="option3" />
@@ -34,7 +41,6 @@
 <jsp:setProperty name="order" property="destinationAddress" />
 
 
-<jsp:useBean id="carInfo" class="carInfo.carInfo" scope="page" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -62,26 +68,26 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
-				int result = orderDAO.writeOrder( order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
+				int result = orderDAO.updateOrder( order.getOrderNumber(), order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
-													order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
+													order.getCarNumber(), order.getDriverName(), order.getDriverPhoneNum(), order.getBasicFare(), order.getAddFare(), order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
 				if( result == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
-					script.println( "alert('오더 작성을 실패했습니다.');" );
+					script.println( "alert('오더 수정을 실패했습니다.');" );
 					script.println( "history.back()" ); 
 					script.println( "</script>" );
 				} else if ( result == -2 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
-					script.println( "alert('오더 작성에 필요한 데이터가 빠져있습니다. 다시 작성해주세요.');" );
-					script.println( "location.href = 'main.jsp'" );
+					script.println( "alert('오더 수정 및 작성에 필요한 데이터가 빠져있습니다. 다시 작성해주세요.');" );
+					script.println( "location.href = 'orderupdate.jsp'" );
 					script.println( "</script>" );
 				} else {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
-					script.println( "alert('오더 작성을 완료했습니다.');" );
+					script.println( "alert('오더 수정을 완료했습니다.');" );
 					script.println( "location.href = 'main.jsp'" );
 					script.println( "</script>" );
 				}

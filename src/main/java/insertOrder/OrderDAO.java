@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,9 +134,9 @@ public class OrderDAO {
 	
 	public int writeOrder( String kindOfCar, String userName, String orderDate, String carWeight, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
 							String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, 
-							String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum ) {
-		String SQL = "INSERT INTO cargoorder(orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID ) "
-				+ "VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+							String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum, String option1, String option2, String option3, String option4, String destinationAddress ) {
+		String SQL = "INSERT INTO cargoorder(orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID, option1, option2, option3, option4, destinationAddress ) "
+				+ "VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
 		java.util.Date sqlOrderDate = null;
@@ -191,6 +192,11 @@ public class OrderDAO {
 			pstmt.setString( 23, departureManagerPhoneNum );
 			pstmt.setString( 24, arrivalManagerPhoneNum );
 			pstmt.setInt( 25, getNext() );
+			pstmt.setString( 26, option1);
+			pstmt.setString( 27, option2);
+			pstmt.setString( 28, option3);
+			pstmt.setString( 29, option4);
+			pstmt.setString( 30, destinationAddress );
 			int resultRows = pstmt.executeUpdate();
 
 			return resultRows;
@@ -245,14 +251,68 @@ public class OrderDAO {
         	params.put("startDate", startDate);
             params.put("endDate", endDate);
             params.put("refNumber", refNumber);
-            params.put("managerName", userName);
+            params.put("userName", userName);
             params.put("departureName", departureName);
             params.put("arrivalName", arrivalName);
-            params.put("arrivalCity", arrivalCities);
+            params.put("arrivalCities", arrivalCities);
             params.put("orderNumber", orderNumber);
 
             return session.selectOne("insertOrder.OrderDAO.getTotalCount", params);
         	
+        }
+    }
+	
+	public Order getOrderById( String orderNumber ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            return session.selectOne("insertOrder.OrderDAO.getOrderById", orderNumber);
+        }
+    }
+	
+	public int updateOrder(String orderNumber, String kindOfCar, String userName, String orderDate, String carWeight, Integer refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
+			String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, 
+			String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum, String carNumber, String driverName, String driverPhoneNum,
+			int basicFare, int addFare, String option1, String option2, String option3, String option4, String destinationAddress) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("orderNumber", orderNumber);
+            params.put("kindOfCar", kindOfCar);
+            params.put("userName", userName);
+            params.put("orderDate", orderDate);
+            params.put("carWeight", carWeight);
+            params.put("refNumber", refNumber);
+            params.put("userPhoneNumber", userPhoneNumber);
+            params.put("fixedCarNumber", fixedCarNumber);
+            params.put("upDown", upDown);
+            params.put("item", item);
+            params.put("etc", etc);
+            params.put("startDate", startDate);
+            params.put("endDate", endDate);
+            params.put("departureName", departureName);
+            params.put("arrivalName", arrivalName);
+            params.put("departureCities", departureCities);
+            params.put("arrivalCities", arrivalCities);
+            params.put("departureTown", departureTown);
+            params.put("arrivalTown", arrivalTown);
+            params.put("departureDetailedAddress", departureDetailedAddress);
+            params.put("arrivalDetailedAddress", arrivalDetailedAddress);
+            params.put("departureManager", departureManager);
+            params.put("arrivalManager", arrivalManager);
+            params.put("departureManagerPhoneNum", departureManagerPhoneNum);
+            params.put("arrivalManagerPhoneNum", arrivalManagerPhoneNum);
+            params.put("carNumber", carNumber);
+            params.put("driverName", driverName);
+            params.put("driverPhoneNum", driverPhoneNum);
+            params.put("basicFare", basicFare);
+            params.put("addFare", addFare);
+            params.put("option1", option1);
+            params.put("option2", option2);
+            params.put("option3", option3);
+            params.put("option4", option4);
+            params.put("destinationAddress", destinationAddress);
+
+           int result = session.update("insertOrder.OrderDAO.updateOrder", params);
+            session.commit();
+            return (result > 0) ? 1 : -1;
         }
     }
 }
