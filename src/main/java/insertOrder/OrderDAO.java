@@ -7,10 +7,11 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -19,8 +20,10 @@ public class OrderDAO {
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
+	private HttpSession session;
 	
-	public OrderDAO() {
+	public OrderDAO(HttpSession session) {
+		this.session = session;
 		try {
 			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
 			String dbID = "root";
@@ -132,11 +135,12 @@ public class OrderDAO {
 		return -1; // 데이터베이스 오류
 	}
 	
-	public int writeOrder( String kindOfCar, String userName, String orderDate, String carWeight, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
+	public int writeOrder( String userID, String kindOfCar, String userName, String orderDate, String carWeight, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
 							String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, 
 							String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum, String option1, String option2, String option3, String option4, String destinationAddress ) {
-		String SQL = "INSERT INTO cargoorder(orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID, option1, option2, option3, option4, destinationAddress ) "
-				+ "VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String insertSQL = "INSERT INTO cargoorder(orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID, option1, option2, option3, option4, destinationAddress, userCompany) "
+                + "VALUES(NOW()+1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String getCompanyIDSQL = "SELECT userCompany FROM user WHERE userID = ?";
 		
 		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
 		java.util.Date sqlOrderDate = null;
@@ -166,7 +170,22 @@ public class OrderDAO {
 		try {
 			if( kindOfCar == null || userName == null || orderDate == null || carWeight == null || startDate == null || endDate == null || departureCities == null 
 				|| arrivalCities == null || departureTown == null || arrivalTown == null ) return -2;
-			PreparedStatement pstmt = conn.prepareStatement( SQL );
+			
+			// userID를 기반으로 userCompany 조회
+	        PreparedStatement pstmtCompany = conn.prepareStatement(getCompanyIDSQL);
+	        pstmtCompany.setString(1, userID);
+	        ResultSet rs = pstmtCompany.executeQuery();
+	        String userCompany = null;
+	        if (rs.next()) {
+	        	userCompany = rs.getString("userCompany");
+	        }
+	        rs.close();
+	        pstmtCompany.close();
+
+	        if ( userCompany == null ) {
+	            return -3; // company_id가 존재하지 않으면 오류 처리
+	        }
+			PreparedStatement pstmt = conn.prepareStatement( insertSQL );
 			pstmt.setString( 1, kindOfCar );
 			pstmt.setString( 2, userName );
 			pstmt.setDate( 3, resultOrderDate );
@@ -197,6 +216,7 @@ public class OrderDAO {
 			pstmt.setString( 28, option3);
 			pstmt.setString( 29, option4);
 			pstmt.setString( 30, destinationAddress );
+			pstmt.setString( 31, userCompany );
 			int resultRows = pstmt.executeUpdate();
 
 			return resultRows;
@@ -230,6 +250,7 @@ public class OrderDAO {
 		 try (SqlSession session = MybatisUtil.getSession()) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
+	            
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
 	            params.put("startDate", startDate);
@@ -240,6 +261,8 @@ public class OrderDAO {
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
+	            params.put("userType", getUserType());
+	            System.out.println(getUserType() + "유저타입");
 
 	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
 	        }
@@ -256,6 +279,7 @@ public class OrderDAO {
             params.put("arrivalName", arrivalName);
             params.put("arrivalCities", arrivalCities);
             params.put("orderNumber", orderNumber);
+            params.put("userType", getUserType());
 
             return session.selectOne("insertOrder.OrderDAO.getTotalCount", params);
         	
@@ -313,6 +337,17 @@ public class OrderDAO {
            int result = session.update("insertOrder.OrderDAO.updateOrder", params);
             session.commit();
             return (result > 0) ? 1 : -1;
+        }
+    }
+	
+	private String getUserID() {
+		return (String) session.getAttribute("userID");
+    }
+	
+	private String getUserType() {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            String userID = getUserID();
+            return session.selectOne("insertOrder.OrderDAO.getUserType", userID);
         }
     }
 }

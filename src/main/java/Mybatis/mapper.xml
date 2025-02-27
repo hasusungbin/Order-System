@@ -5,31 +5,33 @@
 <mapper namespace="insertOrder.OrderDAO">
   <select id="getSearchList" resultType="insertOrder.Order">
         SELECT * FROM cargoorder
-        <where>
-            <if test="startDate != null and endDate != null">
-                AND orderDate BETWEEN #{startDate} AND #{endDate}
-            </if>
-            <if test="refNumber != 0">
-                AND refNumber = #{refNumber}
-            </if>
-            <if test="userName != null and userName != ''">
-                AND userName = #{userName}
-            </if>
-            <if test="departureName != null and departureName != ''">
-                AND departureName = #{departureName}
-            </if>
-            <if test="arrivalName != null and arrivalName != ''">
-                AND arrivalName = #{arrivalName}
-            </if>
-            <if test="arrivalCities != null and arrivalCities != ''">
-                AND arrivalCities = #{arrivalCities}
-            </if>
-            <if test="orderNumber != null and orderNumber != ''">
-                AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
-            </if>
-        </where>
-		ORDER BY orderID DESC LIMIT #{pageSize} OFFSET #{pageNumber}
+        WHERE 1=1
+		<if test="startDate != null and endDate != null">
+			AND orderDate BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="refNumber != null">
+            AND refNumber = #{refNumber}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND userName LIKE CONCAT('%', #{userName}, '%')
+        </if>
+        <if test="departureName != null and departureName != ''">
+            AND departureName LIKE CONCAT('%', #{departureName}, '%')
+        </if>
+        <if test="arrivalName != null and arrivalName != ''">
+            AND arrivalName LIKE CONCAT('%', #{arrivalName}, '%')
+        </if>
+        <if test="arrivalCities != null and arrivalCities != ''">
+            AND arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%')
+        </if>
+        <if test="orderNumber != null and orderNumber != ''">
+            AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
+        </if>
+        ORDER BY orderID DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
+	
+	
 	<select id="getAllList" resultType="insertOrder.Order">
 		SELECT * FROM cargoorder
 		ORDER BY orderID DESC
@@ -61,6 +63,12 @@
         <if test="orderNumber != null and orderNumber != ''">
             AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
         </if>
+		<if test="userType == 'sales'">
+			AND userName = #{userName}  <!-- 본인이 작성한 오더만 -->
+		</if>
+		<if test="userType == 'manager'">
+			AND userCompany = (SELECT userCompany FROM user WHERE userName = #{userName})  <!-- 같은 회사의 오더만 -->
+		</if>
         ORDER BY orderID DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
@@ -90,6 +98,12 @@
         <if test="orderNumber != null and orderNumber != ''">
             AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
         </if>
+		<if test="userType == 'sales'">
+			AND userName = #{userName}  <!-- 본인이 작성한 오더만 -->
+		</if>
+		<if test="userType == 'manager'">
+			AND userCompany = (SELECT userCompany FROM user WHERE userName = #{userName})  <!-- 같은 회사의 오더만 -->
+		</if>
     </select>
 	
 	<select id="getAllOrders" resultType="insertOrder.Order">
@@ -162,5 +176,11 @@
         WHERE orderNumber = #{orderNumber}
     </update>
 
+	<select id="getUserID" resultType="string">
+		SELECT userID FROM user WHERE userID = #{userID}
+	</select>
 	
+	<select id="getUserType" parameterType="string" resultType="string">
+		SELECT userType FROM user WHERE userID = #{userID}
+	</select>
 </mapper>

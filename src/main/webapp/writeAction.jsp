@@ -32,9 +32,10 @@
 <jsp:setProperty name="order" property="option3" />
 <jsp:setProperty name="order" property="option4" />
 <jsp:setProperty name="order" property="destinationAddress" />
+<%-- <jsp:useBean id="user" class="user.User" scope="page" />
+<jsp:setProperty name="user" property="userID" /> --%>
 
 
-<jsp:useBean id="carInfo" class="carInfo.carInfo" scope="page" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -62,7 +63,7 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
-				int result = orderDAO.writeOrder( order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
+				int result = orderDAO.writeOrder( userID, order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
 													order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );

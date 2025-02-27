@@ -386,11 +386,9 @@
 	</div>
 	<%	
 		UserDAO userDAO2 = new UserDAO();
-		System.out.println(userID + "이거 왜아노대 ㅡㅡ");
 		User userType = userDAO2.getAdminUser(userID);
-		System.out.println(userType + "이거 왜아노대 ㅡㅡ2222");
 	%>
-	<div class="container" <%= "admin".equals( userType ) ? "" : "style='display:none;'" %>>
+	<div class="container" <%= "admin".equals( userType.getUserType() ) ? "" : "style='display:none;'" %>>
         <div class="panel panel-primary">
             <div class="panel-heading">차량정보</div>
             <div class="panel-body">

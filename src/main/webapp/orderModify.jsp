@@ -59,7 +59,7 @@
 	    }
 	    
 	    int totalCount = orderDAO.getTotalCount( startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
-	    int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+	    int totalPages = (int) Math.ceil((double) totalCount / pageSize); 
 		
 	    List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
 	%>
@@ -231,6 +231,18 @@
                 </form>
             </div>
         </div>
+        <%
+		    boolean hasSearchData = (startDate != null && !startDate.isEmpty()) || 
+		                            (endDate != null && !endDate.isEmpty()) || 
+		                            (refNumberStr != null && !refNumberStr.isEmpty()) || 
+		                            (userName != null && !userName.isEmpty()) || 
+		                            (departureName != null && !departureName.isEmpty()) || 
+		                            (arrivalName != null && !arrivalName.isEmpty()) || 
+		                            (arrivalCities != null && !arrivalCities.isEmpty()) || 
+		                            (orderNumber != null && !orderNumber.isEmpty());
+		
+		    boolean showResults = hasSearchData && (orderList != null && !orderList.isEmpty());
+		%>
         <div class="panel panel-default">
             <div class="panel-heading">조회 결과
 	            <div class="text-right">
@@ -238,6 +250,7 @@
 	            </div>
             </div>
             <div class="panel-body">
+            	<% if (showResults) { %> <!-- 조회 조건이 있을 때만 테이블 표시 -->
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr style="font-size: 10px;">
@@ -260,34 +273,31 @@
                         </tr>
                     </thead>
                     <tbody>
-	                <%
-	                	for( int i = 0; i < orderList.size(); i++ ) {
-	                %>
-                        <tr style="font-size:10px;">
-                           	<td><input type="checkbox"></td>
-                            <td>
-                            	<a href="orderUpdate.jsp?orderNumber=<%= orderList.get(i).getOrderNumber() %>" class="order-link"><%= orderList.get(i).getOrderNumber() %></a>
-                            </td>
-                            <td><%= orderList.get(i).getOrderDate() %></td>
-                            <td><%= orderList.get(i).getRefNumber() %></td>
-                            <td><%= orderList.get(i).getDepartureName() %></td>
-                            <td><%= orderList.get(i).getDepartureCities() + " " + orderList.get(i).getDepartureTown() %></td>
-                            <td><%= orderList.get(i).getArrivalName() %></td>
-                            <td><%= orderList.get(i).getArrivalCities() + " " + orderList.get(i).getArrivalTown() %></td>
-                            <td><%= orderList.get(i).getCarWeight() %></td>
-                            <td><%= orderList.get(i).getKindOfCar() %></td>
-                            <td><% out.print( orderList.get(i).getCarNumber() == null ? "" : orderList.get(i).getCarNumber() ); %></td>
-                            <td><% out.print( orderList.get(i).getDriverName() == null ? "" : orderList.get(i).getDriverName() ); %></td>
-	                        <td><% out.print( orderList.get(i).getDriverPhoneNum() == null ? "" : orderList.get(i).getDriverPhoneNum() ); %></td>
-	                        <td><%= orderList.get(i).getBasicFare() + orderList.get(i).getAddFare() %></td>
-                            <td><%= orderList.get(i).getUserName() %></td>
-                            <td><%= orderList.get(i).getRegDate() %></td>
-                        </tr>
-	                <%
-	                	}
-	                %>
-                    </tbody>
+			            <% for (Order order : orderList) { %>
+			                <tr style="font-size:10px;">
+			                    <td><input type="checkbox"></td>
+			                    <td><a href="orderUpdate.jsp?orderNumber=<%= order.getOrderNumber() %>"><%= order.getOrderNumber() %></a></td>
+			                    <td><%= order.getOrderDate() %></td>
+			                    <td><%= order.getRefNumber() %></td>
+			                    <td><%= order.getDepartureName() %></td>
+			                    <td><%= order.getDepartureCities() + " " + order.getDepartureTown() %></td>
+			                    <td><%= order.getArrivalName() %></td>
+			                    <td><%= order.getArrivalCities() + " " + order.getArrivalTown() %></td>
+			                    <td><%= order.getCarWeight() %></td>
+			                    <td><%= order.getKindOfCar() %></td>
+			                    <td><%= order.getCarNumber() != null ? order.getCarNumber() : "" %></td>
+			                    <td><%= order.getDriverName() != null ? order.getDriverName() : "" %></td>
+			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
+			                    <td><%= order.getBasicFare() + order.getAddFare() %></td>
+			                    <td><%= order.getUserName() %></td>
+			                    <td><%= order.getRegDate() %></td>
+			                </tr>
+			            <% } %>
+           			</tbody>
                 </table>
+                <% } else { %>
+        			<p class="text-center">검색 결과가 없습니다.</p>
+        		<% } %>
                 <div class="text-center">
 	                <% if (pageNumber > 1) { %>
 	    				<a href="orderModify.jsp?pageNumber=<%= pageNumber - 1 %>" class="btn btn-success btn-arraw-left">이전</a>
