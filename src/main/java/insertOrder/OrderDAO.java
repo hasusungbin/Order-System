@@ -22,8 +22,7 @@ public class OrderDAO {
 	private ResultSet rs;
 	private HttpSession session;
 	
-	public OrderDAO(HttpSession session) {
-		this.session = session;
+	public OrderDAO() {
 		try {
 			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
 			String dbID = "root";
@@ -34,6 +33,10 @@ public class OrderDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setSession(HttpSession session) {
+        this.session = session;
+    }
 	
 	public List<Order> getAllList() {
         try (SqlSession session = MybatisUtil.getSession()) {
@@ -228,7 +231,6 @@ public class OrderDAO {
 	
 	public List<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
 		int pageSize = 10;
-		System.out.println(pageNumber);
 		try (SqlSession session = MybatisUtil.getSession()) {
 			Map<String, Object> params = new HashMap<>();
             params.put("startDate", startDate);
@@ -256,13 +258,32 @@ public class OrderDAO {
 	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
 	            params.put("refNumber", refNumber);
-	            params.put("managerName", userName);
+	            params.put("userName", userName);
 	            params.put("departureName", departureName);
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
-	            params.put("userType", getUserType());
-	            System.out.println(getUserType() + "유저타입");
+
+	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
+	        }
+	}
+	
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType) {
+		 try (SqlSession session = MybatisUtil.getSession()) {
+			 Map<String, Object> params = new HashMap<>();
+	            int offset = (pageNumber - 1) * pageSize;
+	            
+	            params.put("offset", offset);
+	            params.put("pageSize", pageSize);
+	            params.put("startDate", startDate);
+	            params.put("endDate", endDate);
+	            params.put("refNumber", refNumber);
+	            params.put("userName", userName);
+	            params.put("departureName", departureName);
+	            params.put("arrivalName", arrivalName);
+	            params.put("arrivalCity", arrivalCities);
+	            params.put("orderNumber", orderNumber);
+	            params.put("userType", userType);
 
 	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
 	        }
@@ -341,14 +362,34 @@ public class OrderDAO {
     }
 	
 	private String getUserID() {
-		return (String) session.getAttribute("userID");
+		if (session != null) {
+            return (String) session.getAttribute("userID");
+        }
+        return null; // 세션이 없으면 null 반환
     }
 	
-	private String getUserType() {
-        try (SqlSession session = MybatisUtil.getSession()) {
+	public String getUserType() {
+		try (SqlSession sqlSession = MybatisUtil.getSession()) {
             String userID = getUserID();
-            return session.selectOne("insertOrder.OrderDAO.getUserType", userID);
+            if (userID != null) {
+                return sqlSession.selectOne("insertOrder.OrderDAO.getUserType", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null; // 오류 발생 시 null 반환
+    }
+	
+	// 선택한 주문 삭제 메서드
+    public boolean deleteOrders(List<String> orderNumbers) {
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            int deletedRows = sqlSession.delete("insertOrder.OrderDAO.deleteOrders", orderNumbers);
+            sqlSession.commit(); // 삭제 반영
+            return deletedRows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false; 
     }
 }
 

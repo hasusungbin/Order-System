@@ -5,12 +5,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.apache.ibatis.session.SqlSession;
+
+import insertOrder.MybatisUtil;
 
 public class UserDAO {
 	
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
+    private HttpSession session;
 	
 	public UserDAO() {
 		try {
@@ -23,6 +31,11 @@ public class UserDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	// 세션 설정 메서드
+    public void setSession(HttpSession session) {
+        this.session = session;
+    }
 	
 	public int login( String userID, String userPassword ) {
 		String SQL = "SELECT userPassword FROM USER WHERE userID = ?";
@@ -91,6 +104,19 @@ public class UserDAO {
 		return userList;
 	}
 	
+	// 현재 로그인한 사용자의 userType 가져오기
+    public String getUserType() {
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            String userID = getUserID();
+            if (userID != null) {
+                return sqlSession.selectOne("UserDAO.getUserType", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+	
 	public User getAdminUser(String userID) {
 	    User user = null;
 	    try {
@@ -110,4 +136,52 @@ public class UserDAO {
 	    }
 	    return user;
 	}
+	
+	// 현재 로그인한 사용자의 userName 가져오기
+    public String getUserName() {
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            String userID = getUserID();
+            if (userID != null) {
+                return sqlSession.selectOne("UserDAO.getUserName", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 현재 로그인한 사용자의 userCompany 가져오기
+    public String getUserCompany() {
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            String userID = getUserID();
+            if (userID != null) {
+                return sqlSession.selectOne("UserDAO.getUserCompany", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 같은 userCompany에 속한 sales 유저 목록 가져오기 (manager 용)
+    public List<String> getSalesUsersInCompany() {
+        List<String> userList = new ArrayList<>();
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            String userCompany = getUserCompany();
+            if (userCompany != null) {
+                userList = sqlSession.selectList("UserDAO.getSalesUsersInCompany", userCompany);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userList;
+    }
+    
+ // 현재 로그인한 userID 가져오기
+    private String getUserID() {
+        if (session != null) {
+            return (String) session.getAttribute("userID");
+        }
+        return null;
+    }
 }

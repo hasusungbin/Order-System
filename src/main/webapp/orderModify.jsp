@@ -26,6 +26,42 @@
 <script>
 	search.btn();
 </script>
+<script>
+function deleteSelectedOrders() {
+    let selectedOrders = [];
+    
+    // 체크된 체크박스 가져오기
+    document.querySelectorAll('input[name="orderCheckbox"]:checked').forEach((checkbox) => {
+        selectedOrders.push(checkbox.value);
+    });
+
+    if (selectedOrders.length === 0) {
+        alert("삭제할 주문을 선택해주세요.");
+        return;
+    }
+
+    if (!confirm("선택한 주문을 삭제하시겠습니까?")) {
+        return;
+    }
+
+    // 폼 생성 후 POST 요청
+    let form = document.createElement("form");
+    form.method = "POST";
+    form.action = "deleteAction.jsp";
+
+    selectedOrders.forEach(orderNumber => {
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "orderNumbers";
+        input.value = orderNumber;
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+
 	<%
 		String userID = null;
 		if (session.getAttribute("userID") != null) {
@@ -33,6 +69,8 @@
 		}
 		
 		OrderDAO orderDAO = new OrderDAO();
+		orderDAO.setSession(session);
+		String userType = orderDAO.getUserType();
 		
 		String pageNumberStr = request.getParameter("pageNumber");
 	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
@@ -61,7 +99,7 @@
 	    int totalCount = orderDAO.getTotalCount( startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
 	    int totalPages = (int) Math.ceil((double) totalCount / pageSize); 
 		
-	    List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
+	    List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber, userType);
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -151,17 +189,37 @@
                             <input type="number" name="refNumber" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">담당자명:</label>
+                        <%
+	                        UserDAO userDAO = new UserDAO();
+	                    	userDAO.setSession(session);
+	                    	
+	                    	String userType2 = userDAO.getUserType();
+	                        String userName2 = userDAO.getUserName();
+	                        List<String> salesUserList = userDAO.getSalesUsersInCompany();
+	                        
+	                    	ArrayList<User> userList = userDAO.getUserList();
+                        %>
                         <div class="col-sm-3">
-                            <select name="userName" class="form-control">
+                            <select id="userName" name="userName"  class="form-control">
                                 <%
-	                                UserDAO userDAO = new UserDAO();
-		                        	ArrayList<User> userList = userDAO.getUserList();
-		                        	for( int i = 0; i < userList.size(); i++ ) {
-		                        %>
-                                	<option><%= userList.get(i).getUserName() %></option>
-                                <%
-		                        	}
-                                %>
+							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
+							    %>
+							        <option value="<%= userName2 %>"><%= userName2 %></option>
+							    <%
+							        } else if ("manager".equals(userType)) { // 같은 userCompany에 속한 sales 계정 선택 가능
+							            for (String salesUser : salesUserList) {
+							    %>
+							        <option value="<%= salesUser %>"><%= salesUser %></option>
+							    <%
+							            }
+							        } else if( "admin".equals(userType) ) {
+							        	for( int i = 0; i < userList.size(); i++ ) {
+							    %>
+							    	<option><%= userList.get(i).getUserName() %></option>
+							    <%
+							       		}
+							        }
+							    %>
                             </select>
                         </div>
                     </div>
@@ -246,7 +304,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">조회 결과
 	            <div class="text-right">
-					<button class="btn btn-danger">요청취소</button>
+					<button onclick="deleteSelectedOrders()" class="btn btn-danger">요청취소</button>
 	            </div>
             </div>
             <div class="panel-body">
@@ -275,7 +333,7 @@
                     <tbody>
 			            <% for (Order order : orderList) { %>
 			                <tr style="font-size:10px;">
-			                    <td><input type="checkbox"></td>
+			                    <td><input type="checkbox" name="orderCheckbox" value="<%= order.getOrderNumber() %>"></td>
 			                    <td><a href="orderUpdate.jsp?orderNumber=<%= order.getOrderNumber() %>"><%= order.getOrderNumber() %></a></td>
 			                    <td><%= order.getOrderDate() %></td>
 			                    <td><%= order.getRefNumber() %></td>

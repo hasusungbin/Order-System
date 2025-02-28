@@ -39,7 +39,6 @@ public class ExcelDownload extends HttpServlet {
         
         while (true) {
             List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
-            System.out.println("페이지 번호: " + pageNumber + ", 데이터 개수: " + orderList.size() + "startDate:" + startDate + "endDate: " + endDate);
             if (orderList.isEmpty()) {
                 break;  // 더 이상 가져올 데이터가 없으면 반복 종료
             }
@@ -93,7 +92,7 @@ public class ExcelDownload extends HttpServlet {
                 row.createCell( 11 ).setCellValue( order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" );
                 row.createCell( 12 ).setCellValue( order.getBasicFare() + order.getAddFare() == 0 ? 0 : order.getBasicFare() + order.getAddFare());
                 row.createCell( 13 ).setCellValue( order.getUserName() != null ? order.getUserName() : "" );
-                row.createCell( 14 ).setCellValue( order.getRegDate() );
+                row.createCell( 14 ).setCellValue( order.getRegDate().toString() );
             }
         }
 

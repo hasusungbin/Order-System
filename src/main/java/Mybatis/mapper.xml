@@ -183,4 +183,12 @@
 	<select id="getUserType" parameterType="string" resultType="string">
 		SELECT userType FROM user WHERE userID = #{userID}
 	</select>
+	
+	<!-- 주문 삭제 -->
+    <delete id="deleteOrders">
+        DELETE FROM cargoorder WHERE orderNumber IN 
+        <foreach item="orderNumber" collection="list" open="(" separator="," close=")">
+            #{orderNumber}
+        </foreach>
+    </delete>
 </mapper>

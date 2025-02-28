@@ -19,7 +19,6 @@
 		if( session.getAttribute("userID" ) != null) {
 			userID = (String) session.getAttribute("userID");
 		}
-		System.out.println("userType 값 확인: " + user.getUserType());
 		UserDAO userDAO = new UserDAO();
 		int result = userDAO.login(user.getUserID(), user.getUserPassword());
 		if ( result == 1 ) {

@@ -36,8 +36,11 @@
 		String userID = null;
 		if (session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
-			System.out.println(userID);
 		}
+		
+		OrderDAO orderDAO = new OrderDAO();
+		orderDAO.setSession(session);
+		String userType = orderDAO.getUserType();
 	%>
 	
 	<%
@@ -116,7 +119,6 @@
 <form action="updateAction.jsp" method="post" name="f">
 		<%
             String orderNumber = request.getParameter("orderNumber");
-            OrderDAO orderDAO = new OrderDAO();
             Order order = orderDAO.getOrderById( orderNumber );
         %>
 	<div class="container">
@@ -136,22 +138,42 @@
                    </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자명:</a></label>
+                       <%
+	                        UserDAO userDAO = new UserDAO();
+	                    	userDAO.setSession(session);
+	                    	
+	                    	String userType2 = userDAO.getUserType();
+	                        String userName2 = userDAO.getUserName();
+	                        List<String> salesUserList = userDAO.getSalesUsersInCompany();
+	                        
+	                    	ArrayList<User> userList = userDAO.getUserList();
+                        %>
                        <div class="col-sm-3">
-                           <select name="userName" class="form-control" required>
+                           <select id="userName" name="userName" class="form-control" required>
                            	<%
-	                        	UserDAO userDAO = new UserDAO();
-	                        	ArrayList<User> userList = userDAO.getUserList();
-	                        	for( int i = 0; i < userList.size(); i++ ) {
-	                        %>
-                               <option><%= userList.get(i).getUserName() %></option>
-                            <%
-	                        	}
-                            %>
+							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
+							    %>
+							        <option value="<%= userName2 %>"><%= userName2 %></option>
+							    <%
+							        } else if ("manager".equals(userType)) { // 같은 userCompany에 속한 sales 계정 선택 가능
+							            for (String salesUser : salesUserList) {
+							    %>
+							        <option value="<%= salesUser %>"><%= salesUser %></option>
+							    <%
+							            }
+							        } else if( "admin".equals(userType) ) {
+							        	for( int i = 0; i < userList.size(); i++ ) {
+							    %>
+							    	<option><%= userList.get(i).getUserName() %></option>
+							    <%
+							       		}
+							        }
+							    %>
                            </select>
                        </div>
                        <label class="col-sm-2 control-label">연락처:</label>
                        <div class="col-sm-3">
-                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getArrivalManagerPhoneNum() %>">
+                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getArrivalManagerPhoneNum() != null ? order.getArrivalManagerPhoneNum() : "" %>">
                        </div>
                    </div>
                    <div class="form-group row">
@@ -207,7 +229,7 @@
                         </div>
                     	<label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
-                       		<input type="text" name="item" class="form-control" value="<%= order.getItem() %>">
+                       		<input type="text" name="item" class="form-control" value="<%= order.getItem() != null ? order.getItem() : "" %>">
                        </div>
                 </div>
                 <div class="form-group row">
@@ -384,35 +406,37 @@
             </div>
         </div>
 	</div>
-	<%	
-		UserDAO userDAO2 = new UserDAO();
-		User userType = userDAO2.getAdminUser(userID);
-	%>
-	<div class="container" <%= "admin".equals( userType.getUserType() ) ? "" : "style='display:none;'" %>>
+	<div class="container" <%= "admin".equals( userType2 ) ? "" : "style='display:none;'" %>>
         <div class="panel panel-primary">
             <div class="panel-heading">차량정보</div>
             <div class="panel-body">
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">차량번호: </label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="carNumber" class="form-control">          	
-	                	</div>
-	                <label class="col-sm-2 control-label">기사명: </label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="driverName" class="form-control">            	
-	                	</div>
+                	<div class="col-sm-3">
+	                    <input type="text" name="carNumber" class="form-control">          	
+                	</div>
+                </div>
+                <div class="form-group row">
+                	<label class="col-sm-2 control-label">기사명: </label>
+                	<div class="col-sm-3">
+	                    <input type="text" name="driverName" class="form-control">            	
+                	</div>
+                </div>
+	            <div class="form-group row">
 	                <label class="col-sm-2 control-label">기사연락처: </label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="carNumber" class="form-control">            	
-	                	</div>
-	                <label class="col-sm-2 control-label">기본운임: </label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="basicFare" class="form-control">            	
-	                	</div>
+                	<div class="col-sm-3">
+	                    <input type="text" name="carNumber" class="form-control">            	
+                	</div>
+	            </div>
+	            <div class="form-group row">
+	            	<label class="col-sm-2 control-label">기본운임: </label>
+                	<div class="col-sm-3">
+	                    <input type="text" name="basicFare" class="form-control">            	
+                	</div>
 	                <label class="col-sm-2 control-label">추가운임: </label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="addFare" class="form-control">            	
-	                	</div>
+                	<div class="col-sm-3">
+	                    <input type="text" name="addFare" class="form-control">            	
+                	</div>
 	            </div>
             </div>
         </div>

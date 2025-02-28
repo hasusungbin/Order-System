@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserDAO">
+	<select id="getUserType" parameterType="string" resultType="string">
+		SELECT userType FROM user WHERE userID = #{userID}
+	</select>
+
+<!-- 현재 로그인한 사용자의 userName 가져오기 -->
+	<select id="getUserName" parameterType="string" resultType="string">
+		SELECT userName FROM user WHERE userID = #{userID}
+	</select>
+
+<!-- 현재 로그인한 사용자의 userCompany 가져오기 -->
+	<select id="getUserCompany" parameterType="string" resultType="string">
+		SELECT userCompany FROM user WHERE userID = #{userID}
+	</select>
+
+<!-- 같은 userCompany에 속한 sales 유저 목록 가져오기 -->
+	<select id="getSalesUsersInCompany" parameterType="string" resultType="string">
+		SELECT userName FROM user WHERE userCompany = #{userCompany} AND userType = 'sales' OR userType = 'manager'
+	</select>
+</mapper>
