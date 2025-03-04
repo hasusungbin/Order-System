@@ -19,6 +19,20 @@
 
 <!-- 같은 userCompany에 속한 sales 유저 목록 가져오기 -->
 	<select id="getSalesUsersInCompany" parameterType="string" resultType="string">
-		SELECT userName FROM user WHERE userCompany = #{userCompany} AND userType = 'sales' OR userType = 'manager'
+		SELECT userName FROM user WHERE userCompany = #{userCompany} AND (userType = 'sales' OR userType = 'manager')
 	</select>
+	
+	<select id="getUserByCompany" parameterType="string" resultType="user.User">
+        SELECT * FROM user WHERE userCompany = #{userCompany}
+    </select>
+	
+	<select id="isUserExists" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM user WHERE userID = #{userID} AND userPassword = #{userPassword}
+    </select>
+	
+	<!-- 새로운 유저 등록 -->
+    <insert id="insertUser" parameterType="user.User">
+        INSERT INTO user (userID, userPassword, userName, userType, userPhoneNumber, userCompany, userTeam) 
+        VALUES (#{userID}, #{userPassword}, #{userName}, #{userType}, #{userPhoneNumber}, #{userCompany}, #{userTeam})
+    </insert>
 </mapper>

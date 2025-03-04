@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -67,11 +69,10 @@ public class UserDAO {
 				user.setUserID( rs.getString(1) );
 				user.setUserPassword( rs.getString(2) );
 				user.setUserName( rs.getString(3) );
-				user.setUserGendder( rs.getString(4) );
-				user.setUserEmail( rs.getString(5) );
-				user.setUserType( rs.getString(6) );
-				user.setUserPhoneNumber( rs.getString(7) );
-				user.setUserCompany( rs.getString(7) );
+				user.setUserType( rs.getString(4) );
+				user.setUserPhoneNumber( rs.getString(5) );
+				user.setUserCompany( rs.getString(6) );
+				user.setUserTeam( rs.getString(7) );
 				userList.add( user );
 			}
 		} catch ( Exception e ) {
@@ -91,11 +92,10 @@ public class UserDAO {
 				user.setUserID( rs.getString(1) );
 				user.setUserPassword( rs.getString(2) );
 				user.setUserName( rs.getString(3) );
-				user.setUserGendder( rs.getString(4) );
-				user.setUserEmail( rs.getString(5) );
-				user.setUserType( rs.getString(6) );
-				user.setUserPhoneNumber( rs.getString(7) );
-				user.setUserCompany( rs.getString(7) );
+				user.setUserType( rs.getString(4) );
+				user.setUserPhoneNumber( rs.getString(5) );
+				user.setUserCompany( rs.getString(6) );
+				user.setUserTeam( rs.getString(7) );
 				userList.add( user );
 			}
 		} catch ( Exception e ) {
@@ -183,5 +183,28 @@ public class UserDAO {
             return (String) session.getAttribute("userID");
         }
         return null;
+    }
+    
+    public List<User> getUsersByCompany(String userCompany) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            return session.selectList( "UserDAO.getUserByCompany", userCompany );
+        }
+    }
+    
+    public boolean isUserExists(String userID, String userPassword) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("userID", userID);
+            params.put("userPassword", userPassword);
+            int count = session.selectOne("UserDAO.isUserExists", params);
+            return count > 0;
+        }
+    }
+    
+    public void insertUser(User user) { 
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            session.insert("UserDAO.insertUser", user);
+            session.commit();
+        }
     }
 }

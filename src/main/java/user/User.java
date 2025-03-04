@@ -5,13 +5,22 @@ public class User {
 	private String userID;
 	private String userPassword;
 	private String userName;
-	private String userGendder;
-	private String userEmail;
 	private String userType;
 	private String userPhoneNumber;
 	private String userCompany;
+	private	String userTeam;
 	
 	public User() {
+	}
+	public User(String userID, String userPassword, String userName, String userType, 
+            String userPhoneNumber, String userCompany, String userTeam) {
+	    this.userID = userID;
+	    this.userPassword = userPassword;
+	    this.userName = userName;
+	    this.userType = userType;
+	    this.userPhoneNumber = userPhoneNumber;
+	    this.userCompany = userCompany;
+	    this.userTeam = userTeam;
 	}
 	public String getUserID() {
 		return userID;
@@ -31,18 +40,6 @@ public class User {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public String getUserGendder() {
-		return userGendder;
-	}
-	public void setUserGendder(String userGendder) {
-		this.userGendder = userGendder;
-	}
-	public String getUserEmail() {
-		return userEmail;
-	}
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
 	public String getUserType() {
 		return userType;
 	}
@@ -60,5 +57,11 @@ public class User {
 	}
 	public void setUserCompany(String userCompany) {
 		this.userCompany = userCompany;
+	}
+	public String getUserTeam() {
+		return userTeam;
+	}
+	public void setUserTeam(String userTeam) {
+		this.userTeam = userTeam;
 	}
 }

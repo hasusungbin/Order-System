@@ -1,9 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" session="true"%>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,6 +35,10 @@
 		if (session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
 		}
+		
+		UserDAO userDAO = new UserDAO();
+        userDAO.setSession(session);
+        String userType = userDAO.getUserType();
 	%>
 	
 	<%
@@ -76,12 +81,11 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-						<li><a href="carInfo.jsp">차량정보 등록</a></li>
 					</ul>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li><a href="carModify.jsp">담당자 등록</a></li>
+				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="carModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carModify.jsp">고정차량 등록</a></li>
 			</ul>
@@ -128,18 +132,35 @@
                    </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자명:</a></label>
+                       <%
+	                    	String userType2 = userDAO.getUserType();
+	                        String userName2 = userDAO.getUserName();
+	                        List<String> salesUserList = userDAO.getSalesUsersInCompany();
+	                        
+	                    	ArrayList<User> userList = userDAO.getUserList();
+                        %>
                        <div class="col-sm-3">
                            <select name="userName" class="form-control" required>
                            	<%
-	                        	UserDAO userDAO = new UserDAO();
-	                        	ArrayList<User> userList = userDAO.getUserList();
-	                        	for( int i = 0; i < userList.size(); i++ ) {
-	                        %>
-                               <option><%= userList.get(i).getUserName() %></option>
-                               <%
-	                        	}
-                               %>
-                           </select>
+							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
+							    %>
+							        <option value="<%= userName2 %>"><%= userName2 %></option>
+							    <%
+							        } else if ("manager".equals(userType2)) { // 같은 userCompany에 속한 sales 계정 선택 가능
+							            for (String salesUser : salesUserList) {
+							    %>
+							        <option value="<%= salesUser %>"><%= salesUser %></option>
+							    <%
+							            }
+							        } else if( "admin".equals(userType2) ) {
+							        	for( int i = 0; i < userList.size(); i++ ) {
+							    %>
+							    	<option><%= userList.get(i).getUserName() %></option>
+							    <%
+							       		}
+							        }
+							    %>
+                       		</select>
                        </div>
                        <label class="col-sm-2 control-label">연락처:</label>
                        <div class="col-sm-3">

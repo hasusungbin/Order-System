@@ -124,12 +124,11 @@ function deleteSelectedOrders() {
 					</a>
 					<ul class="dropdown-menu">
 						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-						<li><a href="carInfo.jsp">차량정보 등록</a></li>
 					</ul>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li><a href="carModify.jsp">담당자 등록</a></li>
+				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="carModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carModify.jsp">고정차량 등록</a></li>
 			</ul>
