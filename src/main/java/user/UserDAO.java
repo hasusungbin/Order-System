@@ -169,9 +169,9 @@ public class UserDAO {
         try (SqlSession sqlSession = MybatisUtil.getSession()) {
             String userCompany = getUserCompany();
             if (userCompany != null) {
-                userList = sqlSession.selectList("UserDAO.getSalesUsersInCompany", userCompany);
+                userList = sqlSession.selectList( "UserDAO.getSalesUsersInCompany", userCompany );
             }
-        } catch (Exception e) {
+        } catch ( Exception e ) {
             e.printStackTrace();
         }
         return userList;
@@ -179,32 +179,84 @@ public class UserDAO {
     
  // 현재 로그인한 userID 가져오기
     private String getUserID() {
-        if (session != null) {
-            return (String) session.getAttribute("userID");
+        if ( session != null ) {
+            return ( String ) session.getAttribute( "userID" );
         }
         return null;
     }
     
-    public List<User> getUsersByCompany(String userCompany) {
+    public List<User> getUserByCompany( String userCompany ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
             return session.selectList( "UserDAO.getUserByCompany", userCompany );
         }
     }
     
-    public boolean isUserExists(String userID, String userPassword) {
+    public boolean isUserExists( String userID, String userPassword ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
             Map<String, Object> params = new HashMap<>();
-            params.put("userID", userID);
-            params.put("userPassword", userPassword);
-            int count = session.selectOne("UserDAO.isUserExists", params);
+            params.put( "userID", userID );
+            params.put( "userPassword", userPassword );
+            int count = session.selectOne( "UserDAO.isUserExists", params );
             return count > 0;
         }
     }
     
-    public void insertUser(User user) { 
+    public void insertUser( User user ) { 
         try ( SqlSession session = MybatisUtil.getSession() ) {
-            session.insert("UserDAO.insertUser", user);
+            session.insert( "UserDAO.insertUser", user );
             session.commit();
+        }
+    }
+    
+ // 로그인한 사용자 리스트 조회
+    public List<User> getModifyUserList( String userType, String userID, String userCompany ) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            if ( "admin".equals(userType) ) {
+                return session.selectList( "UserDAO.getAdminUserList", userID );
+            } else if ( "manager".equals(userType) ) {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put( "userID", userID );
+                paramMap.put( "userCompany", userCompany );
+                return session.selectList( "UserDAO.getManagerUserList", paramMap );
+            }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+ // 선택한 유저 삭제 메서드
+    public boolean deleteUser(List<String> userIDs) {
+        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+            int deletedRows = sqlSession.delete("UserDAO.deleteUser", userIDs);
+            sqlSession.commit(); // 삭제 반영
+            return deletedRows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false; 
+    }
+    
+    public User getUserById( String userID ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            return session.selectOne("UserDAO.getUserById", userID);
+        }
+    }
+    
+    public int updateUser( String userID, String userPassword, String userName, String userType, String userPhoneNumber, String userCompany, String userTeam) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("userID", userID);
+            params.put("userPassword", userPassword);
+            params.put("userName", userName);
+            params.put("userType", userType);
+            params.put("userPhoneNumber", userPhoneNumber);
+            params.put("userCompany", userCompany);
+            params.put("userTeam", userTeam);
+
+           int result = session.update("UserDAO.updateUser", params);
+            session.commit();
+            return (result > 0) ? 1 : -1;
         }
     }
 }

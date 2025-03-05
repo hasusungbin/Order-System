@@ -1,5 +1,8 @@
 package user;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 public class User {
 	
 	private String userID;
@@ -9,6 +12,7 @@ public class User {
 	private String userPhoneNumber;
 	private String userCompany;
 	private	String userTeam;
+	private Date	regDate;
 	
 	public User() {
 	}
@@ -63,5 +67,16 @@ public class User {
 	}
 	public void setUserTeam(String userTeam) {
 		this.userTeam = userTeam;
+	}
+	public Date getRegDate() {
+		return regDate;
+	}
+	public String getFormattedRegDate() {
+        if (regDate == null) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
+        return sdf.format(regDate);
+    }
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
 	}
 }

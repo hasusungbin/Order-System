@@ -7,6 +7,7 @@
 <jsp:setProperty name="user" property="userID" />
 <jsp:setProperty name="user" property="userPassword" />
 <jsp:setProperty name="user" property="userType" />
+<jsp:setProperty name="user" property="userCompany" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,6 +25,7 @@
 		if ( result == 1 ) {
 			session.setAttribute( "userID", user.getUserID() );
 			session.setAttribute( "userType", user.getUserType() );
+			session.setAttribute( "userCompany", user.getUserCompany() );
 			PrintWriter script = response.getWriter();
 			script.println( "<script>" );
 			script.println( "location.href = 'main.jsp'" );

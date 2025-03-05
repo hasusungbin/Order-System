@@ -24,7 +24,42 @@
 
             return true;
         }
-    </script>
+</script>
+<script>
+    function deleteSelectedUsers() {
+        let selectedUsers = [];
+        
+        // 체크된 체크박스 가져오기
+        document.querySelectorAll('input[name="userCheckbox"]:checked').forEach((checkbox) => {
+            selectedUsers.push(checkbox.value);
+        });
+
+        if (selectedUsers.length === 0) {
+            alert("삭제할 유저를 선택해주세요.");
+            return;
+        }
+
+        if (!confirm("선택한 유저를 삭제하시겠습니까?")) {
+            return;
+        }
+
+        // 폼 생성 후 POST 요청
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = "deleteUserAction.jsp";
+
+        selectedUsers.forEach(userID => {
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "userIDs";
+            input.value = userID;
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
 </head>
 <body>
 <script>
@@ -50,12 +85,10 @@
 		UserDAO userDAO = new UserDAO();
 		userDAO.setSession(session);
 		String userType = userDAO.getUserType();
+		String userCompany = userDAO.getUserCompany();
 		
-		HttpSession userSession = request.getSession();
-	    String sessionCompany = (String) userSession.getAttribute("userCompany");
-
-	    List<User> userList = userDAO.getUsersByCompany(sessionCompany);
-		
+	    //List<User> userList = userDAO.getUserByCompany(userCompany);
+	    List<User> userList = userDAO.getModifyUserList(userType, userID, userCompany); 
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -128,7 +161,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">담당자 등록</div>
             <div class="panel-body">
-                <form id="searchForm" action="./userModify.jsp" onsubmit="return validateForm();" name="f">
+                <form id="searchForm" action="./userRegisterAction.jsp" onsubmit="return validateForm();" name="f">
                 	<div class="text-right">
 		            	<div class="btn-group">
 			                <input type="button" class="btn btn-primary" onclick="rtn();" value="신규">
@@ -156,11 +189,20 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                    	<label class="col-sm-2 control-label">회사명:</label>
+                        <div class="col-sm-3">
+                            <select name="userCompany" class="form-control" required>
+                                <option value="logistalk">로지스톡</option>
+                                <option value="KCC">KCC</option>
+                            </select>
+                        </div>
                         <label class="col-sm-2 control-label">부서명:</label>
                         <div class="col-sm-3">
                             <input type="text" name="userTeam" class="form-control" placeholder="담당자 부서명 입력" required>
                         </div>
-                        <label class="col-sm-2 control-label">담당자 등급:</label>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">담당자 등급:</label>
                         <div class="col-sm-3">
                             <select name="userType" class="form-control" required>
                                 <option value="sales">영업사원</option>
@@ -172,46 +214,32 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">조회 결과
+            <div class="panel-heading">당담자 리스트
 	            <div class="text-right">
-					<button onclick="deleteSelectedOrders()" class="btn btn-danger">요청취소</button>
+					<button onclick="deleteSelectedUsers()" class="btn btn-danger">담당자 삭제</button>
 	            </div>
             </div>
             <div class="panel-body">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr style="font-size: 10px;">
-                            <th>체크</th>
-                        	<th>담당자명</th>
-                            <th>담당자 연락처</th>
-                            <th>부서명</th>
-                            <th>담당자 등급</th>
-                            <th>등록일자</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-			           <%--  <% for (Order order : orderList) { %>
-			                <tr style="font-size:10px;">
-			                    <td><input type="checkbox" name="orderCheckbox" value="<%= order.getOrderNumber() %>"></td>
-			                    <td><a href="orderUpdate.jsp?orderNumber=<%= order.getOrderNumber() %>"><%= order.getOrderNumber() %></a></td>
-			                    <td><%= order.getOrderDate() %></td>
-			                    <td><%= order.getRefNumber() %></td>
-			                    <td><%= order.getDepartureName() %></td>
-			                    <td><%= order.getDepartureCities() + " " + order.getDepartureTown() %></td>
-			                    <td><%= order.getArrivalName() %></td>
-			                    <td><%= order.getArrivalCities() + " " + order.getArrivalTown() %></td>
-			                    <td><%= order.getCarWeight() %></td>
-			                    <td><%= order.getKindOfCar() %></td>
-			                    <td><%= order.getCarNumber() != null ? order.getCarNumber() : "" %></td>
-			                    <td><%= order.getDriverName() != null ? order.getDriverName() : "" %></td>
-			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
-			                    <td><%= order.getBasicFare() + order.getAddFare() %></td>
-			                    <td><%= order.getUserName() %></td>
-			                    <td><%= order.getRegDate() %></td>
-			                </tr>
-			            <% } %> --%>
-           			</tbody>
-                </table>
+				<table class="table table-bordered table-hover" border="1">
+				    <tr style="font-size: 10px;">
+				        <th>체크</th>
+				        <th>담당자명</th>
+				        <th>담당자 연락처</th>
+				        <th>부서명</th>
+				        <th>담당자 등급</th>
+				        <th>등록일자</th>
+				    </tr>
+				<% for (User user : userList) { %>
+			        <tr>
+			            <td><input type="checkbox" name="userCheckbox" value="<%= user.getUserID() %>"></td>
+			            <td><a href="userUpdate.jsp?userID=<%= user.getUserID() %>"><%= user.getUserName() %></a></td>
+			            <td><%= user.getUserPhoneNumber() %></td>
+			            <td><%= user.getUserTeam() %></td>
+			            <td><%= user.getUserType() %></td>
+			            <td><%= user.getFormattedRegDate() %></td>
+			        </tr>
+			    <% } %>
+				</table>
             </div>
         </div>
     </div>

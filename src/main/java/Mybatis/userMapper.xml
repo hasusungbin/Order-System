@@ -35,4 +35,42 @@
         INSERT INTO user (userID, userPassword, userName, userType, userPhoneNumber, userCompany, userTeam) 
         VALUES (#{userID}, #{userPassword}, #{userName}, #{userType}, #{userPhoneNumber}, #{userCompany}, #{userTeam})
     </insert>
+	
+	<!-- userType이 admin일 경우: 자기 자신을 제외한 모든 사용자 조회 -->
+    <select id="getAdminUserList" parameterType="string" resultType="user.User">
+        SELECT * FROM user
+        WHERE userID != #{userID}
+    </select>
+
+    <!-- userType이 manager일 경우: 같은 회사의 사용자만 조회 (자기 자신 제외) -->
+    <select id="getManagerUserList" parameterType="map" resultType="user.User">
+        SELECT * FROM user
+        WHERE userCompany = #{userCompany}
+        AND userID != #{userID}
+    </select>
+	
+	<delete id="deleteUser">
+        DELETE FROM user WHERE userID IN 
+        <foreach item="userID" collection="list" open="(" separator="," close=")">
+            #{userID}
+        </foreach>
+    </delete>
+	
+	<select id="getUserById" resultType="user.User">
+        SELECT * FROM user WHERE userID = #{userID}
+    </select>
+	
+	<update id="updateUser">
+        UPDATE user
+        <set>
+			userID = #{userID},
+			userPassword = #{userPassword},
+			userName = #{userName},
+			userType = #{userType},
+			userPhoneNumber = #{userPhoneNumber},
+			userCompany = #{userCompany},
+			userTeam = #{userTeam}
+		</set>
+        WHERE userID = #{userID}
+    </update>
 </mapper>
