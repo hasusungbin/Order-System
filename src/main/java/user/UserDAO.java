@@ -39,23 +39,27 @@ public class UserDAO {
         this.session = session;
     }
 	
-	public int login( String userID, String userPassword ) {
-		String SQL = "SELECT userPassword FROM USER WHERE userID = ?";
+	public User login( String userID, String userPassword ) {
+		String SQL = "SELECT userPassword, userType, userCompany FROM USER WHERE userID = ?";
 		try {
 			pstmt = conn.prepareStatement( SQL );
 			pstmt.setString( 1, userID );
 			rs = pstmt.executeQuery();
 			if( rs.next() ) {
 				if(rs.getString(1).equals(userPassword)) {
-					return 1; // 로그인 성공
+					User user = new User();
+					user.setUserID(userID);
+					user.setUserType(rs.getString("userType"));
+					user.setUserCompany(rs.getString("userCompany"));
+					return user; // 로그인 성공
 				} else
-					return 0; // 비밀번호 불일치
+					return null; // 비밀번호 불일치
 			}
-			return -1; // 아이디가 없음
+			return null; // 아이디가 없음
 		} catch( Exception e ) {
 			e.printStackTrace();
 		}
-		return -2; // 데이터베이스 오류
+		return null; // 데이터베이스 오류
 	}
 	
 	public ArrayList<User> getUserList() {
@@ -106,7 +110,7 @@ public class UserDAO {
 	
 	// 현재 로그인한 사용자의 userType 가져오기
     public String getUserType() {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try ( SqlSession sqlSession = MybatisUtil.getSession() ) {
             String userID = getUserID();
             if (userID != null) {
                 return sqlSession.selectOne("UserDAO.getUserType", userID);
@@ -178,7 +182,7 @@ public class UserDAO {
     }
     
  // 현재 로그인한 userID 가져오기
-    private String getUserID() {
+    public String getUserID() {
         if ( session != null ) {
             return ( String ) session.getAttribute( "userID" );
         }
@@ -217,7 +221,8 @@ public class UserDAO {
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put( "userID", userID );
                 paramMap.put( "userCompany", userCompany );
-                return session.selectList( "UserDAO.getManagerUserList", paramMap );
+                List<User> modifyUserList = session.selectList( "UserDAO.getManagerUserList", paramMap );
+                return (modifyUserList != null) ? modifyUserList : new ArrayList<>(); // Null 방지
             }
         } catch ( Exception e ) {
             e.printStackTrace();

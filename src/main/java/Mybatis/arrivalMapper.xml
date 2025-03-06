@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrivalDAO">
+	<insert id="insertArrival" parameterType="arrival.Arrival">
+    INSERT INTO arrival (type, arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany)
+    VALUES (#{type}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
+	</insert>
+
+	<select id="getArrivalsByCompany" parameterType="string" resultType="arrival.Arrival">
+		SELECT * FROM arrival WHERE userCompany = #{userCompany} ORDER BY regDate DESC
+	</select>
+	
+	<select id="getArrivalByName" resultType="arrival.Arrival">
+        SELECT * FROM arrival WHERE arrivalName = #{arrivalName}
+    </select>
+	
+	<update id="updateArrival">
+        UPDATE arrival
+        <set>
+			type = #{type},
+			arrivalName = #{arrivalName},
+			arrivalCities = #{arrivalCities},
+			arrivalTown = #{arrivalTown},
+			arrivalDetailedAddress = #{arrivalDetailedAddress},
+			arrivalManager = #{arrivalManager},
+			arrivalManagerPhoneNum = #{arrivalManagerPhoneNum},
+			<if test="etc != null"> etc = #{etc}, </if>
+		</set>
+        WHERE arrivalName = #{arrivalName}
+    </update>
+	
+	<delete id="deleteArrival">
+        DELETE FROM arrival WHERE arrivalName IN 
+        <foreach item="arrivalName" collection="list" open="(" separator="," close=")">
+            #{arrivalName}
+        </foreach>
+    </delete>
+</mapper>

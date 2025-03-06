@@ -3,8 +3,11 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="arrival.ArrivalDAO" %>
+<%@ page import="arrival.Arrival" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
+<%@ page import="org.apache.ibatis.session.SqlSessionFactory" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +15,7 @@
 <meta name="viewport" content="width=device-width", initial-scale="1">
 <link rel="stylesheet" href="css/bootstrap.css">
 <title>로지스톡 운송 오더 시스템</title>
-<script>
+<!-- <script>
         function validateForm() {
             let userId = document.getElementById("userID").value;
             let userPw = document.getElementById("userPassword").value;
@@ -24,35 +27,35 @@
 
             return true;
         }
-</script>
+</script> -->
 <script>
-    function deleteSelectedUsers() {
-        let selectedUsers = [];
+    function deleteSelectedArrival() {
+        let selectedArrival = [];
         
         // 체크된 체크박스 가져오기
-        document.querySelectorAll('input[name="userCheckbox"]:checked').forEach((checkbox) => {
-            selectedUsers.push(checkbox.value);
+        document.querySelectorAll('input[name="arrivalCheckbox"]:checked').forEach((checkbox) => {
+        	selectedArrival.push(checkbox.value);
         });
 
-        if (selectedUsers.length === 0) {
-            alert("삭제할 유저를 선택해주세요.");
+        if (selectedArrival.length === 0) {
+            alert("삭제할 출/도착지를 선택해주세요.");
             return;
         }
 
-        if (!confirm("선택한 유저를 삭제하시겠습니까?")) {
+        if (!confirm("선택한 출/도착지를 삭제하시겠습니까?")) {
             return;
         }
 
         // 폼 생성 후 POST 요청
         let form = document.createElement("form");
         form.method = "POST";
-        form.action = "deleteUserAction.jsp";
+        form.action = "deleteArrivalAction.jsp";
 
-        selectedUsers.forEach(userID => {
+        selectedArrival.forEach(arrivalName => {
             let input = document.createElement("input");
             input.type = "hidden";
-            input.name = "userIDs";
-            input.value = userID;
+            input.name = "arrivalNames";
+            input.value = arrivalName;
             form.appendChild(input);
         });
 
@@ -87,9 +90,10 @@
 		String userType = userDAO.getUserType();
 		String userCompany = userDAO.getUserCompany();
 		
-	    //List<User> userList = userDAO.getUserByCompany(userCompany);
-	    
-	    List<User> userList = userDAO.getModifyUserList(userType, userID, userCompany);
+
+	    // DAO 생성 및 출/도착지 리스트 조회
+	    ArrivalDAO arrivalDAO = new ArrivalDAO();
+	    List<Arrival> arrivalList = arrivalDAO.getArrivalsByCompany(userCompany);
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -118,8 +122,8 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="active" <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
-				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
+				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
+				<li class="active"><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carModify.jsp">고정차량 등록</a></li>
 			</ul>
 	<%
@@ -160,9 +164,9 @@
 	</nav>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">담당자 등록</div>
+            <div class="panel-heading">출/도착지 등록</div>
             <div class="panel-body">
-                <form id="searchForm" action="./userRegisterAction.jsp" onsubmit="return validateForm();" name="f">
+                <form id="searchForm" action="./arrivalRegisterAction.jsp" name="f">
                 	<div class="text-right">
 		            	<div class="btn-group">
 			                <input type="button" class="btn btn-primary" onclick="rtn();" value="신규">
@@ -170,76 +174,87 @@
 		            	</div>
 		            </div>
                 	<div class="form-group row">
-                        <label class="col-sm-2 control-label">* 담당자 ID:</label>
+                        <label class="col-sm-2 control-label">* 출/도착지 구분:</label>
                         <div class="col-sm-3">
-                        	<input type="text" id="userID" name="userID" class="form-control" required autocomplete="off" placeholder="담당자 ID 입력">
-                        </div>
-                        <label class="col-sm-2 control-label">* 담당자 PW:</label>
-                        <div class="col-sm-3">
-                            <input type="password" id="userPassword" name="userPassword" class="form-control" autocomplete="off" placeholder="담당자 비밀번호 입력" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 control-label">* 담당자명:</label>
-                        <div class="col-sm-3">
-                        	<input type="text" name="userName" class="form-control" autocomplete="off" placeholder="담당자명 입력" required>
-                        </div>
-                        <label class="col-sm-2 control-label">담당자 연락처:</label>
-                        <div class="col-sm-3">
-                            <input type="text" name="userPhoneNumber" class="form-control" placeholder="담당자 연락처 입력" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                    	<label class="col-sm-2 control-label">회사명:</label>
-                        <div class="col-sm-3">
-                            <select name="userCompany" class="form-control" required>
-                                <option value="logistalk">로지스톡</option>
-                                <option value="KCC">KCC</option>
+                        	<select name="type" class="form-control" required>
+                                <option value="출발지">출발지</option>
+                                <option value="도착지">도착지</option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label">부서명:</label>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">* 명칭:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="userTeam" class="form-control" placeholder="담당자 부서명 입력" required>
+                            <input type="text" id="arrivalName" name="arrivalName" class="form-control" autocomplete="off" placeholder="명칭을 적어주세요.(명칭은 중복이 불가합니다.)" required>
+                        </div>
+                        <label class="col-sm-2 control-label">* 시/도:</label>
+                        <div class="col-sm-3">
+                        	<input type="text" name="arrivalCities" class="form-control" autocomplete="off" placeholder="시/도 입력" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자 등급:</label>
+                    	<label class="col-sm-2 control-label">담당자 명:</label>
                         <div class="col-sm-3">
-                            <select name="userType" class="form-control" required>
-                                <option value="sales">영업사원</option>
-                                <option value="manager">총괄 매니저</option>
-                            </select>
+							<input type="text" name="arrivalManager" class="form-control" placeholder="담당자명 입력" required>
+                        </div>
+                        <label class="col-sm-2 control-label">시/군/구:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구 입력" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">담당자 연락처:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalManagerPhoneNum" class="form-control" placeholder="담당자 연락처(- 제외)입력" required>
+                        </div>
+                        <label class="col-sm-2 control-label">상세주소:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalDetailedAddress" class="form-control" placeholder="상세주소 입력" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">기타사항:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="etc" class="form-control" placeholder="기타사항 입력">
                         </div>
                     </div>
                 </form>
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">당담자 리스트
+            <div class="panel-heading">출/도착지 리스트
 	            <div class="text-right">
-					<button onclick="deleteSelectedUsers()" class="btn btn-danger">담당자 삭제</button>
+					<button onclick="deleteSelectedArrival()" class="btn btn-danger">출/도착지 삭제</button>
 	            </div>
             </div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
 				    <tr style="font-size: 10px;">
 				        <th>체크</th>
+				        <th>출/도착지 구분</th>
+				        <th>명칭</th>
+				        <th>시/도</th>
+				        <th>시/군/구</th>
+				        <th>상세주소</th>
 				        <th>담당자명</th>
 				        <th>담당자 연락처</th>
-				        <th>부서명</th>
-				        <th>담당자 등급</th>
+				        <th>기타사항</th>
 				        <th>등록일자</th>
 				    </tr>
-				<% for (User user : userList) { %>
-			        <tr>
-			            <td><input type="checkbox" name="userCheckbox" value="<%= user.getUserID() %>"></td>
-			            <td><a href="userUpdate.jsp?userID=<%= user.getUserID() %>"><%= user.getUserName() %></a></td>
-			            <td><%= user.getUserPhoneNumber() %></td>
-			            <td><%= user.getUserTeam() %></td>
-			            <td><%= user.getUserType() %></td>
-			            <td><%= user.getFormattedRegDate() %></td>
-			        </tr>
-			    <% } %>
+					<% for (Arrival arrival : arrivalList) { %>
+				        <tr>
+				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getArrivalName() %>"></td>
+				            <td><%= arrival.getType() %></td>
+				            <td><a href="arrivalUpdate.jsp?arrivalName=<%= arrival.getArrivalName() %>"><%= arrival.getArrivalName() %></a></td>
+				            <td><%= arrival.getArrivalCities() %></td>
+				            <td><%= arrival.getArrivalManager() %></td>
+				            <td><%= arrival.getArrivalTown() %></td>
+				            <td><%= arrival.getArrivalManagerPhoneNum() %></td>
+				            <td><%= arrival.getArrivalDetailedAddress() %></td>
+				            <td><%= arrival.getEtc() %></td>
+				            <td><%= arrival.getFormattedRegDate() %></td>
+				        </tr>
+			    	<% } %>
 				</table>
             </div>
         </div>

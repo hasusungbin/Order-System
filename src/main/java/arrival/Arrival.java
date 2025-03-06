@@ -1,5 +1,6 @@
 package arrival;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Arrival {
@@ -13,6 +14,7 @@ public class Arrival {
 	private String arrivalManagerPhoneNum;
 	private String etc;
 	private Date regDate;
+	private String userCompany;
 	
 	public String getArrivalName() {
 		return arrivalName;
@@ -68,4 +70,15 @@ public class Arrival {
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
 	}
+	public String getUserCompany() {
+		return userCompany;
+	}
+	public void setUserCompany(String userCompany) {
+		this.userCompany = userCompany;
+	}
+	public String getFormattedRegDate() {
+        if (regDate == null) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
+        return sdf.format(regDate);
+    }
 }

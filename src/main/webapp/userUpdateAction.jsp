@@ -52,13 +52,13 @@
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('담당자 수정 및 작성에 필요한 데이터가 빠져있습니다. 다시 작성해주세요.');" );
-					script.println( "location.href = 'orderupdate.jsp'" );
+					script.println( "location.href = 'userUpdate.jsp'" );
 					script.println( "</script>" );
 				} else {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('담당자 수정을 완료했습니다.');" );
-					script.println( "location.href = 'main.jsp'" );
+					script.println( "location.href = 'userModify.jsp'" );
 					script.println( "</script>" );
 				}
 			}

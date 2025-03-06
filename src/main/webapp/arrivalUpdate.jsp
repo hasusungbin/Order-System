@@ -1,12 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" session="true"%>
 <%@ page import="java.io.PrintWriter" %>
-<%@ page import="insertOrder.OrderDAO" %>
-<%@ page import="insertOrder.Order" %>
+<%@ page import="arrival.ArrivalDAO" %>
+<%@ page import="arrival.Arrival" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
+<%@ page import="insertOrder.OrderDAO" %>
+<%@ page import="insertOrder.Order" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -40,6 +42,7 @@
 		
 		OrderDAO orderDAO = new OrderDAO();
 		UserDAO userDAO = new UserDAO();
+		ArrivalDAO arrivalDAO = new ArrivalDAO();
 		orderDAO.setSession(session);
 		String userType = orderDAO.getUserType();
 	%>
@@ -117,14 +120,14 @@
 			f.reset();
 		}
 	</script>
-<form action="userUpdateAction.jsp" method="post" name="f">
+<form action="arrivalUpdateAction.jsp" method="post" name="f">
 		<%
-            String modifyUserID = request.getParameter("userID");
-            User user = userDAO.getUserById( modifyUserID );
+            String arrivalName = request.getParameter("arrivalName");
+            Arrival arrival = arrivalDAO.getArrivalByName( arrivalName ); 
         %>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">담당자 수정</div>
+            <div class="panel-heading">출/도착지 수정</div>
             <div class="panel-body">
 	            <div class="text-right">
 	            	<div class="btn-group">
@@ -132,45 +135,48 @@
 	            	</div>
 	            </div>
                    <div class="form-group row">
-	                   <label class="col-sm-2 control-label">* 담당자 ID:</label>
+	                   <label class="col-sm-2 control-label">출/도착지 구분:</label>
 	                     <div class="col-sm-3">
-	                     	<input type="text" id="userID" name="userID" class="form-control" required autocomplete="off" placeholder="담당자 ID 입력" value="<%= user.getUserID() %>">
-	                     </div>
-	                     <label class="col-sm-2 control-label">* 담당자 PW:</label>
-	                     <div class="col-sm-3">
-	                         <input type="password" id="userPassword" name="userPassword" class="form-control" autocomplete="off" placeholder="담당자 비밀번호 입력" required value="<%= user.getUserPassword() %>">
+	                     	<select name="type" class="form-control" required>
+                                <option value="출발지">출발지</option>
+                                <option value="도착지">도착지</option>
+                            </select>
 	                     </div>
 	               </div>
                    <div class="form-group row">
-                        <label class="col-sm-2 control-label">* 담당자명:</label>
+                   		<label class="col-sm-2 control-label">명칭:</label>
+	                     <div class="col-sm-3">
+	                         <input type="text" id="arrivalName" name="arrivalName" class="form-control" autocomplete="off" placeholder="명칭은 중복이 불가합니다." readonly value="<%= arrival.getArrivalName() %>">
+	                     </div>
+                        <label class="col-sm-2 control-label">* 시/도:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="userName" class="form-control" autocomplete="off" placeholder="담당자명 입력" required value="<%= user.getUserName() %>">
-                        </div>
-                        <label class="col-sm-2 control-label">담당자 연락처:</label>
-                        <div class="col-sm-3">
-                            <input type="text" name="userPhoneNumber" class="form-control" placeholder="담당자 연락처 입력" required value="<%= user.getUserPhoneNumber() %>">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                    	<label class="col-sm-2 control-label">회사명:</label>
-                        <div class="col-sm-3">
-                            <select name="userCompany" class="form-control" required>
-                                <option value="logistalk">로지스톡</option>
-                                <option value="KCC">KCC</option>
-                            </select>
-                        </div>
-                        <label class="col-sm-2 control-label">부서명:</label>
-                        <div class="col-sm-3">
-                            <input type="text" name="userTeam" class="form-control" placeholder="담당자 부서명 입력" required value="<%= user.getUserTeam() %>">
+                        	<input type="text" name="arrivalCities" class="form-control" autocomplete="off" placeholder="시/도 입력" required value="<%= arrival.getArrivalCities() %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자 등급:</label>
+                    	<label class="col-sm-2 control-label">담당자 명:</label>
                         <div class="col-sm-3">
-                            <select name="userType" class="form-control" required>
-                                <option value="sales">영업사원</option>
-                                <option value="manager">총괄 매니저</option>
-                            </select>
+                            <input type="text" name="arrivalManager" class="form-control" placeholder="담당자명 입력" required value="<%= arrival.getArrivalManager() %>">
+                        </div>
+                    	<label class="col-sm-2 control-label">시/군/구:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구 입력" required value="<%= arrival.getArrivalTown() %>">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">담당자 연락처:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalManagerPhoneNum" class="form-control" placeholder="담당자 연락처(- 제외)입력" required value="<%= arrival.getArrivalManagerPhoneNum() %>">
+                        </div>
+                    	<label class="col-sm-2 control-label">상세주소:</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="arrivalDetailedAddress" class="form-control" placeholder="상세주소 입력" required value="<%= arrival.getArrivalDetailedAddress() %>">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">기타사항:</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="etc" class="form-control" placeholder="기타사항 입력" value="<%= arrival.getEtc() %>">
                         </div>
                     </div>
                 </div>
