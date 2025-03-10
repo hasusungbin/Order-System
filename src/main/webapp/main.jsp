@@ -3,8 +3,12 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
+<%@ page import="arrival.ArrivalDAO" %>
+<%@ page import="arrival.Arrival" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.apache.ibatis.session.SqlSession" %>
+<%@ page import="org.apache.ibatis.session.SqlSessionFactory" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +31,36 @@
             document.getElementById("endDate").value = today;
         });
 </script>
+<script>
+       // 선택한 도착지 정보가 부모 창의 input 태그에 반영되도록 처리
+       function updateArrivalDetails() {
+           var selectBox = document.getElementById("arrivalSelect");
+           var selectedOption = selectBox.options[selectBox.selectedIndex];
+           
+           // 선택된 option이 존재하면 정보를 input 태그에 입력
+           if (selectedOption.value !== "") {
+               var orderNumber = selectedOption.value;
+               var arrivalName = selectedOption.getAttribute("data-name");
+               var arrivalCities = selectedOption.getAttribute("data-arrivalCities");
+               var arrivalTown = selectedOption.getAttribute("data-arrivalTown");
+
+               // 부모 창의 input 태그에 값 설정
+               document.getElementById("orderNumber").value = orderNumber;
+               document.getElementById("arrivalName").value = arrivalName;
+               document.getElementById("arrivalCities").value = arrivalCities;
+               document.getElementById("arrivalTown").value = arrivalTown;
+               
+            	// arrivalCities select box 값 자동 선택
+               var citiesSelectBox = document.getElementById("arrivalCities");
+               for (var i = 0; i < citiesSelectBox.options.length; i++) {
+                   if (citiesSelectBox.options[i].value === arrivalCities) {
+                       citiesSelectBox.selectedIndex = i;
+                       break;
+                   }
+               }
+           }
+       }
+   </script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -39,6 +73,7 @@
 		UserDAO userDAO = new UserDAO();
         userDAO.setSession(session);
         String userType = userDAO.getUserType();
+        String userCompany = userDAO.getUserCompany();
 	%>
 	
 	<%
@@ -243,17 +278,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">출발지명:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 출발지명:</a></label>
                         <div class="col-sm-3">
-                            <select name="departureName" class="form-control" required>
-                            	<%
-		                        	for( int i = 0; i < userList.size(); i++ ) {
-		                        %>
-                                <option><%= userList.get(i).getUserName() %></option>
-                                <%
-		                        	}
-                                %>
-                            </select>
+                            <input type="text" name="departureName" id="departureName" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -314,25 +341,43 @@
                         <div class="col-sm-4">
                             <input type="date" name="endDate" id="endDate" class="form-control" required>
                         </div>
+                        <label class="col-sm-2 control-label"><a class="text-danger">오더번호:</a></label>
+                        <div class="col-sm-4">
+                        	<input type="text" id="orderNumber" class="form-control" readonly>
+                        </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">도착지명:</label>
-                        <div class="col-sm-3">
-                            <select name="arrivalName" class="form-control" required>
-                            	<%
-		                        	for( int i = 0; i < userList.size(); i++ ) {
-		                        %>
-                                <option><%= userList.get(i).getUserName() %></option>
-                                <%
-		                        	}
-                                %>
-                            </select>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 신규 도착지명:</a></label>
+                        <div class="col-sm-4">
+                        	<input type="text" name="arrivalName" id="arrivalName" class="form-control" required>
                         </div>
+                        <label class="col-sm-2 control-label"><a class="text-danger">기존 도착지 명 선택:</a></label>
+                        <div class="col-sm-4">
+	                        <select class="form-control" id="arrivalSelect" onchange="updateArrivalDetails()">
+	                        <option value="">-- 선택 --</option>
+					        <%
+					            // ArrivalDAO 생성 후 도착지 리스트 가져오기
+					            ArrivalDAO arrivalDAO = new ArrivalDAO();
+					            List<Arrival> arrivalList = arrivalDAO.getArrivalList(userCompany);
+								System.out.println(userCompany + ": userCompany");
+					            // 도착지 리스트를 select box에 동적으로 추가
+					            for (Arrival arrival : arrivalList) {
+					        %>
+				            <option value="<%= arrival.getOrderNumber() %>" 
+				                    data-name="<%= arrival.getArrivalName() %>" 
+				                    data-arrivalCities="<%= arrival.getArrivalCities() %>"
+				                    data-arrivalTown="<%= arrival.getArrivalTown() %>">
+				                <%= arrival.getArrivalName() %></option>
+					        <%
+					            }
+					        %>
+	    					</select>
+	    				</div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">
-                            <select name="arrivalCities" class="form-control" required>
+                            <select id= "arrivalCities" name="arrivalCities" class="form-control" required>
                                 <option value="서울특별시">서울특별시</option>
                                 <option value="경기도">경기도</option>
                                 <option value="인천광역시">인천광역시</option>
@@ -356,7 +401,7 @@
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalTown" class="form-control">
+                        	<input type="text" id="arrivalTown" name="arrivalTown" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">

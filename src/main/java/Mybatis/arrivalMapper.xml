@@ -4,8 +4,8 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ArrivalDAO">
 	<insert id="insertArrival" parameterType="arrival.Arrival">
-    INSERT INTO arrival (type, arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany)
-    VALUES (#{type}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
+		INSERT INTO arrival (type, arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany)
+		VALUES (#{type}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
 	</insert>
 
 	<select id="getArrivalsByCompany" parameterType="string" resultType="arrival.Arrival">
@@ -37,4 +37,17 @@
             #{arrivalName}
         </foreach>
     </delete>
+	
+	<select id="getArrivalList" resultType="arrival.Arrival">
+        SELECT * 
+        FROM arrival
+        WHERE userCompany = #{userCompany} AND type = '도착지'
+    </select>
+
+    <!-- 도착지 ID로 도착지 정보 가져오기 -->
+    <select id="selectArrivalById" resultType="arrival.Arrival">
+        SELECT * 
+        FROM arrival
+        WHERE orderNumber = #{orderNumber}
+    </select>
 </mapper>

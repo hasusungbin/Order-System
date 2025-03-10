@@ -83,7 +83,6 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-						<li><a href="carInfo.jsp">차량정보 등록</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -133,6 +132,7 @@
                    <div class="form-group row">
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
+                       		<input type="hidden" name="orderNumber" value="<%= order.getOrderNumber() %>">
                            <input type="date" name="orderDate" id="orderDate" class="form-control" required value="<%= order.getOrderDate() %>">
                        </div>
                    </div>

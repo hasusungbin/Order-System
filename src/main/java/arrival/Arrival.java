@@ -15,6 +15,7 @@ public class Arrival {
 	private String etc;
 	private Date regDate;
 	private String userCompany;
+	private int orderNumber;
 	
 	public String getArrivalName() {
 		return arrivalName;
@@ -81,4 +82,10 @@ public class Arrival {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
         return sdf.format(regDate);
     }
+	public int getOrderNumber() {
+		return orderNumber;
+	}
+	public void setOrderNumber(int orderNumber) {
+		this.orderNumber = orderNumber;
+	}
 }

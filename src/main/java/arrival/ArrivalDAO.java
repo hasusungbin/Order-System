@@ -37,6 +37,12 @@ public class ArrivalDAO {
 		}
 	}
 	
+	private SqlSession sqlSession;
+
+    public ArrivalDAO(SqlSession sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+	
 	// 세션 설정 메서드
     public void setSession( HttpSession session ) {
         this.session = session;
@@ -90,5 +96,17 @@ public class ArrivalDAO {
             e.printStackTrace();
         }
         return false; 
+    }
+    
+    public List<Arrival> getArrivalList( String userCompany ) {
+    	try( SqlSession session = MybatisUtil.getSession() ) {
+    		 return session.selectList("ArrivalDAO.getArrivalList", userCompany);
+    	}
+    }
+    
+    public Arrival getArrivalById(int orderNumber) {
+    	try( SqlSession session = MybatisUtil.getSession() ) {
+    		return session.selectOne("ArrivalDAO.getArrivalById", orderNumber);
+    	}
     }
 }

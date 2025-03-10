@@ -4,6 +4,7 @@
 <%@ page import="java.io.PrintWriter" %>
 <% request.setCharacterEncoding( "UTF-8" ); %>
 <jsp:useBean id="order" class="insertOrder.Order" scope="page" />
+<jsp:setProperty name="order" property="orderNumber" />
 <jsp:setProperty name="order" property="userName" />
 <jsp:setProperty name="order" property="orderDate" />
 <jsp:setProperty name="order" property="carWeight" />
@@ -88,7 +89,7 @@
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('오더 수정을 완료했습니다.');" );
-					script.println( "location.href = 'main.jsp'" );
+					script.println( "location.href = 'orderUpdate.jsp'" );
 					script.println( "</script>" );
 				}
 			}

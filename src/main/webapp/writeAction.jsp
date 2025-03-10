@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="insertOrder.OrderDAO" %>
+<%@ page import="arrival.ArrivalDAO" %>
+<%@ page import="arrival.Arrival" %>
 <%@ page import="java.io.PrintWriter" %>
 <% request.setCharacterEncoding( "UTF-8" ); %>
 <jsp:useBean id="order" class="insertOrder.Order" scope="page" />
@@ -63,6 +65,18 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
+				ArrivalDAO arrivalDAO = new ArrivalDAO();
+				String type = request.getParameter("type");
+				String arrivalName = request.getParameter("arrivalName");
+				String arrivalCities = request.getParameter("arrivalCities");
+				String arrivalTown = request.getParameter("arrivalTown");
+				String arrivalDetailedAddress = request.getParameter("arrivalDetailedAddress");
+				String arrivalManager = request.getParameter("arrivalManager");
+				String arrivalManagerPhoneNum = request.getParameter("arrivalManagerPhoneNum");
+				String etc = request.getParameter("etc");
+				String userCompany = request.getParameter("userCompany");
+				int orderNumber = Integer.parseInt(request.getParameter("orderNumber"));
+				arrivalDAO.insertArrival(arrival);
 				int result = orderDAO.writeOrder( userID, order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
