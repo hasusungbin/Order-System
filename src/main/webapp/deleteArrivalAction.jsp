@@ -13,10 +13,10 @@
 </head>
 <body>
 	<%
-		String[] arrivalNames = request.getParameterValues("arrivalNames");
-		if (arrivalNames != null && arrivalNames.length > 0) {
+		String[] orderNumbers = request.getParameterValues("orderNumbers");
+		if (orderNumbers != null && orderNumbers.length > 0) {
 	        ArrivalDAO arrivalDAO = new ArrivalDAO();
-	        boolean success = arrivalDAO.deleteArrival(Arrays.asList(arrivalNames));
+	        boolean success = arrivalDAO.deleteArrival(Arrays.asList(orderNumbers));
 		if (success) { 
 		
 %>

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class OrderDAO {
 	private PreparedStatement pstmt;
 	private ResultSet rs;
 	private HttpSession session;
+	private SqlSession sqlSession;
 	
 	public OrderDAO() {
 		try {
@@ -141,8 +143,8 @@ public class OrderDAO {
 	public int writeOrder( String userID, String kindOfCar, String userName, String orderDate, String carWeight, int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
 							String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, 
 							String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum, String option1, String option2, String option3, String option4, String destinationAddress ) {
-		String insertSQL = "INSERT INTO cargoorder(kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID, option1, option2, option3, option4, destinationAddress, userCompany, newOrderID) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+		String insertSQL = "INSERT INTO cargoorder(kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber, fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum, orderID, option1, option2, option3, option4, destinationAddress, userCompany) "
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		String getCompanyIDSQL = "SELECT userCompany FROM user WHERE userID = ?";
 		
 		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
@@ -220,9 +222,12 @@ public class OrderDAO {
 			pstmt.setString( 29, option4);
 			pstmt.setString( 30, destinationAddress );
 			pstmt.setString( 31, userCompany );
-			int resultRows = pstmt.executeUpdate();
-
-			return resultRows;
+			pstmt.executeUpdate();
+			try(SqlSession session = MybatisUtil.getSession()){
+				return session.selectOne("insertOrder.OrderDAO.getLastInsertedOrderID");
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
@@ -390,6 +395,29 @@ public class OrderDAO {
             e.printStackTrace();
         }
         return false; 
+    }
+    
+ // orderID와 현재 날짜를 결합하여 orderNumber를 생성하는 함수
+    public int generateOrderNumber(int orderID) {
+        // 현재 날짜 가져오기 (yyyyMMdd 형식)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String currentDate = sdf.format(new Date());
+        
+        // 날짜 문자열을 숫자형으로 변환
+        long currentDateNumber = Long.parseLong(currentDate);  // 예: 20250311
+        
+        // orderID 값을 4자리로 맞추고, 숫자 형태로 결합
+        // 예: currentDateNumber = 20250311, orderID = 1 -> 202503110001
+        int orderNumber = (int)(currentDateNumber * 10000 + orderID); // 예: 202503110001
+        
+        return orderNumber;
+    }
+    
+    // 현재 세션의 LAST_INSERT_ID() 사용 → 동시성 문제 해결
+    public int getGeneratedOrderNumber() {
+    	try (SqlSession sqlSession = MybatisUtil.getSession()) {
+    		return sqlSession.selectOne("insertOrder.OrderDAO.getGeneratedOrderNumber");    		
+    	}
     }
 }
 

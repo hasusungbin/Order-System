@@ -5,6 +5,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="arrival.ArrivalDAO" %>
 <%@ page import="arrival.Arrival" %>
+<%@ page import="departure.DepartureDAO" %>
+<%@ page import="departure.Departure" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
 <%@ page import="org.apache.ibatis.session.SqlSessionFactory" %>
@@ -15,19 +17,6 @@
 <meta name="viewport" content="width=device-width", initial-scale="1">
 <link rel="stylesheet" href="css/bootstrap.css">
 <title>로지스톡 운송 오더 시스템</title>
-<!-- <script>
-        function validateForm() {
-            let userId = document.getElementById("userID").value;
-            let userPw = document.getElementById("userPassword").value;
-
-            if (userId === "" || userPw === "") {
-                alert("ID와 PW를 입력하세요.");
-                return false;
-            }
-
-            return true;
-        }
-</script> -->
 <script>
     function deleteSelectedArrival() {
         let selectedArrival = [];
@@ -51,11 +40,11 @@
         form.method = "POST";
         form.action = "deleteArrivalAction.jsp";
 
-        selectedArrival.forEach(arrivalName => {
+        selectedArrival.forEach(orderNumber => {
             let input = document.createElement("input");
             input.type = "hidden";
-            input.name = "arrivalNames";
-            input.value = arrivalName;
+            input.name = "orderNumbers";
+            input.value = orderNumber;
             form.appendChild(input);
         });
 
@@ -93,7 +82,7 @@
 
 	    // DAO 생성 및 출/도착지 리스트 조회
 	    ArrivalDAO arrivalDAO = new ArrivalDAO();
-	    List<Arrival> arrivalList = arrivalDAO.getArrivalsByCompany(userCompany);
+	    List<Arrival> arrivalList = arrivalDAO.getArrivalsByCompany(userType, userCompany);
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -261,9 +250,9 @@
 				    </tr>
 					<% for (Arrival arrival : arrivalList) { %>
 				        <tr>
-				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getArrivalName() %>"></td>
-				            <td><%= arrival.getType() %></td>
-				            <td><a href="arrivalUpdate.jsp?arrivalName=<%= arrival.getArrivalName() %>"><%= arrival.getArrivalName() %></a></td>
+				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getOrderNumber() %>"></td>
+				            <td><a href="arrivalUpdate.jsp?orderNumber=<%= arrival.getOrderNumber() %>"><%= arrival.getOrderNumber() %></a></td>
+				            <td><%= arrival.getArrivalName() %></td>
 				            <td><%= arrival.getArrivalCities() %></td>
 				            <td><%= arrival.getArrivalManager() %></td>
 				            <td><%= arrival.getArrivalTown() %></td>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DepartureDAO">
+	<insert id="insertDeparture" parameterType="departure.Departure">
+		INSERT INTO departure (orderNumber, departureName, departureCities, departureTown, departureDetailedAddress, departureManager, departureManagerPhoneNum, etc, regDate, userCompany)
+		VALUES (#{orderNumber}, #{departureName}, #{departureCities}, #{departureTown}, #{departureDetailedAddress}, #{departureManager}, #{departureManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
+	</insert>
+
+	<select id="getDeparturesByCompany" parameterType="map" resultType="departure.Departure">
+        SELECT *
+        FROM departure
+        <where>
+            <if test="userType != 'admin'">
+                userCompany = #{userCompany}
+            </if>
+        </where>
+        ORDER BY departureID DESC
+    </select>
+	
+	<select id="getDepartureByName" resultType="departure.Departure">
+        SELECT * FROM departure WHERE arrivalName = #{arrivalName}
+    </select>
+	
+	<update id="updateDeparture">
+        UPDATE departure
+        <set>
+			arrivalName = #{arrivalName},
+			arrivalCities = #{arrivalCities},
+			arrivalTown = #{arrivalTown},
+			arrivalDetailedAddress = #{arrivalDetailedAddress},
+			arrivalManager = #{arrivalManager},
+			arrivalManagerPhoneNum = #{arrivalManagerPhoneNum},
+			<if test="etc != null"> etc = #{etc}, </if>
+		</set>
+        WHERE arrivalName = #{arrivalName}
+    </update>
+	
+	<delete id="deleteDeparture">
+        DELETE FROM departure WHERE orderNumber IN 
+        <foreach item="orderNumber" collection="list" open="(" separator="," close=")">
+            #{orderNumber}
+        </foreach>
+    </delete>
+	
+	<select id="getDepartureList" resultType="departure.Departure">
+        SELECT * 
+        FROM departure
+        <where>
+			<if test="userType != 'admin'">
+				userCompany = #{userCompany}
+			</if>
+		</where>
+		
+    </select>
+
+    <!-- 도착지 ID로 도착지 정보 가져오기 -->
+    <select id="selectDepartureById" resultType="departure.Departure">
+        SELECT * 
+        FROM departure
+        WHERE orderNumber = #{orderNumber}
+    </select>
+</mapper>

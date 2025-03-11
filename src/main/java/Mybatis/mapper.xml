@@ -191,4 +191,8 @@
             #{orderNumber}
         </foreach>
     </delete>
+	
+	<select id="getLastInsertedOrderID" resultType="int">
+        SELECT LAST_INSERT_ID();
+    </select>
 </mapper>

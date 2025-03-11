@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Arrival {
 	
-	private String Type;
+	private long orderNumber;
 	private String arrivalName;
 	private String arrivalCities;
 	private String arrivalTown;
@@ -15,7 +15,23 @@ public class Arrival {
 	private String etc;
 	private Date regDate;
 	private String userCompany;
-	private int orderNumber;
+	
+	
+	public Arrival() {
+	}
+	
+	public Arrival( long orderNumber, String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress,
+			String arrivalManager, String arrivalManagerPhoneNum, String etc, String userCompany ) {
+		this.orderNumber = orderNumber;
+		this.arrivalName = arrivalName;
+		this.arrivalCities = arrivalCities;
+		this.arrivalTown = arrivalTown;
+		this.arrivalDetailedAddress = arrivalDetailedAddress;
+		this.arrivalManager = arrivalManager;
+		this.arrivalManagerPhoneNum = arrivalManagerPhoneNum;
+		this.etc = etc;
+		this.userCompany = userCompany;
+	}
 	
 	public String getArrivalName() {
 		return arrivalName;
@@ -53,12 +69,6 @@ public class Arrival {
 	public void setArrivalManagerPhoneNum(String arrivalManagerPhoneNum) {
 		this.arrivalManagerPhoneNum = arrivalManagerPhoneNum;
 	}
-	public String getType() {
-		return Type;
-	}
-	public void setType(String type) {
-		Type = type;
-	}
 	public String getEtc() {
 		return etc;
 	}
@@ -82,10 +92,12 @@ public class Arrival {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
         return sdf.format(regDate);
     }
-	public int getOrderNumber() {
+
+	public long getOrderNumber() {
 		return orderNumber;
 	}
-	public void setOrderNumber(int orderNumber) {
+
+	public void setOrderNumber(long orderNumber) {
 		this.orderNumber = orderNumber;
 	}
 }

@@ -4,7 +4,6 @@
 <%@ page import="java.io.PrintWriter" %>
 <% request.setCharacterEncoding( "UTF-8" ); %>
 <jsp:useBean id="arrival" class="arrival.Arrival" scope="page" />
-<jsp:setProperty name="arrival" property="type" />
 <jsp:setProperty name="arrival" property="arrivalName" />
 <jsp:setProperty name="arrival" property="arrivalCities" />
 <jsp:setProperty name="arrival" property="arrivalManager" />
@@ -34,14 +33,13 @@
 			script.println( "location.href = 'login.jsp'" );
 			script.println( "</script>" );
 		} else {
-			if ( arrival.getType() == null || arrival.getArrivalName() == null || arrival.getArrivalCities() == null || arrival.getArrivalManager() == null || arrival.getArrivalTown() == null || arrival.getArrivalManagerPhoneNum() == null ||
+			if ( arrival.getArrivalName() == null || arrival.getArrivalCities() == null || arrival.getArrivalManager() == null || arrival.getArrivalTown() == null || arrival.getArrivalManagerPhoneNum() == null ||
 				 arrival.getArrivalDetailedAddress() == null ) {
 				PrintWriter script = response.getWriter();
 				script.println( "<script>" );
 				script.println( "alert('필수 입력사항 중 누락이 있습니다.') ;" );
 				script.println( "history.back()" );
 				script.println( "</script>" );
-				System.out.println(arrival.getType());
 				System.out.println(arrival.getArrivalName());
 				System.out.println(arrival.getArrivalCities());
 				System.out.println(arrival.getArrivalManager());
@@ -50,7 +48,7 @@
 				System.out.println(arrival.getArrivalDetailedAddress());
 			} else {
 				ArrivalDAO arrivalDAO = new ArrivalDAO();
-				int result = arrivalDAO.updateArrival( arrival.getType(), arrival.getArrivalName(), arrival.getArrivalCities(), arrival.getArrivalTown(), arrival.getArrivalDetailedAddress(), arrival.getArrivalManager(), arrival.getArrivalManagerPhoneNum(), arrival.getEtc() );
+				int result = arrivalDAO.updateArrival( arrival.getArrivalName(), arrival.getArrivalCities(), arrival.getArrivalTown(), arrival.getArrivalDetailedAddress(), arrival.getArrivalManager(), arrival.getArrivalManagerPhoneNum(), arrival.getEtc() );
 				if( result == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );

@@ -3,14 +3,30 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ArrivalDAO">
+	<resultMap id="ArrivalResultMap" type="arrival.Arrival">
+		<result property="arrivalName" column="arrivalName"/>
+		<result property="arrivalCities" column="arrivalCities"/>
+		<result property="arrivalTown" column="arrivalTown"/>
+		<result property="arrivalDetailedAddress" column="arrivalDetailedAddress"/>
+		<result property="arrivalManager" column="arrivalManager"/>
+		<result property="arrivalManagerPhoneNum" column="arrivalManagerPhoneNum"/>
+	</resultMap>
+	
 	<insert id="insertArrival" parameterType="arrival.Arrival">
-		INSERT INTO arrival (type, arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany)
-		VALUES (#{type}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
+		INSERT INTO arrival( orderNumber , arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany, )
+		VALUES ( #{orderNumber}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany} )
 	</insert>
 
-	<select id="getArrivalsByCompany" parameterType="string" resultType="arrival.Arrival">
-		SELECT * FROM arrival WHERE userCompany = #{userCompany} ORDER BY regDate DESC
-	</select>
+	<select id="getArrivalsByCompany" parameterType="map" resultType="arrival.Arrival">
+        SELECT *
+        FROM arrival
+        <where>
+            <if test="userType != 'admin'">
+                userCompany = #{userCompany}
+            </if>
+        </where>
+        ORDER BY arrivalID DESC
+    </select>
 	
 	<select id="getArrivalByName" resultType="arrival.Arrival">
         SELECT * FROM arrival WHERE arrivalName = #{arrivalName}
@@ -19,7 +35,6 @@
 	<update id="updateArrival">
         UPDATE arrival
         <set>
-			type = #{type},
 			arrivalName = #{arrivalName},
 			arrivalCities = #{arrivalCities},
 			arrivalTown = #{arrivalTown},
@@ -32,16 +47,21 @@
     </update>
 	
 	<delete id="deleteArrival">
-        DELETE FROM arrival WHERE arrivalName IN 
-        <foreach item="arrivalName" collection="list" open="(" separator="," close=")">
-            #{arrivalName}
+        DELETE FROM arrival WHERE orderNumber IN 
+        <foreach item="orderNumber" collection="list" open="(" separator="," close=")">
+            #{orderNumber}
         </foreach>
     </delete>
 	
 	<select id="getArrivalList" resultType="arrival.Arrival">
         SELECT * 
         FROM arrival
-        WHERE userCompany = #{userCompany} AND type = '도착지'
+        <where>
+			<if test="userType != 'admin'">
+				userCompany = #{userCompany}
+			</if>
+		</where>
+		
     </select>
 
     <!-- 도착지 ID로 도착지 정보 가져오기 -->
@@ -49,5 +69,39 @@
         SELECT * 
         FROM arrival
         WHERE orderNumber = #{orderNumber}
+    </select>
+	
+	<select id="getSearchArrivalByCompany" resultType="arrival.Arrival" resultMap="ArrivalResultMap">
+        SELECT *
+        FROM arrival
+        <where>
+            <!-- userType이 admin이 아닌 경우 userCompany 조건 추가 -->
+            <if test="userType != null and userType != 'admin'">
+                userCompany = #{userCompany}
+            </if>
+
+            <!-- 도착지명 검색 조건 -->
+            <if test="arrivalName != null and arrivalName != ''">
+                AND arrivalName LIKE CONCAT('%', #{arrivalName}, '%')
+            </if>
+
+            <!-- 시/도 검색 조건 -->
+            <if test="arrivalCities != null and arrivalCities != ''">
+                AND arrivalCities = #{arrivalCities}
+            </if>
+
+            <!-- 시/군/구 검색 조건 -->
+            <if test="arrivalTown != null and arrivalTown != ''">
+                AND arrivalTown = #{arrivalTown}
+            </if>
+
+            <!-- 담당자 검색 조건 -->
+            <if test="arrivalManager != null and arrivalManager != ''">
+                AND arrivalManager LIKE CONCAT('%', #{arrivalManager}, '%')
+            </if>
+        </where>
+
+        <!-- 최신 순으로 정렬 -->
+        ORDER BY arrivalID DESC
     </select>
 </mapper>

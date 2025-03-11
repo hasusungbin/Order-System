@@ -1,4 +1,4 @@
-package arrival;
+package departure;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,15 +16,14 @@ import org.apache.ibatis.session.SqlSessionFactory;
 
 import insertOrder.MybatisUtil;
 
-public class ArrivalDAO {
+public class DepartureDAO {
 	
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
     private HttpSession session;
-	private SqlSessionFactory sqlSessionFactory;
 	
-	public ArrivalDAO() {
+	public DepartureDAO() {
 		try {
 			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
 			String dbID = "root";
@@ -38,7 +37,7 @@ public class ArrivalDAO {
 	
 	private SqlSession sqlSession;
 
-    public ArrivalDAO(SqlSession sqlSession) {
+    public DepartureDAO(SqlSession sqlSession) {
         this.sqlSession = sqlSession;
     }
 	
@@ -48,10 +47,10 @@ public class ArrivalDAO {
     }
 	
     // 도착지 저장
-    public int insertArrival( Arrival arrival ) {
+    public int insertDeparture( Departure departure ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-        	System.out.println(arrival.getOrderNumber() + ": arrival.OrderNumber");
-            session.insert( "ArrivalDAO.insertArrival", arrival );
+            session.insert( "DepartureDAO.insertDeparture", departure );
+            System.out.println("실행됨" + departure.getOrderNumber());
             session.commit();
             return 1;
         } catch ( Exception e ) {
@@ -61,51 +60,42 @@ public class ArrivalDAO {
     }
 
     // 회사별 출/도착지 리스트 조회
-    public List<Arrival> getArrivalsByCompany(String userType, String userCompany) {
+    public List<Departure> getDeparturesByCompany(String userType, String userCompany) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);
-            return session.selectList( "ArrivalDAO.getArrivalsByCompany", params );
+            session.commit();
+            return session.selectList( "DepartureDAO.getDeparturesByCompany", params );
         }
     }
     
-    // 검색 조건 설정 후 리스트 조회
-    public List<Arrival> getSearchArrivalByCompany(String userType, String userCompany) {
-        try ( SqlSession session = MybatisUtil.getSession() ) {
-        	Map<String, Object> params = new HashMap<>();
-            params.put("userType", userType);
-            params.put("userCompany", userCompany);
-            return session.selectList( "ArrivalDAO.getSearchArrivalByCompany", params );
-        }
-    }
-    
-    public Arrival getArrivalByName( String arrivalName ) {
+    public Departure getDepartureByName( String departureName ) {
         try (SqlSession session = MybatisUtil.getSession()) {
-            return session.selectOne("ArrivalDAO.getArrivalByName", arrivalName);
+            return session.selectOne("DepartureDAO.getDepartureByName", departureName);
         }
     }
     
-    public int updateArrival( String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress, String arrivalManager, String arrivalManagerPhoneNum, String etc) {
+    public int updateDeparture( String departureName, String departureCities, String departureTown, String departureDetailedAddress, String departureManager, String departureManagerPhoneNum, String etc) {
         try (SqlSession session = MybatisUtil.getSession()) {
             Map<String, Object> params = new HashMap<>();
-            params.put("arrivalName", arrivalName);
-            params.put("arrivalCities", arrivalCities);
-            params.put("arrivalTown", arrivalTown);
-            params.put("arrivalDetailedAddress", arrivalDetailedAddress);
-            params.put("arrivalManager", arrivalManager);
-            params.put("arrivalManagerPhoneNum", arrivalManagerPhoneNum);
+            params.put("departureName", departureName);
+            params.put("departureCities", departureCities);
+            params.put("departureTown", departureTown);
+            params.put("departureDetailedAddress", departureDetailedAddress);
+            params.put("departureManager", departureManager);
+            params.put("departureManagerPhoneNum", departureManagerPhoneNum);
             params.put("etc", etc);
 
-           int result = session.update("ArrivalDAO.updateArrival", params);
+           int result = session.update("DepartureDAO.updateDeparture", params);
             session.commit();
             return (result > 0) ? 1 : -1;
         }
     }
     
-    public boolean deleteArrival(List<String> orderNumbers) {
+    public boolean deleteDeparture(List<String> orderNumbers) {
         try (SqlSession sqlSession = MybatisUtil.getSession()) {
-            int deletedRows = sqlSession.delete("ArrivalDAO.deleteArrival", orderNumbers);
+            int deletedRows = sqlSession.delete("DepartureDAO.deleteDeparture", orderNumbers);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
         } catch (Exception e) {
@@ -114,18 +104,18 @@ public class ArrivalDAO {
         return false; 
     }
     
-    public List<Arrival> getArrivalList( String userType, String userCompany ) {
+    public List<Departure> getDepartureList( String userType, String userCompany ) {
     	try( SqlSession session = MybatisUtil.getSession() ) {
     		Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);
-    		return session.selectList("ArrivalDAO.getArrivalList", params);
+    		return session.selectList("DepartureDAO.getDepartureList", params);
     	}
     }
     
-    public Arrival getArrivalById(int orderNumber) {
+    public Departure getDepartureById(long orderNumber) {
     	try( SqlSession session = MybatisUtil.getSession() ) {
-    		return session.selectOne("ArrivalDAO.getArrivalById", orderNumber);
+    		return session.selectOne("DepartureDAO.getDepartureById", orderNumber);
     	}
     }
 }

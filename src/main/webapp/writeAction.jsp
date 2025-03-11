@@ -1,12 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="insertOrder.OrderDAO" %>
+<%@ page import="departure.DepartureDAO" %>
+<%@ page import="departure.Departure" %>
 <%@ page import="arrival.ArrivalDAO" %>
 <%@ page import="arrival.Arrival" %>
 <%@ page import="java.io.PrintWriter" %>
 <% request.setCharacterEncoding( "UTF-8" ); %>
 <jsp:useBean id="order" class="insertOrder.Order" scope="page" />
 <jsp:setProperty name="order" property="userName" />
+<jsp:setProperty name="order" property="orderNumber" />
 <jsp:setProperty name="order" property="orderDate" />
 <jsp:setProperty name="order" property="carWeight" />
 <jsp:setProperty name="order" property="kindOfCar" />
@@ -47,8 +50,8 @@
 <body>
 	<%
 		String userID = null;
-		if( session.getAttribute("userID" ) != null) {
-			userID = (String) session.getAttribute("userID");
+		if( session.getAttribute("userID") != null ) {
+			userID = ( String ) session.getAttribute( "userID" );
 		}
  		if( userID == null ) {
 			PrintWriter script = response.getWriter();
@@ -56,39 +59,63 @@
 			script.println( "alert('로그인을 하세요.') ;" );
 			script.println( "location.href = 'login.jsp'" );
 			script.println( "</script>" );
-		} else {
-			if ( order.getUserName() == null || order.getCarWeight() == null || order.getKindOfCar() == null || order.getStartDate() == null || order.getEndDate() == null || order.getDepartureCities() == null || order.getArrivalCities() == null || order.getDepartureTown() == null || order.getArrivalTown() == null ) {
+		} /* else {
+			if ( order.getUserName() == null || 
+				 order.getCarWeight() == null || 
+				 order.getKindOfCar() == null || 
+				 order.getStartDate() == null || 
+				 order.getEndDate() == null || 
+				 order.getDepartureCities() == null || 
+				 order.getArrivalCities() == null || 
+				 order.getDepartureTown() == null || 
+				 order.getArrivalTown() == null ) {
+				
 				PrintWriter script = response.getWriter();
 				script.println( "<script>" );
 				script.println( "alert('필수 입력사항 중 누락이 있습니다.') ;" );
 				script.println( "history.back()" );
 				script.println( "</script>" );
-			} else {
+			} */ else {
 				OrderDAO orderDAO = new OrderDAO();
 				ArrivalDAO arrivalDAO = new ArrivalDAO();
-				String type = request.getParameter("type");
-				String arrivalName = request.getParameter("arrivalName");
-				String arrivalCities = request.getParameter("arrivalCities");
-				String arrivalTown = request.getParameter("arrivalTown");
-				String arrivalDetailedAddress = request.getParameter("arrivalDetailedAddress");
-				String arrivalManager = request.getParameter("arrivalManager");
-				String arrivalManagerPhoneNum = request.getParameter("arrivalManagerPhoneNum");
-				String etc = request.getParameter("etc");
-				String userCompany = request.getParameter("userCompany");
-				int orderNumber = Integer.parseInt(request.getParameter("orderNumber"));
-				arrivalDAO.insertArrival(arrival);
-				int result = orderDAO.writeOrder( userID, order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
-													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
-													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
+				DepartureDAO departureDAO = new DepartureDAO();
+				
+				String arrivalName = request.getParameter( "arrivalName" );
+				System.out.println(arrivalName + ": arrivalName");
+				String arrivalCities = request.getParameter( "arrivalCities" );
+				String arrivalTown = request.getParameter( "arrivalTown" );
+				String arrivalDetailedAddress = request.getParameter( "arrivalDetailedAddress" );
+				String arrivalManager = request.getParameter( "arrivalManager" );
+				String arrivalManagerPhoneNum = request.getParameter( "arrivalManagerPhoneNum" );
+				String arrivalEtc = request.getParameter( "arrivalEtc" );
+				
+				String departureName = request.getParameter( "departureName" );
+				String departureCities = request.getParameter( "departureCities" );
+				String departureTown = request.getParameter( "departureTown" );
+				String departureDetailedAddress = request.getParameter( "departureDetailedAddress" );
+				String departureManager = request.getParameter( "departureManager" );
+				String departureManagerPhoneNum = request.getParameter( "departureManagerPhoneNum" );
+				String departureEtc = request.getParameter( "departureEtc" );
+				
+				String userCompany = request.getParameter( "userCompany" );
+				
+				int orderID = orderDAO.writeOrder( userID, order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
+													order.getStartDate(), order.getEndDate(), departureName, arrivalName, departureCities, arrivalCities, departureTown, arrivalTown, 
+													departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum, arrivalManagerPhoneNum,
 													order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
-				if( result == -1 ) {
+				
+				long orderNumber = orderDAO.generateOrderNumber(orderID);
+				
+				int result2 = arrivalDAO.insertArrival( new Arrival(orderNumber, arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, arrivalEtc, userCompany) );
+				int result3 = departureDAO.insertDeparture( new Departure(orderNumber, departureName, departureCities, departureTown, departureDetailedAddress, departureManager, departureManagerPhoneNum, departureEtc, userCompany) );
+				if( orderID == -1 && result2 == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('오더 작성을 실패했습니다.');" );
 					script.println( "history.back()" ); 
 					script.println( "</script>" );
-				} else if ( result == -2 ) {
-					PrintWriter script = response.getWriter();
+				} else if ( orderID == -2 ) {
+					PrintWriter script = response.getWriter(); 
 					script.println( "<script>" );
 					script.println( "alert('오더 작성에 필요한 데이터가 빠져있습니다. 다시 작성해주세요.');" );
 					script.println( "location.href = 'main.jsp'" );
@@ -101,7 +128,7 @@
 					script.println( "</script>" );
 				}
 			}
-		}
+/* 		} */
 	%>
 </body>
 </html>
