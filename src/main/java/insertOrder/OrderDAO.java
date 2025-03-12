@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.http.HttpSession;
 
@@ -139,69 +140,109 @@ public class OrderDAO {
 	}
 	
 	public int writeOrder(
-            String userID, String kindOfCar, String userName, String orderDate, String carWeight,
-            int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
-            String etc, String startDate, String endDate, String departureName, String arrivalName,
-            String departureCities, String arrivalCities, String departureTown, String arrivalTown,
-            String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
-            String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
-            String option1, String option2, String option3, String option4, String destinationAddress, String userCompany ) {
-		sqlSession = MybatisUtil.getSession();
-		System.out.println(sqlSession + ": sqlSession");
-        try {
-            Order order = new Order();
-            order.setKindOfCar(kindOfCar);
-            order.setUserName(userName);
-            order.setOrderDate(orderDate);
-            order.setCarWeight(carWeight);
-            order.setRefNumber(refNumber);
-            order.setUserPhoneNumber(userPhoneNumber);
-            order.setFixedCarNumber(fixedCarNumber);
-            order.setUpDown(upDown);
-            order.setItem(item);
-            order.setEtc(etc);
-            order.setStartDate(startDate);
-            order.setEndDate(endDate);
-            order.setDepartureName(departureName);
-            order.setArrivalName(arrivalName);
-            order.setDepartureCities(departureCities);
-            order.setArrivalCities(arrivalCities);
-            order.setDepartureTown(departureTown);
-            order.setArrivalTown(arrivalTown);
-            order.setDepartureDetailedAddress(departureDetailedAddress);
-            order.setArrivalDetailedAddress(arrivalDetailedAddress);
-            order.setDepartureManager(departureManager);
-            order.setArrivalManager(arrivalManager);
-            order.setDepartureManagerPhoneNum(departureManagerPhoneNum);
-            order.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
-            order.setOption1(option1);
-            order.setOption2(option2);
-            order.setOption3(option3);
-            order.setOption4(option4);
-            order.setDestinationAddress(destinationAddress);
-            order.setUserCompany(userCompany);
-            System.out.println("departureCities Length: " + departureCities.length());
+	        String userID, String kindOfCar, String userName, String orderDate, String carWeight,
+	        int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
+	        String etc, String startDate, String endDate, String departureName, String arrivalName,
+	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
+	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
+	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
+	        String option1, String option2, String option3, String option4, String destinationAddress, 
+	        String userCompany) {
 
-            // ✅ MyBatis 매퍼 호출
-            int affectedRows = sqlSession.insert("insertOrder.OrderDAO.writeOrder", order);
+	    int affectedRows = 0;
+	    SqlSession sqlSession = MybatisUtil.getSession();
 
-            if (affectedRows > 0) {
-                sqlSession.commit();
-                System.out.println("✅ 트랜잭션 커밋 성공");
-            } else {
-                sqlSession.rollback();
-                System.out.println("❌ 트랜잭션 롤백 발생");
-            }
+	    try {
+	        // ✅ Order 객체 생성 및 데이터 설정
+	        Order order = new Order();
+	        // 현재 날짜 (yyyyMMdd)
+	        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
-            return affectedRows;
+	        // 랜덤한 숫자 및 문자 생성
+	        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	        StringBuilder randomPart = new StringBuilder();
 
-        } catch (Exception e) {
-            sqlSession.rollback();
-            e.printStackTrace();
-            System.out.println("❌ SQL 실행 오류 발생: " + e.getMessage());
-            return -1;
-        }
-    }
+	        Random random = new Random();
+	        for (int i = 0; i < 6; i++) { // 6자리 랜덤 문자열 생성
+	            int index = random.nextInt(characters.length());
+	            randomPart.append(characters.charAt(index));
+	        }
+	        
+	        order.setOrderNumber(date + randomPart.toString());
+	        order.setKindOfCar(kindOfCar);
+	        order.setUserName(userName);
+	        order.setOrderDate(orderDate);
+	        order.setCarWeight(carWeight);
+	        order.setRefNumber(refNumber);
+	        order.setUserPhoneNumber(userPhoneNumber);
+	        order.setFixedCarNumber(fixedCarNumber);
+	        order.setUpDown(upDown);
+	        order.setItem(item);
+	        order.setEtc(etc);
+	        order.setStartDate(startDate);
+	        order.setEndDate(endDate);
+	        order.setDepartureName(departureName);
+	        order.setArrivalName(arrivalName);
+	        order.setDepartureCities(departureCities);
+	        order.setArrivalCities(arrivalCities);
+	        order.setDepartureTown(departureTown);
+	        order.setArrivalTown(arrivalTown);
+	        order.setDepartureDetailedAddress(departureDetailedAddress);
+	        order.setArrivalDetailedAddress(arrivalDetailedAddress);
+	        order.setDepartureManager(departureManager);
+	        order.setArrivalManager(arrivalManager);
+	        order.setDepartureManagerPhoneNum(departureManagerPhoneNum);
+	        order.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
+	        order.setOption1(option1);
+	        order.setOption2(option2);
+	        order.setOption3(option3);
+	        order.setOption4(option4);
+	        order.setDestinationAddress(destinationAddress);
+	        order.setUserCompany(userCompany);
+
+	        // ✅ MyBatis 매퍼 호출 - INSERT
+	        affectedRows = sqlSession.insert("insertOrder.OrderDAO.writeOrder", order);
+	        System.out.println("✅ affectedRows: " + affectedRows);
+	        if (affectedRows > 0) {
+	            // ✅ INSERT 후 생성된 orderID 가져오기
+	            int orderId = order.getOrderID();
+	            System.out.println("✅ orderId: " + orderId);
+	            System.out.println("✅ kindOfCar: " + order.getKindOfCar());
+
+	            // ✅ orderNumber 생성: 날짜 + orderID
+	            String currentDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+	            String orderNumber = currentDate + String.format("%04d", orderId);
+
+	            // ✅ orderNumber 업데이트 처리
+	            Map<String, Object> params = new HashMap<>();
+	            params.put("orderId", orderId);
+	            params.put("orderNumber", orderNumber);
+
+	            int updatedRows = sqlSession.update("insertOrder.OrderDAO.updateOrderNumber", params);
+	            if (updatedRows > 0) {
+	                sqlSession.commit();  // ✅ 커밋
+	                System.out.println("✅ Order 등록 완료 및 orderNumber 업데이트 성공");
+	            } else {
+	                sqlSession.rollback();  // ❌ 실패 시 롤백
+	                System.out.println("❌ orderNumber 업데이트 실패");
+	                affectedRows = -1;
+	            }
+	        }
+	    } catch (Exception e) {
+	        if (sqlSession != null) {
+	            sqlSession.rollback();  // ❌ 예외 발생 시 롤백
+	            System.out.println("❌ SQL 실행 오류 발생: " + e.getMessage());
+	        }
+	        e.printStackTrace();
+	    } finally {
+	        if (sqlSession != null) {
+	            sqlSession.close();  // ✅ 세션 닫기
+	            System.out.println("✅ 세션 닫기 완료");
+	        }
+	    }
+
+	    return affectedRows;
+	}
 	
 	public List<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
 		int pageSize = 10;
@@ -344,6 +385,7 @@ public class OrderDAO {
 	
 	public String getUserType() {
 		try ( SqlSession session = MybatisUtil.getSession() ) {
+			sqlSession = MybatisUtil.getSession();
             String userID = getUserID();
             if (userID != null) {
                 return sqlSession.selectOne("insertOrder.OrderDAO.getUserType", userID);
@@ -357,6 +399,7 @@ public class OrderDAO {
 	// 선택한 주문 삭제 메서드
     public boolean deleteOrders(List<String> orderNumbers) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
+        	sqlSession = MybatisUtil.getSession();
             int deletedRows = sqlSession.delete("insertOrder.OrderDAO.deleteOrders", orderNumbers);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
@@ -385,6 +428,7 @@ public class OrderDAO {
     // 현재 세션의 LAST_INSERT_ID() 사용 → 동시성 문제 해결
     public int getGeneratedOrderNumber() {
     	try ( SqlSession session = MybatisUtil.getSession() ) {
+    		sqlSession = MybatisUtil.getSession();
     		return sqlSession.selectOne("insertOrder.OrderDAO.getGeneratedOrderNumber");    		
     	}
     }

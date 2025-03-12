@@ -14,6 +14,7 @@ public class Arrival {
 	private String etc;
 	private Date regDate;
 	private String userCompany;
+	private int arrivalID;
 	
 	
 	public Arrival() {
@@ -90,4 +91,12 @@ public class Arrival {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
         return sdf.format(regDate);
     }
+
+	public int getArrivalID() {
+		return arrivalID;
+	}
+
+	public void setArrivalID(int arrivalID) {
+		this.arrivalID = arrivalID;
+	}
 }

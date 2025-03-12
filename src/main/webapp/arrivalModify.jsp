@@ -250,7 +250,7 @@
 				    </tr>
 					<% for (Arrival arrival : arrivalList) { %>
 				        <tr>
-				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getArrivalID() %>"></td>
+				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getArrivalID() %>"></td> 
 				            <td><a href="arrivalUpdate.jsp?arrivalID=<%= arrival.getArrivalID() %>"><%= arrival.getArrivalID() %></a></td>
 				            <td><%= arrival.getArrivalName() %></td>
 				            <td><%= arrival.getArrivalCities() %></td>
