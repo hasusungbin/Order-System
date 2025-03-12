@@ -73,4 +73,24 @@
 		</set>
         WHERE userID = #{userID}
     </update>
+	
+	<select id="login" parameterType="user.User" resultType="user.User">
+        SELECT * 
+        FROM user 
+        WHERE userID = #{userID} 
+        AND userPassword = #{userPassword}
+    </select>
+	
+	<select id="getUserList" resultType="user.User">
+        SELECT 
+            userID, 
+            userPassword, 
+            userName, 
+            userType, 
+            userPhoneNumber, 
+            userCompany, 
+            userTeam
+        FROM USER
+        WHERE userType != 'admin'
+    </select>
 </mapper>

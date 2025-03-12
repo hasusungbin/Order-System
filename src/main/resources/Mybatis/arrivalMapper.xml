@@ -13,9 +13,54 @@
 	</resultMap>
 	
 	<insert id="insertArrival" parameterType="arrival.Arrival">
-		INSERT INTO arrival( orderNumber , arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum, etc, regDate, userCompany, )
-		VALUES ( #{orderNumber}, #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress}, #{arrivalManager}, #{arrivalManagerPhoneNum}, #{etc}, NOW(), #{userCompany} )
-	</insert>
+    INSERT INTO arrival (
+        arrivalName,
+        arrivalCities,
+        arrivalTown,
+        arrivalDetailedAddress,
+        arrivalManager,
+        arrivalManagerPhoneNum,
+        etc,
+        regDate,
+        userCompany
+    )
+    VALUES (
+        #{arrivalName},
+        #{arrivalCities},
+        <if test="arrivalTown != null">
+            #{arrivalTown}
+        </if>
+        <if test="arrivalTown == null">
+            NULL
+        </if>,
+        <if test="arrivalDetailedAddress != null">
+            #{arrivalDetailedAddress}
+        </if>
+        <if test="arrivalDetailedAddress == null">
+            NULL
+        </if>,
+        <if test="arrivalManager != null">
+            #{arrivalManager}
+        </if>
+        <if test="arrivalManager == null">
+            NULL
+        </if>,
+        <if test="arrivalManagerPhoneNum != null">
+            #{arrivalManagerPhoneNum}
+        </if>
+        <if test="arrivalManagerPhoneNum == null">
+            NULL
+        </if>,
+        <if test="etc != null">
+            #{etc}
+        </if>
+        <if test="etc == null">
+            NULL
+        </if>,
+        NOW(),
+        #{userCompany}
+    )
+</insert>
 
 	<select id="getArrivalsByCompany" parameterType="map" resultType="arrival.Arrival">
         SELECT *
@@ -43,13 +88,13 @@
 			arrivalManagerPhoneNum = #{arrivalManagerPhoneNum},
 			<if test="etc != null"> etc = #{etc}, </if>
 		</set>
-        WHERE arrivalName = #{arrivalName}
+        WHERE arrivalID = #{arrivalID}
     </update>
 	
 	<delete id="deleteArrival">
-        DELETE FROM arrival WHERE orderNumber IN 
-        <foreach item="orderNumber" collection="list" open="(" separator="," close=")">
-            #{orderNumber}
+        DELETE FROM arrival WHERE arrivalID IN 
+        <foreach item="arrivalID" collection="list" open="(" separator="," close=")">
+            #{arrivalID}
         </foreach>
     </delete>
 	
@@ -71,37 +116,44 @@
         WHERE orderNumber = #{orderNumber}
     </select>
 	
-	<select id="getSearchArrivalByCompany" resultType="arrival.Arrival" resultMap="ArrivalResultMap">
+	<select id="getSearchArrivalByCompany" resultType="arrival.Arrival">
         SELECT *
         FROM arrival
         <where>
-            <!-- userType이 admin이 아닌 경우 userCompany 조건 추가 -->
-            <if test="userType != null and userType != 'admin'">
+            <if test="userType != 'admin'">
                 userCompany = #{userCompany}
             </if>
-
-            <!-- 도착지명 검색 조건 -->
             <if test="arrivalName != null and arrivalName != ''">
                 AND arrivalName LIKE CONCAT('%', #{arrivalName}, '%')
             </if>
-
-            <!-- 시/도 검색 조건 -->
             <if test="arrivalCities != null and arrivalCities != ''">
-                AND arrivalCities = #{arrivalCities}
+                AND arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%')
             </if>
-
-            <!-- 시/군/구 검색 조건 -->
             <if test="arrivalTown != null and arrivalTown != ''">
-                AND arrivalTown = #{arrivalTown}
+                AND arrivalTown LIKE CONCAT('%', #{arrivalTown}, '%')
             </if>
-
-            <!-- 담당자 검색 조건 -->
             <if test="arrivalManager != null and arrivalManager != ''">
                 AND arrivalManager LIKE CONCAT('%', #{arrivalManager}, '%')
             </if>
         </where>
-
-        <!-- 최신 순으로 정렬 -->
         ORDER BY arrivalID DESC
     </select>
+	
+	<select id="checkDuplicateArrival" resultType="int">
+        SELECT COUNT(*)
+        FROM arrival
+        WHERE arrivalName = #{arrivalName}
+    </select>
+
+    <!-- 중복이 없으면 INSERT -->
+    <insert id="insertOrderArrival" parameterType="arrival.Arrival">
+        INSERT INTO arrival (
+            arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress,
+            arrivalManager, arrivalManagerPhoneNum, userCompany
+        )
+        VALUES (
+            #{arrivalName}, #{arrivalCities}, #{arrivalTown}, #{arrivalDetailedAddress},
+            #{arrivalManager}, #{arrivalManagerPhoneNum}, #{userCompany}
+        )
+    </insert>
 </mapper>

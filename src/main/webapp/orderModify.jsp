@@ -196,7 +196,7 @@ function deleteSelectedOrders() {
 	                        String userName2 = userDAO.getUserName();
 	                        List<String> salesUserList = userDAO.getSalesUsersInCompany();
 	                        
-	                    	ArrayList<User> userList = userDAO.getUserList();
+	                    	List<User> userList = userDAO.getUserList();
                         %>
                         <div class="col-sm-3">
                             <select id="userName" name="userName"  class="form-control">

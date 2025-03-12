@@ -26,6 +26,10 @@ public class User {
 	    this.userCompany = userCompany;
 	    this.userTeam = userTeam;
 	}
+	public User(String userID, String userPassword) {
+        this.userID = userID;
+        this.userPassword = userPassword;
+    }
 	public String getUserID() {
 		return userID;
 	}

@@ -50,17 +50,34 @@
     </style>
 
     <script>
+	 	// 문자열의 특수문자를 처리해주는 함수
+	    function escapeJavaScript(str) {
+	        if (str) {
+	            return str.replace(/\\/g, '\\\\')
+	                      .replace(/'/g, '\\\'')
+	                      .replace(/"/g, '\\\"')
+	                      .replace(/\n/g, '\\n')
+	                      .replace(/\r/g, '\\r');
+	        }
+	        return '';
+	    }
         // 부모창에 값 세팅 함수
         function selectArrival(arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum) {
-            if (window.opener && !window.opener.closed) {
+        	if (window.opener && !window.opener.closed) {
                 window.opener.document.getElementById("arrivalName").value = arrivalName;
                 window.opener.document.getElementById("arrivalCities").value = arrivalCities;
                 window.opener.document.getElementById("arrivalTown").value = arrivalTown;
                 window.opener.document.getElementById("arrivalDetailedAddress").value = arrivalDetailedAddress;
                 window.opener.document.getElementById("arrivalManager").value = arrivalManager;
                 window.opener.document.getElementById("arrivalManagerPhoneNum").value = arrivalManagerPhoneNum;
+            } else {
+                alert("부모창이 열려있지 않습니다.");
             }
-            window.close(); // 팝업창 닫기
+
+            // 팝업창 닫기
+            setTimeout(function() {
+                window.close();
+            }, 100); // 100ms 딜레이 후 닫기
         }
     </script>
 </head>
@@ -75,11 +92,18 @@
 		
 		String userType = request.getParameter("userType");
 	    String userCompany = request.getParameter("userCompany");
-		System.out.println("userType: " + userType);
-		System.out.println("userCompany: " + userCompany);
-	    ArrivalDAO arrivalDAO = new ArrivalDAO();
-	    List<Arrival> arrivalList = arrivalDAO.getSearchArrivalByCompany(userType, userCompany); // DAO에서 데이터 조회
-	    System.out.println(arrivalList);
+	    String arrivalName = request.getParameter("arrivalName");
+	    String arrivalCities = request.getParameter("arrivalCities");
+	    String arrivalTown = request.getParameter("arrivalTown");
+	    String arrivalManager = request.getParameter("arrivalManager");
+
+	    List<Arrival> arrivalList = new ArrayList<>();
+	    if (request.getParameter("search") != null) {
+	        ArrivalDAO arrivalDAO = new ArrivalDAO();
+	        arrivalList = arrivalDAO.getSearchArrivalByCompany(
+	            userType, userCompany, arrivalName, arrivalCities, arrivalTown, arrivalManager
+	        );
+	    }
 	%>
 	<%
 		if (userID == null) {
@@ -107,22 +131,23 @@
                 <div class="form-group row">
                     <label class="col-sm-2 control-label">도착지 명:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalName" class="form-control" placeholder="도착지 명">
+                    	<input type="hidden" name="search" value="true">
+                        <input type="text" name="arrivalName" class="form-control" placeholder="도착지 명" value="<%= arrivalName != null ? arrivalName : "" %>">
                     </div>
                     <label class="col-sm-2 control-label">시/도:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalCities" class="form-control" placeholder="시/도">
+                        <input type="text" name="arrivalCities" class="form-control" placeholder="시/도" value="<%= arrivalCities != null ? arrivalCities : "" %>">
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label class="col-sm-2 control-label">시/군/구:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구">
+                        <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구" value="<%= arrivalTown != null ? arrivalTown : "" %>">
                     </div>
                     <label class="col-sm-2 control-label">담당자:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalManager" class="form-control" placeholder="담당자">
+                        <input type="text" name="arrivalManager" class="form-control" placeholder="담당자" value="<%= arrivalManager != null ? arrivalManager : "" %>">
                     </div>
                 </div>
 
@@ -153,45 +178,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:choose>
-                        <c:when test="${not empty arrivalList}">
-                            <c:forEach var="arrival" items="${arrivalList}">
-                                <tr>
-                                	<c:if test="${empty arrivalList}">
-									    <p>도착지 목록이 없습니다.</p>
-									</c:if>
-									
-									<c:if test="${not empty arrivalList}">
-									    <p>${arrivalList}</p> <!-- 리스트 값 확인 -->
-									</c:if>
-                                    <td>${arrival.arrivalName}</td>
-                                    <td>${arrival.arrivalCities}</td>
-                                    <td>${arrival.arrivalTown}</td>
-                                    <td>${arrival.arrivalDetailedAddress}</td>
-                                    <td>${arrival.arrivalManager}</td>
-                                    <td>${arrival.arrivalManagerPhoneNum}</td>
-                                    <td>
-                                        <button class="btn btn-primary"
-                                                onclick="selectArrival(
-                                                    '${arrival.arrivalName}',
-                                                    '${arrival.arrivalCities}',
-                                                    '${arrival.arrivalTown}',
-                                                    '${arrival.arrivalDetailedAddress}',
-                                                    '${arrival.arrivalManager}',
-                                                    '${arrival.arrivalManagerPhoneNum}'
-                                                )">
-                                            선택
-                                        </button>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td colspan="7">검색 결과가 없습니다.</td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
+                    <%
+					    if (arrivalList != null && !arrivalList.isEmpty()) {
+					        for (Arrival arrival : arrivalList) {
+					%>
+					            <tr>
+					                <td><%= arrival.getArrivalName() %></td>
+					                <td><%= arrival.getArrivalCities() %></td>
+					                <td><%= arrival.getArrivalTown() %></td>
+					                <td><%= arrival.getArrivalDetailedAddress() %></td>
+					                <td><%= arrival.getArrivalManager() %></td>
+					                <td><%= arrival.getArrivalManagerPhoneNum() %></td>
+					                <td>
+					                    <button class="btn btn-primary"
+					                            onclick="selectArrival(
+					                                '<%= arrival.getArrivalName() %>',
+					                                '<%= arrival.getArrivalCities() %>',
+					                                '<%= arrival.getArrivalTown() %>',
+					                                '<%= arrival.getArrivalDetailedAddress() %>',
+					                                '<%= arrival.getArrivalManager() %>',
+					                                '<%= arrival.getArrivalManagerPhoneNum() %>'
+					                            )">
+					                        선택
+					                    </button>
+					                </td>
+					            </tr>
+					<%
+					        }
+					    } else {
+					%>
+					        <tr>
+					            <td colspan="7">검색 결과가 없습니다.</td>
+					        </tr>
+					<%
+					    }
+					%>
                 </tbody>
             </table>
 

@@ -24,15 +24,6 @@ public class DepartureDAO {
     private HttpSession session;
 	
 	public DepartureDAO() {
-		try {
-			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
-			String dbID = "root";
-			String dbPassword = "root";
-			Class.forName( "com.mysql.jdbc.Driver" );
-			conn = DriverManager.getConnection( dbURL, dbID, dbPassword );
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
 	}
 	
 	private SqlSession sqlSession;
@@ -50,7 +41,6 @@ public class DepartureDAO {
     public int insertDeparture( Departure departure ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
             session.insert( "DepartureDAO.insertDeparture", departure );
-            System.out.println("실행됨" + departure.getOrderNumber());
             session.commit();
             return 1;
         } catch ( Exception e ) {
@@ -71,13 +61,13 @@ public class DepartureDAO {
     }
     
     public Departure getDepartureByName( String departureName ) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             return session.selectOne("DepartureDAO.getDepartureByName", departureName);
         }
     }
     
     public int updateDeparture( String departureName, String departureCities, String departureTown, String departureDetailedAddress, String departureManager, String departureManagerPhoneNum, String etc) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             Map<String, Object> params = new HashMap<>();
             params.put("departureName", departureName);
             params.put("departureCities", departureCities);
@@ -94,7 +84,8 @@ public class DepartureDAO {
     }
     
     public boolean deleteDeparture(List<String> orderNumbers) {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+        	sqlSession = MybatisUtil.getSession();
             int deletedRows = sqlSession.delete("DepartureDAO.deleteDeparture", orderNumbers);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
@@ -117,5 +108,15 @@ public class DepartureDAO {
     	try( SqlSession session = MybatisUtil.getSession() ) {
     		return session.selectOne("DepartureDAO.getDepartureById", orderNumber);
     	}
+    }
+    
+    public int checkDuplicateDeparture(String departureName) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            int count = session.selectOne("DepartureDAO.checkDuplicateDeparture", departureName);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; // 오류 발생 시 -1 반환
+        }
     }
 }

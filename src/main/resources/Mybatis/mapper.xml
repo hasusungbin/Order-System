@@ -135,6 +135,29 @@
         SELECT * FROM cargoorder WHERE orderNumber = #{orderNumber}
     </select>
 	
+	<insert id="writeOrder" parameterType="insertOrder.Order">
+        INSERT INTO cargoorder (
+            kindOfCar, userName, orderDate, carWeight, refNumber, 
+            userPhoneNumber, fixedCarNumber, upDown, item, etc, 
+            startDate, endDate, departureName, arrivalName, 
+            departureCities, arrivalCities, departureTown, arrivalTown, 
+            departureDetailedAddress, arrivalDetailedAddress, 
+            departureManager, arrivalManager, departureManagerPhoneNum, 
+            arrivalManagerPhoneNum, option1, option2, option3, option4, 
+            destinationAddress, userCompany
+        )
+        VALUES (
+            #{kindOfCar}, #{userName}, #{orderDate, jdbcType=DATE}, #{carWeight}, #{refNumber},
+            #{userPhoneNumber}, #{fixedCarNumber}, #{upDown}, #{item}, #{etc},
+            #{startDate, jdbcType=DATE}, #{endDate, jdbcType=DATE}, #{departureName}, #{arrivalName},
+            #{departureCities}, #{arrivalCities}, #{departureTown}, #{arrivalTown},
+            #{departureDetailedAddress}, #{arrivalDetailedAddress},
+            #{departureManager}, #{arrivalManager}, #{departureManagerPhoneNum},
+            #{arrivalManagerPhoneNum}, #{option1}, #{option2}, #{option3},
+            #{option4}, #{destinationAddress}, #{userCompany}
+        )
+    </insert>
+	
 	<update id="updateOrder">
         UPDATE cargoorder
         <set>

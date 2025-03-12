@@ -5,7 +5,6 @@ import java.util.Date;
 
 public class Arrival {
 	
-	private long orderNumber;
 	private String arrivalName;
 	private String arrivalCities;
 	private String arrivalTown;
@@ -22,7 +21,6 @@ public class Arrival {
 	
 	public Arrival( long orderNumber, String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress,
 			String arrivalManager, String arrivalManagerPhoneNum, String etc, String userCompany ) {
-		this.orderNumber = orderNumber;
 		this.arrivalName = arrivalName;
 		this.arrivalCities = arrivalCities;
 		this.arrivalTown = arrivalTown;
@@ -92,12 +90,4 @@ public class Arrival {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
         return sdf.format(regDate);
     }
-
-	public long getOrderNumber() {
-		return orderNumber;
-	}
-
-	public void setOrderNumber(long orderNumber) {
-		this.orderNumber = orderNumber;
-	}
 }

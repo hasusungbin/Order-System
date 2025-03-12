@@ -1,6 +1,8 @@
 package insertOrder;
 
+import java.io.IOException;
 import java.io.InputStream;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -11,7 +13,7 @@ public class MybatisUtil {
 
     static {
         try {
-            String resource = "config.xml";
+            String resource = "Mybatis/config.xml"; // 경로 수정
             InputStream inputStream = Resources.getResourceAsStream(resource);
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         } catch (Exception e) {
@@ -20,7 +22,11 @@ public class MybatisUtil {
         }
     }
 
+    // 트랜잭션 명시적 관리 -> autoCommit = false
     public static SqlSession getSession() {
-        return sqlSessionFactory.openSession();
+        if (sqlSessionFactory == null) {
+            throw new IllegalStateException("MyBatis 설정이 로드되지 않았습니다.");
+        }
+        return sqlSessionFactory.openSession(false);  // 👈 트랜잭션 자동 커밋 해제
     }
 }

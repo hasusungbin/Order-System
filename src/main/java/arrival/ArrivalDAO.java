@@ -25,15 +25,6 @@ public class ArrivalDAO {
 	private SqlSessionFactory sqlSessionFactory;
 	
 	public ArrivalDAO() {
-		try {
-			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
-			String dbID = "root";
-			String dbPassword = "root";
-			Class.forName( "com.mysql.jdbc.Driver" );
-			conn = DriverManager.getConnection( dbURL, dbID, dbPassword );
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
 	}
 	
 	private SqlSession sqlSession;
@@ -50,7 +41,6 @@ public class ArrivalDAO {
     // 도착지 저장
     public int insertArrival( Arrival arrival ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-        	System.out.println(arrival.getOrderNumber() + ": arrival.OrderNumber");
             session.insert( "ArrivalDAO.insertArrival", arrival );
             session.commit();
             return 1;
@@ -71,23 +61,28 @@ public class ArrivalDAO {
     }
     
     // 검색 조건 설정 후 리스트 조회
-    public List<Arrival> getSearchArrivalByCompany(String userType, String userCompany) {
+    public List<Arrival> getSearchArrivalByCompany(String userType, String userCompany, String arrivalName, String arrivalCities, String arrivalTown, String arrivalManager) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);
+            params.put("arrivalName", arrivalName);
+            params.put("arrivalCities", arrivalCities);
+            params.put("arrivalTown", arrivalTown);
+            params.put("arrivalManager", arrivalManager);
             return session.selectList( "ArrivalDAO.getSearchArrivalByCompany", params );
         }
     }
     
     public Arrival getArrivalByName( String arrivalName ) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             return session.selectOne("ArrivalDAO.getArrivalByName", arrivalName);
         }
     }
     
     public int updateArrival( String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress, String arrivalManager, String arrivalManagerPhoneNum, String etc) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+        	sqlSession = MybatisUtil.getSession();
             Map<String, Object> params = new HashMap<>();
             params.put("arrivalName", arrivalName);
             params.put("arrivalCities", arrivalCities);
@@ -104,7 +99,8 @@ public class ArrivalDAO {
     }
     
     public boolean deleteArrival(List<String> orderNumbers) {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+        	sqlSession = MybatisUtil.getSession();
             int deletedRows = sqlSession.delete("ArrivalDAO.deleteArrival", orderNumbers);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
@@ -116,6 +112,7 @@ public class ArrivalDAO {
     
     public List<Arrival> getArrivalList( String userType, String userCompany ) {
     	try( SqlSession session = MybatisUtil.getSession() ) {
+    		sqlSession = MybatisUtil.getSession();
     		Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);
@@ -125,7 +122,30 @@ public class ArrivalDAO {
     
     public Arrival getArrivalById(int orderNumber) {
     	try( SqlSession session = MybatisUtil.getSession() ) {
+    		sqlSession = MybatisUtil.getSession();
     		return session.selectOne("ArrivalDAO.getArrivalById", orderNumber);
     	}
     }
+    
+    public int checkDuplicateArrival(String arrivalName) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+        	sqlSession = MybatisUtil.getSession();
+            int count = session.selectOne("ArrivalDAO.checkDuplicateArrival", arrivalName);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; // 오류 발생 시 -1 반환
+        }
+    }
+    
+	/*
+	 * public int insertOrderArrival(Arrival arrival) { try (SqlSession session =
+	 * MybatisUtil.getSession()) { // 중복 체크 쿼리 실행 int count =
+	 * session.selectOne("ArrivalDAO.checkDuplicateArrival", arrival); if (count >
+	 * 0) { return 0; // 중복 발생 시 INSERT 실행 안함 }
+	 * 
+	 * // 중복이 없으면 INSERT 실행 int result =
+	 * session.insert("ArrivalDAO.insertOrderArrival", arrival); session.commit();
+	 * return result; } }
+	 */
 }

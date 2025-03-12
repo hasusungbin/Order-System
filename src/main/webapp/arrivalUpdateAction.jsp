@@ -40,12 +40,6 @@
 				script.println( "alert('필수 입력사항 중 누락이 있습니다.') ;" );
 				script.println( "history.back()" );
 				script.println( "</script>" );
-				System.out.println(arrival.getArrivalName());
-				System.out.println(arrival.getArrivalCities());
-				System.out.println(arrival.getArrivalManager());
-				System.out.println(arrival.getArrivalTown());
-				System.out.println(arrival.getArrivalManagerPhoneNum());
-				System.out.println(arrival.getArrivalDetailedAddress());
 			} else {
 				ArrivalDAO arrivalDAO = new ArrivalDAO();
 				int result = arrivalDAO.updateArrival( arrival.getArrivalName(), arrival.getArrivalCities(), arrival.getArrivalTown(), arrival.getArrivalDetailedAddress(), arrival.getArrivalManager(), arrival.getArrivalManagerPhoneNum(), arrival.getEtc() );

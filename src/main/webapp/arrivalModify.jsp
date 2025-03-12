@@ -250,8 +250,8 @@
 				    </tr>
 					<% for (Arrival arrival : arrivalList) { %>
 				        <tr>
-				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getOrderNumber() %>"></td>
-				            <td><a href="arrivalUpdate.jsp?orderNumber=<%= arrival.getOrderNumber() %>"><%= arrival.getOrderNumber() %></a></td>
+				            <td><input type="checkbox" name="arrivalCheckbox" value="<%= arrival.getArrivalID() %>"></td>
+				            <td><a href="arrivalUpdate.jsp?arrivalID=<%= arrival.getArrivalID() %>"><%= arrival.getArrivalID() %></a></td>
 				            <td><%= arrival.getArrivalName() %></td>
 				            <td><%= arrival.getArrivalCities() %></td>
 				            <td><%= arrival.getArrivalManager() %></td>

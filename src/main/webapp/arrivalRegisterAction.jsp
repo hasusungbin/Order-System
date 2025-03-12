@@ -49,7 +49,6 @@
 
     // Arrival 객체 생성 및 값 설정
     Arrival arrival = new Arrival();
-    arrival.setType(type);
     arrival.setArrivalName(arrivalName);
     arrival.setArrivalCities(arrivalCities);
     arrival.setArrivalManager(arrivalManager);

@@ -17,6 +17,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width", initial-scale="1">
 <link rel="stylesheet" href="css/bootstrap.css">
+<!-- jQuery 공식 CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
@@ -47,42 +49,75 @@
                         "ArrivalSearch", "width=800,height=500");
         }
 </script>
+<script>
+        $(document).ready(function() {
+            // ✅ jQuery 로드 확인
+            console.log("window.$ 값: ", window.$); // undefined -> jQuery 로드 실패
+            if (window.$) {
+                console.log("✅ jQuery 로드 성공");
+            } else {
+                console.error("❌ jQuery 로드 실패");
+            }
+        });
+    </script>
 <!-- <script>
-       // 선택한 도착지 정보가 부모 창의 input 태그에 반영되도록 처리
-       function updateArrivalDetails() {
-           var selectBox = document.getElementById("arrivalSelect");
-           var selectedOption = selectBox.options[selectBox.selectedIndex];
-           
-           // 선택된 option이 존재하면 정보를 input 태그에 입력
-           if (selectedOption.value !== "") {
-               var orderNumber = selectedOption.value;
-               var arrivalName = selectedOption.getAttribute("data-name");
-               var arrivalCities = selectedOption.getAttribute("data-arrivalCities");
-               var arrivalTown = selectedOption.getAttribute("data-arrivalTown");
+    function insertOrder() {
+        const orderData = {
+            userName: document.getElementById("userName").value,
+            orderDate: document.getElementById("orderDate").value,
+            carWeight: document.getElementById("carWeight").value,
+            kindOfCar: document.getElementById("kindOfCar").value,
+            refNumber: document.getElementById("refNumber").value,
+            userPhoneNumber: document.getElementById("userPhoneNumber").value,
+            fixedCarNumber: document.getElementById("fixedCarNumber").value,
+            upDown: document.getElementById("upDown").value,
+            item: document.getElementById("item").value,
+            etc: document.getElementById("etc").value,
+            startDate: document.getElementById("startDate").value,
+            endDate: document.getElementById("endDate").value,
+            departureName: document.getElementById("departureName").value,
+            arrivalName: document.getElementById("arrivalName").value,
+            departureCities: document.getElementById("departureCities").value,
+            arrivalCities: document.getElementById("arrivalCities").value,
+            departureTown: document.getElementById("departureTown").value,
+            arrivalTown: document.getElementById("arrivalTown").value,
+            departureDetailedAddress: document.getElementById("departureDetailedAddress").value,
+            arrivalDetailedAddress: document.getElementById("arrivalDetailedAddress").value,
+            departureManager: document.getElementById("departureManager").value,
+            arrivalManager: document.getElementById("arrivalManager").value,
+            departureManagerPhoneNum: document.getElementById("departureManagerPhoneNum").value,
+            arrivalManagerPhoneNum: document.getElementById("arrivalManagerPhoneNum").value,
+            option1: document.getElementById("option1").value,
+            option2: document.getElementById("option2").value,
+            option3: document.getElementById("option3").value,
+            option4: document.getElementById("option4").value,
+            destinationAddress: document.getElementById("destinationAddress").value,
+            userCompany: document.getElementById("userCompany").value
+        };
 
-               // 부모 창의 input 태그에 값 설정
-               document.getElementById("orderNumber").value = orderNumber;
-               document.getElementById("arrivalName").value = arrivalName;
-               document.getElementById("arrivalCities").value = arrivalCities;
-               document.getElementById("arrivalTown").value = arrivalTown;
-               
-            	// arrivalCities select box 값 자동 선택
-               var citiesSelectBox = document.getElementById("arrivalCities");
-               for (var i = 0; i < citiesSelectBox.options.length; i++) {
-                   if (citiesSelectBox.options[i].value === arrivalCities) {
-                       citiesSelectBox.selectedIndex = i;
-                       break;
-                   }
-               }
-           } else if( selectedOption.value === "" ) {
-        	// "-- 선택 --"을 클릭했을 때 input 및 select box 초기화
-				document.getElementById("orderNumber").value = "";
-				document.getElementById("arrivalName").value = "";
-				document.getElementById("arrivalTown").value = "";
-				document.getElementById("arrivalCities").selectedIndex = 0;
-           }
-       }
-   </script> -->
+        $.ajax({
+            type: "POST",
+            url: "writeAction.jsp",
+            data: orderData,
+            success: function(response) {
+            	let result = response.trim();  // ✅ 응답값 공백 제거
+                console.log("Result: ", result);
+                if (response.trim() === "SUCCESS") {
+                    alert("오더 작성 완료");
+                    window.location.replace("main.jsp");
+                } else if (response.trim() === "DUPLICATE") {
+                    alert("이미 존재하는 출/도착지입니다. 오더만 등록되었습니다.");
+                } else {
+                    alert("오더 작성에 실패했습니다.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error: ", error);
+                alert("서버 오류 발생!");
+            }
+        });
+    }
+</script> -->
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -178,13 +213,15 @@
 	            <div class="text-right">
 	            	<div class="btn-group">
 		                <input type="button" class="btn btn-primary" onclick="rtn();" value="신규">
-		                <button type="submit" class="btn btn-primary" style="margin-left: 10px;">저장</button>
+		                <button type="submit" class="btn btn-primary" style="margin-left: 10px;" onclick="insertOrder();">저장</button>
 	            	</div>
 	            </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
                            <input type="date" name="orderDate" id="orderDate" class="form-control" required>
+                           <input type="hidden" name="userType" id="userType" value="<%= userType %>">
+                           <input type="hidden" name="userCompany" id="userCompany" value="<%= userCompany %>">
                        </div>
                    </div>
                    <div class="form-group row">
@@ -194,7 +231,7 @@
 	                        String userName2 = userDAO.getUserName();
 	                        List<String> salesUserList = userDAO.getSalesUsersInCompany();
 	                        
-	                    	ArrayList<User> userList = userDAO.getUserList();
+	                    	List<User> userList = userDAO.getUserList();
                         %>
                        <div class="col-sm-3">
                            <select name="userName" class="form-control" required>
@@ -283,7 +320,7 @@
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기타:</label>
                         <div class="col-sm-10">
-                            <input type="text" name="etc" class="form-control">
+                            <input type="text" name="etc" id="etc" class="form-control">
                         </div>
 				</div>
             </div>
@@ -343,7 +380,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자:</label>
+                    	<label class="col-sm-2 control-label">출발지 담당자:</label>
                         <div class="col-sm-3">
                         	<input type="text" name="departureManager" class="form-control">
                         </div>
@@ -410,7 +447,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자:</label>
+                    	<label class="col-sm-2 control-label">도착지 담당자:</label>
                         <div class="col-sm-3">
                         	<input type="text" name="arrivalManager" class="form-control">
                         </div>

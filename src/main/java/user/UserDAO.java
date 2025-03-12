@@ -21,17 +21,9 @@ public class UserDAO {
 	private PreparedStatement pstmt;
 	private ResultSet rs;
     private HttpSession session;
+    private SqlSession sqlSession = MybatisUtil.getSession();
 	
 	public UserDAO() {
-		try {
-			String dbURL = "jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&useSSL=false";;
-			String dbID = "root";
-			String dbPassword = "root";
-			Class.forName( "com.mysql.jdbc.Driver" );
-			conn = DriverManager.getConnection( dbURL, dbID, dbPassword );
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
 	}
 	
 	// 세션 설정 메서드
@@ -39,51 +31,44 @@ public class UserDAO {
         this.session = session;
     }
 	
-	public User login( String userID, String userPassword ) {
-		String SQL = "SELECT userPassword, userType, userCompany FROM USER WHERE userID = ?";
-		try {
-			pstmt = conn.prepareStatement( SQL );
-			pstmt.setString( 1, userID );
-			rs = pstmt.executeQuery();
-			if( rs.next() ) {
-				if(rs.getString(1).equals(userPassword)) {
-					User user = new User();
-					user.setUserID(userID);
-					user.setUserType(rs.getString("userType"));
-					user.setUserCompany(rs.getString("userCompany"));
-					return user; // 로그인 성공
-				} else
-					return null; // 비밀번호 불일치
-			}
-			return null; // 아이디가 없음
-		} catch( Exception e ) {
-			e.printStackTrace();
-		}
-		return null; // 데이터베이스 오류
-	}
+    public User login(String userID, String userPassword) {
+        User user = null;
+        try {
+            sqlSession = MybatisUtil.getSession();
+
+            user = sqlSession.selectOne("UserDAO.login", 
+                new User(userID, userPassword));
+
+            if (user != null) {
+                System.out.println("로그인 성공: " + user.getUserID());
+            } else {
+                System.out.println("로그인 실패: 아이디 또는 비밀번호 오류");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (sqlSession != null) {
+                sqlSession.close(); // ✅ 세션 닫기
+            }
+        }
+
+        return user;
+    }
 	
-	public ArrayList<User> getUserList() {
-		String SQL = "SELECT * FROM USER WHERE userType <> 'admin'";
-		ArrayList<User> userList = new ArrayList<User>();
-		try {
-			pstmt = conn.prepareStatement( SQL );
-			rs = pstmt.executeQuery();
-			while( rs.next() ) {
-				User user = new User();
-				user.setUserID( rs.getString(1) );
-				user.setUserPassword( rs.getString(2) );
-				user.setUserName( rs.getString(3) );
-				user.setUserType( rs.getString(4) );
-				user.setUserPhoneNumber( rs.getString(5) );
-				user.setUserCompany( rs.getString(6) );
-				user.setUserTeam( rs.getString(7) );
-				userList.add( user );
-			}
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-		return userList;
-	}
+    public List<User> getUserList() {
+        List<User> userList = null;
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+            // ✅ MyBatis selectList 사용
+            userList = sqlSession.selectList("UserDAO.getUserList");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (sqlSession != null) {
+                sqlSession.close(); // ✅ 세션 닫기
+            }
+        }
+        return userList;
+    }
 	
 	public ArrayList<User> getAdminUserList() {
 		String SQL = "SELECT * FROM USER WHERE userType = 'admin'";
@@ -110,7 +95,7 @@ public class UserDAO {
 	
 	// 현재 로그인한 사용자의 userType 가져오기
     public String getUserType() {
-        try ( SqlSession sqlSession = MybatisUtil.getSession() ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
             String userID = getUserID();
             if (userID != null) {
                 return sqlSession.selectOne("UserDAO.getUserType", userID);
@@ -143,7 +128,7 @@ public class UserDAO {
 	
 	// 현재 로그인한 사용자의 userName 가져오기
     public String getUserName() {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try (SqlSession session = MybatisUtil.getSession()) {
             String userID = getUserID();
             if (userID != null) {
                 return sqlSession.selectOne("UserDAO.getUserName", userID);
@@ -156,7 +141,7 @@ public class UserDAO {
 
     // 현재 로그인한 사용자의 userCompany 가져오기
     public String getUserCompany() {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try (SqlSession session = MybatisUtil.getSession()) {
             String userID = getUserID();
             if (userID != null) {
                 return sqlSession.selectOne("UserDAO.getUserCompany", userID);
@@ -170,7 +155,7 @@ public class UserDAO {
     // 같은 userCompany에 속한 sales 유저 목록 가져오기 (manager 용)
     public List<String> getSalesUsersInCompany() {
         List<String> userList = new ArrayList<>();
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try (SqlSession session = MybatisUtil.getSession()) {
             String userCompany = getUserCompany();
             if (userCompany != null) {
                 userList = sqlSession.selectList( "UserDAO.getSalesUsersInCompany", userCompany );
@@ -232,7 +217,7 @@ public class UserDAO {
     
  // 선택한 유저 삭제 메서드
     public boolean deleteUser(List<String> userIDs) {
-        try (SqlSession sqlSession = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             int deletedRows = sqlSession.delete("UserDAO.deleteUser", userIDs);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
@@ -243,13 +228,13 @@ public class UserDAO {
     }
     
     public User getUserById( String userID ) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             return session.selectOne("UserDAO.getUserById", userID);
         }
     }
     
     public int updateUser( String userID, String userPassword, String userName, String userType, String userPhoneNumber, String userCompany, String userTeam) {
-        try (SqlSession session = MybatisUtil.getSession()) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
             Map<String, Object> params = new HashMap<>();
             params.put("userID", userID);
             params.put("userPassword", userPassword);

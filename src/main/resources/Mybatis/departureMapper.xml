@@ -4,9 +4,24 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="DepartureDAO">
 	<insert id="insertDeparture" parameterType="departure.Departure">
-		INSERT INTO departure (orderNumber, departureName, departureCities, departureTown, departureDetailedAddress, departureManager, departureManagerPhoneNum, etc, regDate, userCompany)
-		VALUES (#{orderNumber}, #{departureName}, #{departureCities}, #{departureTown}, #{departureDetailedAddress}, #{departureManager}, #{departureManagerPhoneNum}, #{etc}, NOW(), #{userCompany})
-	</insert>
+        INSERT INTO departure (
+            departureName, departureCities, departureTown, departureDetailedAddress,
+            departureManager, departureManagerPhoneNum, etc, regDate, userCompany
+        ) VALUES (
+            #{departureName}, #{departureCities},
+            <if test="departureTown != null">#{departureTown}</if>
+            <if test="departureTown == null">NULL</if>,
+            <if test="departureDetailedAddress != null">#{departureDetailedAddress}</if>
+            <if test="departureDetailedAddress == null">NULL</if>,
+            <if test="departureManager != null">#{departureManager}</if>
+            <if test="departureManager == null">NULL</if>,
+            <if test="departureManagerPhoneNum != null">#{departureManagerPhoneNum}</if>
+            <if test="departureManagerPhoneNum == null">NULL</if>,
+            <if test="etc != null">#{etc}</if>
+            <if test="etc == null">NULL</if>,
+            NOW(), #{userCompany}
+        )
+    </insert>
 
 	<select id="getDeparturesByCompany" parameterType="map" resultType="departure.Departure">
         SELECT *
@@ -60,5 +75,11 @@
         SELECT * 
         FROM departure
         WHERE orderNumber = #{orderNumber}
+    </select>
+	
+	<select id="checkDuplicateDeparture" resultType="int">
+        SELECT COUNT(*)
+        FROM departure
+        WHERE departureName = #{departureName}
     </select>
 </mapper>

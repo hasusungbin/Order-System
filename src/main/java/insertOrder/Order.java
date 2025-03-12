@@ -41,6 +41,7 @@ public class Order {
 	private String option3;
 	private String option4;
 	private String destinationAddress;
+	private String userCompany;
 	
 	public Order() {
 	}
@@ -339,6 +340,14 @@ public class Order {
 
 	public void setOption3(String option3) {
 		this.option3 = option3;
+	}
+
+	public String getUserCompany() {
+		return userCompany;
+	}
+
+	public void setUserCompany(String userCompany) {
+		this.userCompany = userCompany;
 	}
 	
 	
