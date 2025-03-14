@@ -12,7 +12,7 @@
 <meta name="viewport" content="width=device-width", initial-scale="1">
 <link rel="stylesheet" href="css/bootstrap.css">
 <title>로지스톡 운송 오더 시스템</title>
-<script>
+<!-- <script>
         function validateForm() {
             let userId = document.getElementById("userID").value;
             let userPw = document.getElementById("userPassword").value;
@@ -24,7 +24,7 @@
 
             return true;
         }
-</script>
+</script> -->
 <script>
     function deleteSelectedUsers() {
         let selectedUsers = [];
@@ -120,7 +120,7 @@
 			<ul class="nav navbar-nav">
 				<li class="active" <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 	<%
 		if (userID == null) {
@@ -170,40 +170,44 @@
 		            	</div>
 		            </div>
                 	<div class="form-group row">
-                        <label class="col-sm-2 control-label">* 담당자 ID:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자 ID:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" id="userID" name="userID" class="form-control" required autocomplete="off" placeholder="담당자 ID 입력">
+                        	<input type="text" id="userID" name="userID" class="form-control" required placeholder="담당자 ID 입력" autocomplete="off" onfocus="this.removeAttribute('readonly');">
                         </div>
-                        <label class="col-sm-2 control-label">* 담당자 PW:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자 PW:</a></label>
                         <div class="col-sm-3">
-                            <input type="password" id="userPassword" name="userPassword" class="form-control" autocomplete="off" placeholder="담당자 비밀번호 입력" required>
+                            <input type="password" id="userPassword" name="userPassword" class="form-control" placeholder="담당자 비밀번호 입력" required autocomplete="new-password" onfocus="this.removeAttribute('readonly');">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">* 담당자명:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자명:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="userName" class="form-control" autocomplete="off" placeholder="담당자명 입력" required>
+                        	<input type="text" name="userName" class="form-control" placeholder="담당자명 입력" required>
                         </div>
                         <label class="col-sm-2 control-label">담당자 연락처:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="userPhoneNumber" class="form-control" placeholder="담당자 연락처 입력" required>
+                            <input type="text" name="userPhoneNumber" class="form-control" placeholder="담당자 연락처 입력">
                         </div>
                     </div>
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">회사명:</label>
                         <div class="col-sm-3">
-                            <select name="userCompany" class="form-control" required>
-                                <option value="logistalk">로지스톡</option>
-                                <option value="KCC">KCC</option>
-                            </select>
+                            <select name="userCompany" class="form-control">
+									<option value="">--선택--</option>
+									<option value="KCC글라스">KCC글라스</option>
+									<option value="(주)쎄레코">(주)쎄레코</option>
+									<option value="(주)JKC 코퍼레이션">(주)JKC 코퍼레이션</option>
+									<option value="코스모프로">코스모프로</option>
+									<option value="(주)발렉스">(주)발렉스</option>
+								</select>
                         </div>
                         <label class="col-sm-2 control-label">부서명:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="userTeam" class="form-control" placeholder="담당자 부서명 입력" required>
+                            <input type="text" name="userTeam" class="form-control" placeholder="담당자 부서명 입력">
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자 등급:</label>
+                    	<label class="col-sm-2 control-label"><a class="text-danger">* 담당자 등급:</a></label>
                         <div class="col-sm-3">
                             <select name="userType" class="form-control" required>
                                 <option value="sales">영업사원</option>
@@ -234,10 +238,10 @@
 			        <tr>
 			            <td><input type="checkbox" name="userCheckbox" value="<%= user.getUserID() %>"></td>
 			            <td><a href="userUpdate.jsp?userID=<%= user.getUserID() %>"><%= user.getUserName() %></a></td>
-			            <td><%= user.getUserPhoneNumber() %></td>
-			            <td><%= user.getUserTeam() %></td>
-			            <td><%= user.getUserType() %></td>
-			            <td><%= user.getFormattedRegDate() %></td>
+			            <td><%= user.getUserPhoneNumber() != null ? user.getUserPhoneNumber() : "" %></td>
+			            <td><%= user.getUserTeam() != null ? user.getUserTeam() : "" %></td>
+			            <td><%= user.getUserType() != null ? user.getUserType() : "" %></td>
+			            <td><%= user.getFormattedRegDate() != null ? user.getFormattedRegDate() : "" %></td>
 			        </tr>
 			    <% } %>
 				</table>

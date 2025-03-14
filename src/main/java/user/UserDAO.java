@@ -105,6 +105,17 @@ public class UserDAO {
         }
         return null;
     }
+    
+    public String getUserTypeByID( String userID ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
+            if (userID != null) {
+                return sqlSession.selectOne("UserDAO.getUserTypeByID", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 	
 	public User getAdminUser(String userID) {
 	    User user = null;
@@ -143,6 +154,18 @@ public class UserDAO {
     public String getUserCompany() {
         try (SqlSession session = MybatisUtil.getSession()) {
             String userID = getUserID();
+            if (userID != null) {
+                return sqlSession.selectOne("UserDAO.getUserCompany", userID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+ // 현재 로그인한 사용자의 userCompany 가져오기
+    public String getUserCompany( String userID ) {
+        try (SqlSession session = MybatisUtil.getSession()) {
             if (userID != null) {
                 return sqlSession.selectOne("UserDAO.getUserCompany", userID);
             }

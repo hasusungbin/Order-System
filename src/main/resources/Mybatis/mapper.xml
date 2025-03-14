@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="insertOrder.OrderDAO">
+<mapper namespace="OrderDAO">
   <select id="getSearchList" resultType="insertOrder.Order">
         SELECT * FROM cargoorder
         WHERE 1=1
@@ -12,19 +12,19 @@
         <if test="refNumber != null">
             AND refNumber = #{refNumber}
         </if>
-        <if test="userName != null and userName != ''">
+        <if test="userName != null and userName IS NOT NULL">
             AND userName LIKE CONCAT('%', #{userName}, '%')
         </if>
-        <if test="departureName != null and departureName != ''">
+        <if test="departureName != null and departureName IS NOT NULL">
             AND departureName LIKE CONCAT('%', #{departureName}, '%')
         </if>
-        <if test="arrivalName != null and arrivalName != ''">
+        <if test="arrivalName != null and arrivalName IS NOT NULL">
             AND arrivalName LIKE CONCAT('%', #{arrivalName}, '%')
         </if>
-        <if test="arrivalCities != null and arrivalCities != ''">
+        <if test="arrivalCities != null and arrivalCities IS NOT NULL">
             AND arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%')
         </if>
-        <if test="orderNumber != null and orderNumber != ''">
+        <if test="orderNumber != null and orderNumber IS NOT NULL">
             AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
         </if>
         ORDER BY orderID DESC
@@ -38,40 +38,139 @@
 	</select>
 	
 	
-	<!-- 검색 + 페이징 리스트 조회 -->
-    <select id="getPagedList" resultType="insertOrder.Order">
-        SELECT * FROM cargoorder
-        WHERE 1=1
-		<if test="startDate != null and endDate != null">
-			AND orderDate BETWEEN #{startDate} AND #{endDate}
+	<select id="getSearchOrderList" parameterType="map" resultType="insertOrder.Order">
+	SELECT *
+    FROM cargoorder
+    WHERE 1=1
+    <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
+    <if test="startDate != null and endDate != null">
+        AND orderDate BETWEEN #{startDate} AND #{endDate}
+    </if>
+    
+    <!-- ✅ 참조번호 -->
+    <if test="refNumber != null">
+        AND refNumber = #{refNumber}
+    </if>
+
+    <!-- ✅ 담당자명 -->
+    <if test="userName != null and userName != ''">
+        AND (userName LIKE CONCAT('%', #{userName}, '%') OR #{userName} IS NULL)
+    </if>
+
+    <!-- ✅ 출발지명 -->
+    <if test="departureName != null and departureName != ''">
+        AND (departureName LIKE CONCAT('%', #{departureName}, '%') OR #{departureName} IS NULL)
+    </if>
+	
+	<!-- ✅ 출발지 시/도 -->
+    <if test="departureCities != null and departureCities != ''">
+        AND (departureCities LIKE CONCAT('%', #{departureCities}, '%') OR #{departureCities} IS NULL)
+    </if>
+
+    <!-- ✅ 도착지명 -->
+    <if test="arrivalName != null and arrivalName != ''">
+        AND (arrivalName LIKE CONCAT('%', #{arrivalName}, '%') OR #{arrivalName} IS NULL)
+    </if>
+
+    <!-- ✅ 도착지 시/도 -->
+    <if test="arrivalCities != null and arrivalCities != ''">
+        AND (arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%') OR #{arrivalCities} IS NULL)
+    </if>
+    <!-- ✅ 오더번호 -->
+    <if test="orderNumber != null and orderNumber.trim() != ''">
+        AND (CAST(orderNumber AS CHAR) LIKE CONCAT('%', #{orderNumber}, '%') OR #{orderNumber} IS NULL)
+    </if>
+    <!-- ✅ userCompany -->
+    <if test="userCompany != null and userCompany != ''">
+        AND (userCompany LIKE CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
+    </if>
+    <!-- ✅ 권한별 조회 조건 -->
+    <if test="userType != null">
+        <if test="userType == 'sales'">
+            AND userName = #{userName}  <!-- ✅ sales는 본인 오더만 -->
         </if>
-        <if test="refNumber != null">
-            AND refNumber = #{refNumber}
+        <if test="userType == 'manager'">
+            AND (userCompany like CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
         </if>
-        <if test="userName != null and userName != ''">
-            AND userName LIKE CONCAT('%', #{userName}, '%')
+        <if test="userType == 'admin'">
+			<!-- ✅ sales는 본인 오더만 -->
         </if>
-        <if test="departureName != null and departureName != ''">
-            AND departureName LIKE CONCAT('%', #{departureName}, '%')
+    </if>
+	<if test="userType == null or userType == ''">
+        <!-- userType이 null인 경우 쿼리 수행하지 않게 강제 필터 -->
+    </if>
+
+    ORDER BY orderID DESC
+    LIMIT #{pageSize} OFFSET #{offset}
+</select>
+
+
+<select id="getPagedList" parameterType="map" resultType="insertOrder.Order">
+    SELECT *
+    FROM cargoorder
+    WHERE 1=1
+    
+    <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
+    <if test="startDate != null and endDate != null">
+        AND orderDate BETWEEN #{startDate} AND #{endDate}
+    </if>
+    
+    <!-- ✅ 참조번호 -->
+    <if test="refNumber != null">
+        AND refNumber = #{refNumber}
+    </if>
+
+    <!-- ✅ 담당자명 -->
+    <if test="userName != null and userName != ''">
+        AND (userName LIKE CONCAT('%', #{userName}, '%') OR #{userName} IS NULL)
+    </if>
+
+    <!-- ✅ 출발지명 -->
+    <if test="departureName != null and departureName != ''">
+        AND (departureName LIKE CONCAT('%', #{departureName}, '%') OR #{departureName} IS NULL)
+    </if>
+	
+	<!-- ✅ 출발지 시/도 -->
+    <if test="departureCities != null and departureCities != ''">
+        AND (departureCities LIKE CONCAT('%', #{departureCities}, '%') OR #{departureCities} IS NULL)
+    </if>
+
+    <!-- ✅ 도착지명 -->
+    <if test="arrivalName != null and arrivalName != ''">
+        AND (arrivalName LIKE CONCAT('%', #{arrivalName}, '%') OR #{arrivalName} IS NULL)
+    </if>
+
+    <!-- ✅ 도착지 시/도 -->
+    <if test="arrivalCities != null and arrivalCities != ''">
+        AND (arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%') OR #{arrivalCities} IS NULL)
+    </if>
+    <!-- ✅ 오더번호 -->
+    <if test="orderNumber != null and orderNumber.trim() != ''">
+        AND (CAST(orderNumber AS CHAR) LIKE CONCAT('%', #{orderNumber}, '%') OR #{orderNumber} IS NULL)
+    </if>
+    <!-- ✅ userCompany -->
+    <if test="userCompany != null and userCompany != ''">
+        AND (userCompany LIKE CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
+    </if>
+    <!-- ✅ 권한별 조회 조건 -->
+    <if test="userType != null">
+        <if test="userType == 'sales'">
+            AND userName = #{userName}  <!-- ✅ sales는 본인 오더만 -->
         </if>
-        <if test="arrivalName != null and arrivalName != ''">
-            AND arrivalName LIKE CONCAT('%', #{arrivalName}, '%')
+        <if test="userType == 'manager'">
+            AND userCompany = #{userCompany}
         </if>
-        <if test="arrivalCities != null and arrivalCities != ''">
-            AND arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%')
+        <if test="userType == 'admin'">
+			<!-- ✅ sales는 본인 오더만 -->
         </if>
-        <if test="orderNumber != null and orderNumber != ''">
-            AND orderNumber LIKE CONCAT('%', #{orderNumber}, '%')
-        </if>
-		<if test="userType == 'sales'">
-			AND userName = #{userName}  <!-- 본인이 작성한 오더만 -->
-		</if>
-		<if test="userType == 'manager'">
-			AND userCompany = (SELECT userCompany FROM user WHERE userName = #{userName})  <!-- 같은 회사의 오더만 -->
-		</if>
-        ORDER BY orderID DESC
-        LIMIT #{pageSize} OFFSET #{offset}
-    </select>
+    </if>
+	<if test="userType == null or userType == ''">
+        <!-- userType이 null인 경우 쿼리 수행하지 않게 강제 필터 -->
+    </if>
+
+    ORDER BY orderID DESC
+    LIMIT #{pageSize} OFFSET #{offset}
+</select>
 
     <!-- 검색 결과 개수 조회 -->
     <select id="getTotalCount" resultType="int">
@@ -131,34 +230,33 @@
     LIMIT #{pageSize} OFFSET #{offset}
 	</select>
 	
-	<select id="getOrderById" resultType="insertOrder.Order">
-        SELECT * FROM cargoorder WHERE orderNumber = #{orderNumber}
+	<select id="getOrderById" parameterType="String" resultType="insertOrder.Order">
+        SELECT * FROM cargoorder WHERE orderNumber = TRIM(#{orderNumber})
     </select>
 	
-	<insert id="writeOrder" parameterType="insertOrder.Order">
-        INSERT INTO cargoorder (
-            kindOfCar, userName, orderDate, carWeight, refNumber, 
-            userPhoneNumber, fixedCarNumber, upDown, item, etc, 
-            startDate, endDate, departureName, arrivalName, 
-            departureCities, arrivalCities, departureTown, arrivalTown, 
-            departureDetailedAddress, arrivalDetailedAddress, 
-            departureManager, arrivalManager, departureManagerPhoneNum, 
-            arrivalManagerPhoneNum, option1, option2, option3, option4, 
-            destinationAddress, userCompany
-        )
-        VALUES (
-            #{kindOfCar}, #{userName}, #{orderDate, jdbcType=DATE}, #{carWeight}, #{refNumber},
-            #{userPhoneNumber}, #{fixedCarNumber}, #{upDown}, #{item}, #{etc},
-            #{startDate, jdbcType=DATE}, #{endDate, jdbcType=DATE}, #{departureName}, #{arrivalName},
-            #{departureCities}, #{arrivalCities}, #{departureTown}, #{arrivalTown},
-            #{departureDetailedAddress}, #{arrivalDetailedAddress},
-            #{departureManager}, #{arrivalManager}, #{departureManagerPhoneNum},
-            #{arrivalManagerPhoneNum}, #{option1}, #{option2}, #{option3},
-            #{option4}, #{destinationAddress}, #{userCompany}
-        )
-    </insert>
+	<insert id="writeOrder" parameterType="map">
+		INSERT INTO cargoorder (
+			orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber,
+			userPhoneNumber, fixedCarNumber, upDown, item, etc,
+			startDate, endDate, departureName, arrivalName,
+			departureCities, arrivalCities, departureTown, arrivalTown,
+			departureDetailedAddress, arrivalDetailedAddress,
+			departureManager, arrivalManager, departureManagerPhoneNum,
+			arrivalManagerPhoneNum, option1, option2, option3, option4,
+			destinationAddress, userCompany
+		) VALUES (
+			#{orderNumber}, #{kindOfCar}, #{userName}, #{orderDate}, #{carWeight}, #{refNumber},
+			#{userPhoneNumber}, #{fixedCarNumber}, #{upDown}, #{item}, #{etc},
+			#{startDate}, #{endDate}, #{departureName}, #{arrivalName},
+			#{departureCities}, #{arrivalCities}, #{departureTown}, #{arrivalTown},
+			#{departureDetailedAddress}, #{arrivalDetailedAddress},
+			#{departureManager}, #{arrivalManager}, #{departureManagerPhoneNum},
+			#{arrivalManagerPhoneNum}, #{option1}, #{option2}, #{option3}, #{option4},
+			#{destinationAddress}, #{userCompany}
+		)
+	</insert>
 	
-	<update id="updateOrder" parameterType="insertOrder.Order" useGeneratedKeys="true" keyProperty="orderID" keyColumn="orderID">
+	<update id="updateOrder" parameterType="insertOrder.Order">
         UPDATE cargoorder
         <set>
 			<if test="kindOfCar != null"> kindOfCar = #{kindOfCar}, </if>
@@ -215,18 +313,4 @@
         </foreach>
     </delete>
 	
-	<select id="getLastInsertedOrderID" resultType="int">
-        SELECT LAST_INSERT_ID();
-    </select>
-	
-	 <!-- ✅ orderNumber 업데이트 쿼리 추가 -->
-    <update id="updateOrderNumber" parameterType="map">
-        UPDATE cargoorder
-        SET orderNumber = #{orderNumber}
-        WHERE orderID = #{orderID}
-    </update>
-	
-	<select id="getOrderID" resultType="int">
-    SELECT LAST_INSERT_ID()
-</select>
 </mapper>

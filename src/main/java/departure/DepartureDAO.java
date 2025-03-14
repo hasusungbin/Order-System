@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
+import arrival.Arrival;
 import insertOrder.MybatisUtil;
 
 public class DepartureDAO {
@@ -55,20 +56,20 @@ public class DepartureDAO {
         	Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);
-            session.commit();
             return session.selectList( "DepartureDAO.getDeparturesByCompany", params );
         }
     }
     
-    public Departure getDepartureByName( String departureName ) {
+    public Departure getDepartureByID( String departureID ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-            return session.selectOne("DepartureDAO.getDepartureByName", departureName);
+            return session.selectOne("DepartureDAO.getDepartureByID", departureID);
         }
     }
     
-    public int updateDeparture( String departureName, String departureCities, String departureTown, String departureDetailedAddress, String departureManager, String departureManagerPhoneNum, String etc) {
+    public int updateDeparture( int departureID, String departureName, String departureCities, String departureTown, String departureDetailedAddress, String departureManager, String departureManagerPhoneNum, String etc) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
             Map<String, Object> params = new HashMap<>();
+            params.put("departureID", departureID);
             params.put("departureName", departureName);
             params.put("departureCities", departureCities);
             params.put("departureTown", departureTown);
@@ -83,10 +84,10 @@ public class DepartureDAO {
         }
     }
     
-    public boolean deleteDeparture(List<String> orderNumbers) {
+    public boolean deleteDeparture(List<String> departureIDs) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	sqlSession = MybatisUtil.getSession();
-            int deletedRows = sqlSession.delete("DepartureDAO.deleteDeparture", orderNumbers);
+            int deletedRows = sqlSession.delete("DepartureDAO.deleteDeparture", departureIDs);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
         } catch (Exception e) {
@@ -117,6 +118,20 @@ public class DepartureDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return -1; // 오류 발생 시 -1 반환
+        }
+    }
+    
+    // 검색 조건 설정 후 리스트 조회
+    public List<Departure> getSearchDepartureByCompany(String userType, String userCompany, String departureName, String departureCities, String departureTown, String departureManager) {
+        try ( SqlSession session = MybatisUtil.getSession() ) {
+        	Map<String, Object> params = new HashMap<>();
+            params.put("userType", userType);
+            params.put("userCompany", userCompany);
+            params.put("departureName", departureName);
+            params.put("departureCities", departureCities);
+            params.put("departureTown", departureTown);
+            params.put("departureManager", departureManager);
+            return session.selectList( "DepartureDAO.getSearchDepartureByCompany", params );
         }
     }
 }

@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ page import="arrival.ArrivalDAO" %>
 <%@ page import="arrival.Arrival" %>
+<%@ page import="departure.DepartureDAO" %>
+<%@ page import="departure.Departure" %>
 <%@ page import="org.apache.ibatis.session.SqlSessionFactory" %>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="user.UserDAO" %>
@@ -48,25 +50,47 @@
     String etc = request.getParameter("etc");
 
     // Arrival 객체 생성 및 값 설정
-    Arrival arrival = new Arrival();
-    arrival.setArrivalName(arrivalName);
-    arrival.setArrivalCities(arrivalCities);
-    arrival.setArrivalManager(arrivalManager);
-    arrival.setArrivalTown(arrivalTown);
-    arrival.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
-    arrival.setArrivalDetailedAddress(arrivalDetailedAddress);
-    arrival.setEtc(etc);
-    arrival.setUserCompany(userCompany); // 세션에서 가져온 userCompany 저장 
+    if( type.equals("출발지") ) {
+    	Departure departure = new Departure();
+    	departure.setDepartureName(arrivalName);
+    	departure.setDepartureCities(arrivalCities);
+    	departure.setDepartureManager(arrivalManager);
+    	departure.setDepartureTown(arrivalTown);
+    	departure.setDepartureManagerPhoneNum(arrivalManagerPhoneNum);
+    	departure.setDepartureDetailedAddress(arrivalDetailedAddress);
+    	departure.setEtc(etc);
+    	departure.setUserCompany(userCompany);
+    	
+    	DepartureDAO departureDAO = new DepartureDAO();
+    	departureDAO.insertDeparture(departure);
+    	
+    	PrintWriter script = response.getWriter();
+        script.println("<script>");
+        script.println("alert('출발지가 저장되었습니다.');");
+        script.println("location.href='arrivalModify.jsp';");
+        script.println("</script>");
+        
+    } else if( type.equals("도착지") ) {
+    	Arrival arrival = new Arrival();
+        arrival.setArrivalName(arrivalName);
+        arrival.setArrivalCities(arrivalCities);
+        arrival.setArrivalManager(arrivalManager);
+        arrival.setArrivalTown(arrivalTown);
+        arrival.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
+        arrival.setArrivalDetailedAddress(arrivalDetailedAddress);
+        arrival.setEtc(etc);
+        arrival.setUserCompany(userCompany); // 세션에서 가져온 userCompany 저장 
 
-    // DAO 생성 및 저장
-    ArrivalDAO arrivalDAO = new ArrivalDAO(); 
-    arrivalDAO.insertArrival(arrival);
+        // DAO 생성 및 저장
+        ArrivalDAO arrivalDAO = new ArrivalDAO(); 
+        arrivalDAO.insertArrival(arrival);
 
-    PrintWriter script = response.getWriter();
-    script.println("<script>");
-    script.println("alert('출/도착지가 저장되었습니다.');");
-    script.println("location.href='arrivalModify.jsp';");
-    script.println("</script>");
+        PrintWriter script = response.getWriter();
+        script.println("<script>");
+        script.println("alert('도착지가 저장되었습니다.');");
+        script.println("location.href='arrivalModify.jsp';");
+        script.println("</script>");
+    }
 %>
 </body>
 </html>

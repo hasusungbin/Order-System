@@ -89,7 +89,7 @@
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
 					script.println( "alert('오더 수정을 완료했습니다.');" );
-					script.println( "location.href = 'orderUpdate.jsp'" );
+					script.println( "location.href = 'orderModify.jsp'" );
 					script.println( "</script>" );
 				}
 			}

@@ -13,54 +13,54 @@
 	</resultMap>
 	
 	<insert id="insertArrival" parameterType="arrival.Arrival">
-    INSERT INTO arrival (
-        arrivalName,
-        arrivalCities,
-        arrivalTown,
-        arrivalDetailedAddress,
-        arrivalManager,
-        arrivalManagerPhoneNum,
-        etc,
-        regDate,
-        userCompany
-    )
-    VALUES (
-        #{arrivalName},
-        #{arrivalCities},
-        <if test="arrivalTown != null">
-            #{arrivalTown}
-        </if>
-        <if test="arrivalTown == null">
-            NULL
-        </if>,
-        <if test="arrivalDetailedAddress != null">
-            #{arrivalDetailedAddress}
-        </if>
-        <if test="arrivalDetailedAddress == null">
-            NULL
-        </if>,
-        <if test="arrivalManager != null">
-            #{arrivalManager}
-        </if>
-        <if test="arrivalManager == null">
-            NULL
-        </if>,
-        <if test="arrivalManagerPhoneNum != null">
-            #{arrivalManagerPhoneNum}
-        </if>
-        <if test="arrivalManagerPhoneNum == null">
-            NULL
-        </if>,
-        <if test="etc != null">
-            #{etc}
-        </if>
-        <if test="etc == null">
-            NULL
-        </if>,
-        NOW(),
-        #{userCompany}
-    )
-</insert>
+		INSERT INTO arrival (
+			arrivalName,
+			arrivalCities,
+			arrivalTown,
+			arrivalDetailedAddress,
+			arrivalManager,
+			arrivalManagerPhoneNum,
+			etc,
+			regDate,
+			userCompany
+		)
+		VALUES (
+			#{arrivalName},
+			#{arrivalCities},
+			<if test="arrivalTown != null">
+				#{arrivalTown}
+			</if>
+			<if test="arrivalTown == null">
+				NULL
+			</if>,
+			<if test="arrivalDetailedAddress != null">
+				#{arrivalDetailedAddress}
+			</if>
+			<if test="arrivalDetailedAddress == null">
+				NULL
+			</if>,
+			<if test="arrivalManager != null">
+				#{arrivalManager}
+			</if>
+			<if test="arrivalManager == null">
+				NULL
+			</if>,
+			<if test="arrivalManagerPhoneNum != null">
+				#{arrivalManagerPhoneNum}
+			</if>
+			<if test="arrivalManagerPhoneNum == null">
+				NULL
+			</if>,
+			<if test="etc != null">
+				#{etc}
+			</if>
+			<if test="etc == null">
+				NULL
+			</if>,
+			NOW(),
+			#{userCompany}
+		)
+	</insert>
 
 	<select id="getArrivalsByCompany" parameterType="map" resultType="arrival.Arrival">
         SELECT *
@@ -73,8 +73,8 @@
         ORDER BY arrivalID DESC
     </select>
 	
-	<select id="getArrivalByName" resultType="arrival.Arrival">
-        SELECT * FROM arrival WHERE arrivalName = #{arrivalName}
+	<select id="getArrivalByID" resultType="arrival.Arrival">
+        SELECT * FROM arrival WHERE arrivalID = #{arrivalID}
     </select>
 	
 	<update id="updateArrival">

@@ -6,7 +6,7 @@
 	<insert id="insertDeparture" parameterType="departure.Departure">
         INSERT INTO departure (
             departureName, departureCities, departureTown, departureDetailedAddress,
-            departureManager, departureManagerPhoneNum, etc, regDate, userCompany
+            departureManager, departureManagerPhoneNum, etc, userCompany
         ) VALUES (
             #{departureName}, #{departureCities},
             <if test="departureTown != null">#{departureTown}</if>
@@ -19,7 +19,7 @@
             <if test="departureManagerPhoneNum == null">NULL</if>,
             <if test="etc != null">#{etc}</if>
             <if test="etc == null">NULL</if>,
-            NOW(), #{userCompany}
+            #{userCompany}
         )
     </insert>
 
@@ -34,28 +34,28 @@
         ORDER BY departureID DESC
     </select>
 	
-	<select id="getDepartureByName" resultType="departure.Departure">
-        SELECT * FROM departure WHERE arrivalName = #{arrivalName}
+	<select id="getDepartureByID" resultType="departure.Departure">
+        SELECT * FROM departure WHERE departureID = #{departureID}
     </select>
 	
 	<update id="updateDeparture">
         UPDATE departure
         <set>
-			arrivalName = #{arrivalName},
-			arrivalCities = #{arrivalCities},
-			arrivalTown = #{arrivalTown},
-			arrivalDetailedAddress = #{arrivalDetailedAddress},
-			arrivalManager = #{arrivalManager},
-			arrivalManagerPhoneNum = #{arrivalManagerPhoneNum},
+			departureName = #{departureName},
+			departureCities = #{departureCities},
+			departureTown = #{departureTown},
+			departureDetailedAddress = #{departureDetailedAddress},
+			departureManager = #{departureManager},
+			departureManagerPhoneNum = #{departureManagerPhoneNum},
 			<if test="etc != null"> etc = #{etc}, </if>
 		</set>
-        WHERE arrivalName = #{arrivalName}
+        WHERE departureID = #{departureID}
     </update>
 	
 	<delete id="deleteDeparture">
-        DELETE FROM departure WHERE orderNumber IN 
-        <foreach item="orderNumber" collection="list" open="(" separator="," close=")">
-            #{orderNumber}
+        DELETE FROM departure WHERE departureID IN 
+        <foreach item="departureID" collection="list" open="(" separator="," close=")">
+            #{departureID}
         </foreach>
     </delete>
 	
@@ -69,17 +69,33 @@
 		</where>
 		
     </select>
-
-    <!-- 도착지 ID로 도착지 정보 가져오기 -->
-    <select id="selectDepartureById" resultType="departure.Departure">
-        SELECT * 
-        FROM departure
-        WHERE orderNumber = #{orderNumber}
-    </select>
 	
 	<select id="checkDuplicateDeparture" resultType="int">
         SELECT COUNT(*)
         FROM departure
         WHERE departureName = #{departureName}
+    </select>
+	
+	<select id="getSearchDepartureByCompany" resultType="departure.Departure">
+        SELECT *
+        FROM departure
+        <where>
+            <if test="userType != 'admin'">
+                userCompany = #{userCompany}
+            </if>
+            <if test="departureName != null and departureName != ''">
+                AND departureName LIKE CONCAT('%', #{departureName}, '%')
+            </if>
+            <if test="departureCities != null and departureCities != ''">
+                AND departureCities LIKE CONCAT('%', #{departureCities}, '%')
+            </if>
+            <if test="departureTown != null and departureTown != ''">
+                AND departureTown LIKE CONCAT('%', #{departureTown}, '%')
+            </if>
+            <if test="departureManager != null and departureManager != ''">
+                AND departureManager LIKE CONCAT('%', #{departureManager}, '%')
+            </if>
+        </where>
+		ORDER BY departureID DESC
     </select>
 </mapper>

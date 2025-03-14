@@ -41,7 +41,7 @@ public class OrderDAO {
 	
 	public List<Order> getAllList() {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-            return session.selectList("insertOrder.OrderDAO.getAllList");
+            return session.selectList("OrderDAO.getAllList");
         }
     }
 	
@@ -146,101 +146,114 @@ public class OrderDAO {
 	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
 	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
-	        String option1, String option2, String option3, String option4, String destinationAddress, 
+	        String driverName, String driverPhoneNum,
+	        String option1, String option2, String option3, String option4, String destinationAddress,
 	        String userCompany) {
 
 	    int affectedRows = 0;
-	    SqlSession sqlSession = MybatisUtil.getSession();
+	    SqlSession sqlSession = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
 
 	    try {
-	        // ✅ Order 객체 생성 및 데이터 설정
-	        Order order = new Order();
-	        // 현재 날짜 (yyyyMMdd)
-	        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+	        // ✅ 트랜잭션 가능한 세션 열기
+	        sqlSession = MybatisUtil.getSession();
+	        conn = sqlSession.getConnection(); 
+	        conn.setAutoCommit(false);
 
-	        // 랜덤한 숫자 및 문자 생성
-	        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	        StringBuilder randomPart = new StringBuilder();
+	        // ✅ 현재 날짜 (yyMMdd 형식) 생성 → "250313"
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
+	        String datePart = dateFormat.format(new Date());
 
-	        Random random = new Random();
-	        for (int i = 0; i < 6; i++) { // 6자리 랜덤 문자열 생성
-	            int index = random.nextInt(characters.length());
-	            randomPart.append(characters.charAt(index));
-	        }
-	        
-	        order.setOrderNumber(date + randomPart.toString());
-	        order.setKindOfCar(kindOfCar);
-	        order.setUserName(userName);
-	        order.setOrderDate(orderDate);
-	        order.setCarWeight(carWeight);
-	        order.setRefNumber(refNumber);
-	        order.setUserPhoneNumber(userPhoneNumber);
-	        order.setFixedCarNumber(fixedCarNumber);
-	        order.setUpDown(upDown);
-	        order.setItem(item);
-	        order.setEtc(etc);
-	        order.setStartDate(startDate);
-	        order.setEndDate(endDate);
-	        order.setDepartureName(departureName);
-	        order.setArrivalName(arrivalName);
-	        order.setDepartureCities(departureCities);
-	        order.setArrivalCities(arrivalCities);
-	        order.setDepartureTown(departureTown);
-	        order.setArrivalTown(arrivalTown);
-	        order.setDepartureDetailedAddress(departureDetailedAddress);
-	        order.setArrivalDetailedAddress(arrivalDetailedAddress);
-	        order.setDepartureManager(departureManager);
-	        order.setArrivalManager(arrivalManager);
-	        order.setDepartureManagerPhoneNum(departureManagerPhoneNum);
-	        order.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
-	        order.setOption1(option1);
-	        order.setOption2(option2);
-	        order.setOption3(option3);
-	        order.setOption4(option4);
-	        order.setDestinationAddress(destinationAddress);
-	        order.setUserCompany(userCompany);
+	        // ✅ 밀리초 값에서 뒤 6자리 사용 → 동시성 문제 방지
+	        String timePart = String.valueOf(System.currentTimeMillis()).substring(7);
 
-	        // ✅ MyBatis 매퍼 호출 - INSERT
-	        affectedRows = sqlSession.insert("insertOrder.OrderDAO.writeOrder", order);
-	        System.out.println("✅ affectedRows: " + affectedRows);
+	        // ✅ orderNumber 생성 (날짜 + 밀리초)
+	        String orderNumber = datePart + timePart;
+	        System.out.println("Generated orderNumber: " + orderNumber);
+
+	        // ✅ SQL 작성 (orderID는 제외)
+	        String sql = "INSERT INTO cargoorder (" +
+	                "orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, " +
+	                "userPhoneNumber, fixedCarNumber, upDown, item, etc, " +
+	                "startDate, endDate, departureName, arrivalName, " +
+	                "departureCities, arrivalCities, departureTown, arrivalTown, " +
+	                "departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, " +
+	                "departureManagerPhoneNum, arrivalManagerPhoneNum, driverName, driverPhoneNum, option1, option2, option3, option4, " +
+	                "destinationAddress, userCompany) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	        // ✅ PreparedStatement 생성
+	        pstmt = conn.prepareStatement(sql);
+
+	        pstmt.setString(1, orderNumber);
+	        pstmt.setString(2, kindOfCar);
+	        pstmt.setString(3, userName);
+	        pstmt.setString(4, orderDate);
+	        pstmt.setString(5, carWeight);
+	        pstmt.setInt(6, refNumber);
+	        pstmt.setString(7, userPhoneNumber);
+	        pstmt.setString(8, fixedCarNumber);
+	        pstmt.setString(9, upDown);
+	        pstmt.setString(10, item);
+	        pstmt.setString(11, etc);
+	        pstmt.setString(12, startDate);
+	        pstmt.setString(13, endDate);
+	        pstmt.setString(14, departureName);
+	        pstmt.setString(15, arrivalName);
+	        pstmt.setString(16, departureCities);
+	        pstmt.setString(17, arrivalCities);
+	        pstmt.setString(18, departureTown);
+	        pstmt.setString(19, arrivalTown);
+	        pstmt.setString(20, departureDetailedAddress);
+	        pstmt.setString(21, arrivalDetailedAddress);
+	        pstmt.setString(22, departureManager);
+	        pstmt.setString(23, arrivalManager);
+	        pstmt.setString(24, departureManagerPhoneNum);
+	        pstmt.setString(25, arrivalManagerPhoneNum);
+	        pstmt.setString(26, driverName);
+	        pstmt.setString(27, driverPhoneNum);
+	        pstmt.setString(28, option1);
+	        pstmt.setString(29, option2);
+	        pstmt.setString(30, option3);
+	        pstmt.setString(31, option4);
+	        pstmt.setString(32, destinationAddress);
+	        pstmt.setString(33, userCompany);
+
+	        // ✅ 쿼리 실행
+	        affectedRows = pstmt.executeUpdate();
+
 	        if (affectedRows > 0) {
-	            // ✅ INSERT 후 생성된 orderID 가져오기
-	            int orderId = order.getOrderID();
-	            System.out.println("✅ orderId: " + orderId);
-	            System.out.println("✅ kindOfCar: " + order.getKindOfCar());
+	            // ✅ 커밋
+	            conn.commit();
+	            System.out.println("✅ INSERT 성공 및 트랜잭션 커밋 완료");
+	        } else {
+	            // ❌ 실패 시 롤백
+	            conn.rollback();
+	            System.out.println("❌ INSERT 실패 → 트랜잭션 롤백");
+	        }
 
-	            // ✅ orderNumber 생성: 날짜 + orderID
-	            String currentDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-	            String orderNumber = currentDate + String.format("%04d", orderId);
-
-	            // ✅ orderNumber 업데이트 처리
-	            Map<String, Object> params = new HashMap<>();
-	            params.put("orderId", orderId);
-	            params.put("orderNumber", orderNumber);
-
-	            int updatedRows = sqlSession.update("insertOrder.OrderDAO.updateOrderNumber", params);
-	            if (updatedRows > 0) {
-	                sqlSession.commit();  // ✅ 커밋
-	                System.out.println("✅ Order 등록 완료 및 orderNumber 업데이트 성공");
-	            } else {
-	                sqlSession.rollback();  // ❌ 실패 시 롤백
-	                System.out.println("❌ orderNumber 업데이트 실패");
-	                affectedRows = -1;
+	    } catch (Exception e) {
+	        if (conn != null) {
+	            try {
+	                conn.rollback(); 
+	                System.out.println("❌ 트랜잭션 롤백 발생");
+	            } catch (SQLException rollbackEx) {
+	                rollbackEx.printStackTrace();
 	            }
 	        }
-	    } catch (Exception e) {
-	        if (sqlSession != null) {
-	            sqlSession.rollback();  // ❌ 예외 발생 시 롤백
-	            System.out.println("❌ SQL 실행 오류 발생: " + e.getMessage());
-	        }
 	        e.printStackTrace();
+
 	    } finally {
-	        if (sqlSession != null) {
-	            sqlSession.close();  // ✅ 세션 닫기
-	            System.out.println("✅ 세션 닫기 완료");
+	        try {
+	            if (pstmt != null) pstmt.close();
+	            if (conn != null) conn.setAutoCommit(true);
+	            if (sqlSession != null) sqlSession.close();
+	            System.out.println("✅ 세션 종료 및 리소스 반환 완료");
+	        } catch (SQLException closeEx) {
+	            closeEx.printStackTrace();
 	        }
 	    }
-
 	    return affectedRows;
 	}
 	
@@ -259,11 +272,11 @@ public class OrderDAO {
             params.put("pageSize", pageSize);
             params.put("orderNumber", orderNumber);
 
-            return session.selectList("insertOrder.OrderDAO.getSearchList", params);
+            return session.selectList("OrderDAO.getSearchList", params);
 			}
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
@@ -278,29 +291,37 @@ public class OrderDAO {
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
+	            System.out.println("userType???: " + orderNumber);
 
-	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
+	            return session.selectList("OrderDAO.getPagedList", params);
 	        }
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
 	            
+	            String userID = getUserID();
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
 	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
 	            params.put("refNumber", refNumber);
+	            System.out.println("refNumber: " + refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
+	            System.out.println("departureName: " + departureName);
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
 	            params.put("userType", userType);
+	            params.put("userCompany", userCompany);
+	            params.put("userID", userID);
+	            System.out.println("userType: " + userType);
+	            //System.out.println("userCompany: " + userCompany);
 
-	            return session.selectList("insertOrder.OrderDAO.getPagedList", params);
+	            return session.selectList("OrderDAO.getSearchOrderList", params);
 	        }
 	}
 	
@@ -317,64 +338,110 @@ public class OrderDAO {
             params.put("orderNumber", orderNumber);
             params.put("userType", getUserType());
 
-            return session.selectOne("insertOrder.OrderDAO.getTotalCount", params);
+            return session.selectOne("OrderDAO.getTotalCount", params);
         	
         }
     }
 	
 	public Order getOrderById( String orderNumber ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-            return session.selectOne("insertOrder.OrderDAO.getOrderById", orderNumber);
+        	System.out.println(orderNumber + ": orderNumber");
+            return session.selectOne("OrderDAO.getOrderById", orderNumber);
         }
     }
 	
-	public int updateOrder(String orderNumber, String kindOfCar, String userName, String orderDate, String carWeight, Integer refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item, String etc, 
-			String startDate, String endDate, String departureName, String arrivalName, String departureCities, String arrivalCities, String departureTown, String arrivalTown, String departureDetailedAddress, 
-			String arrivalDetailedAddress, String departureManager, String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum, String carNumber, String driverName, String driverPhoneNum,
-			int basicFare, int addFare, String option1, String option2, String option3, String option4, String destinationAddress) {
-        try ( SqlSession session = MybatisUtil.getSession() ) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("orderNumber", orderNumber);
-            params.put("kindOfCar", kindOfCar);
-            params.put("userName", userName);
-            params.put("orderDate", orderDate);
-            params.put("carWeight", carWeight);
-            params.put("refNumber", refNumber);
-            params.put("userPhoneNumber", userPhoneNumber);
-            params.put("fixedCarNumber", fixedCarNumber);
-            params.put("upDown", upDown);
-            params.put("item", item);
-            params.put("etc", etc);
-            params.put("startDate", startDate);
-            params.put("endDate", endDate);
-            params.put("departureName", departureName);
-            params.put("arrivalName", arrivalName);
-            params.put("departureCities", departureCities);
-            params.put("arrivalCities", arrivalCities);
-            params.put("departureTown", departureTown);
-            params.put("arrivalTown", arrivalTown);
-            params.put("departureDetailedAddress", departureDetailedAddress);
-            params.put("arrivalDetailedAddress", arrivalDetailedAddress);
-            params.put("departureManager", departureManager);
-            params.put("arrivalManager", arrivalManager);
-            params.put("departureManagerPhoneNum", departureManagerPhoneNum);
-            params.put("arrivalManagerPhoneNum", arrivalManagerPhoneNum);
-            params.put("carNumber", carNumber);
-            params.put("driverName", driverName);
-            params.put("driverPhoneNum", driverPhoneNum);
-            params.put("basicFare", basicFare);
-            params.put("addFare", addFare);
-            params.put("option1", option1);
-            params.put("option2", option2);
-            params.put("option3", option3);
-            params.put("option4", option4);
-            params.put("destinationAddress", destinationAddress);
+	public int updateOrder(
+	        String orderNumber, String kindOfCar, String userName, String orderDate, String carWeight,
+	        Integer refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
+	        String etc, String startDate, String endDate, String departureName, String arrivalName,
+	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
+	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
+	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
+	        String carNumber, String driverName, String driverPhoneNum, int basicFare, int addFare,
+	        String option1, String option2, String option3, String option4, String destinationAddress) {
 
-           int result = session.update("insertOrder.OrderDAO.updateOrder", params);
-            session.commit();
-            return (result > 0) ? 1 : -1;
-        }
-    }
+	    int affectedRows = 0;
+	    SqlSession sqlSession = null;
+
+	    try {
+	        // ✅ 세션 열기
+	        sqlSession = MybatisUtil.getSession();
+
+	        // ✅ 파라미터 설정
+	        Map<String, Object> params = new HashMap<>();
+	        params.put("orderNumber", orderNumber);
+	        params.put("kindOfCar", kindOfCar);
+	        params.put("userName", userName);
+	        params.put("orderDate", orderDate);
+	        params.put("carWeight", carWeight);
+	        params.put("refNumber", refNumber);
+	        params.put("userPhoneNumber", userPhoneNumber);
+	        params.put("fixedCarNumber", fixedCarNumber);
+	        params.put("upDown", upDown);
+	        params.put("item", item);
+	        params.put("etc", etc);
+	        params.put("startDate", startDate);
+	        params.put("endDate", endDate);
+	        params.put("departureName", departureName);
+	        params.put("arrivalName", arrivalName);
+	        params.put("departureCities", departureCities);
+	        params.put("arrivalCities", arrivalCities);
+	        params.put("departureTown", departureTown);
+	        params.put("arrivalTown", arrivalTown);
+	        params.put("departureDetailedAddress", departureDetailedAddress);
+	        params.put("arrivalDetailedAddress", arrivalDetailedAddress);
+	        params.put("departureManager", departureManager);
+	        params.put("arrivalManager", arrivalManager);
+	        params.put("departureManagerPhoneNum", departureManagerPhoneNum);
+	        params.put("arrivalManagerPhoneNum", arrivalManagerPhoneNum);
+	        params.put("carNumber", carNumber);
+	        params.put("driverName", driverName);
+	        params.put("driverPhoneNum", driverPhoneNum);
+	        params.put("basicFare", basicFare);
+	        params.put("addFare", addFare);
+	        params.put("option1", option1);
+	        params.put("option2", option2);
+	        params.put("option3", option3);
+	        params.put("option4", option4);
+	        params.put("destinationAddress", destinationAddress);
+
+	        // ✅ 업데이트 실행
+	        affectedRows = sqlSession.update("OrderDAO.updateOrder", params);
+	        System.out.println("✅ UPDATE affectedRows: " + affectedRows);
+
+	        if (affectedRows > 0) {
+	            // ✅ 트랜잭션 커밋
+	            sqlSession.commit();
+	            System.out.println("✅ 트랜잭션 커밋 성공");
+	        } else {
+	            // ❌ 업데이트 실패 시 롤백
+	            sqlSession.rollback();
+	            System.out.println("❌ UPDATE 실패 → 트랜잭션 롤백");
+	            return -1;
+	        }
+	    } catch (Exception e) {
+	        if (sqlSession != null) {
+	            try {
+	                sqlSession.rollback(); // ❌ 예외 발생 시 롤백
+	                System.out.println("❌ SQL 실행 오류 발생: " + e.getMessage());
+	            } catch (Exception rollbackEx) {
+	                rollbackEx.printStackTrace();
+	            }
+	        }
+	        e.printStackTrace();
+	        return -1;
+	    } finally {
+	        if (sqlSession != null) {
+	            try {
+	                sqlSession.close(); // ✅ 세션 닫기
+	                System.out.println("✅ 세션 닫기 완료");
+	            } catch (Exception closeEx) {
+	                closeEx.printStackTrace();
+	            }
+	        }
+	    }
+	    return affectedRows;
+	}
 	
 	private String getUserID() {
 		if (session != null) {
@@ -388,7 +455,7 @@ public class OrderDAO {
 			sqlSession = MybatisUtil.getSession();
             String userID = getUserID();
             if (userID != null) {
-                return sqlSession.selectOne("insertOrder.OrderDAO.getUserType", userID);
+                return sqlSession.selectOne("OrderDAO.getUserType", userID);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -400,7 +467,7 @@ public class OrderDAO {
     public boolean deleteOrders(List<String> orderNumbers) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	sqlSession = MybatisUtil.getSession();
-            int deletedRows = sqlSession.delete("insertOrder.OrderDAO.deleteOrders", orderNumbers);
+            int deletedRows = sqlSession.delete("OrderDAO.deleteOrders", orderNumbers);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
         } catch (Exception e) {
@@ -429,7 +496,7 @@ public class OrderDAO {
     public int getGeneratedOrderNumber() {
     	try ( SqlSession session = MybatisUtil.getSession() ) {
     		sqlSession = MybatisUtil.getSession();
-    		return sqlSession.selectOne("insertOrder.OrderDAO.getGeneratedOrderNumber");    		
+    		return sqlSession.selectOne("OrderDAO.getGeneratedOrderNumber");    		
     	}
     }
 }

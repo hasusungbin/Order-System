@@ -3,9 +3,11 @@
 
 <configuration>
 	<settings>
-		<!-- 자동 생성된 키 반환 설정 -->
-		<setting name="useGeneratedKeys" value="true" />
+		<setting name="cacheEnabled" value="false"/>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+        <setting name="logImpl" value="STDOUT_LOGGING" />
 	</settings>
+	
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC" />
@@ -23,5 +25,6 @@
         <mapper resource="Mybatis/mapper.xml" />
         <mapper resource="Mybatis/arrivalMapper.xml" />
         <mapper resource="Mybatis/departureMapper.xml" />
+		<mapper resource="Mybatis/carInfoMapper.xml" />
     </mappers>
 </configuration>

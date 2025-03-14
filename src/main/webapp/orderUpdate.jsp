@@ -89,7 +89,7 @@
 			<ul class="nav navbar-nav">
 				<li><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
@@ -117,6 +117,7 @@
 	</script>
 <form action="updateAction.jsp" method="post" name="f">
 		<%
+			
             String orderNumber = request.getParameter("orderNumber");
             Order order = orderDAO.getOrderById( orderNumber );
         %>
@@ -133,7 +134,7 @@
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
                        		<input type="hidden" name="orderNumber" value="<%= order.getOrderNumber() %>">
-                           <input type="date" name="orderDate" id="orderDate" class="form-control" required value="<%= order.getOrderDate() %>">
+                           <input type="date" name="orderDate" id="orderDate" class="form-control" required value="<%= order.getOrderDate() == null ? "" : order.getOrderDate() %>">
                        </div>
                    </div>
                    <div class="form-group row">
@@ -173,36 +174,36 @@
                        </div>
                        <label class="col-sm-2 control-label">연락처:</label>
                        <div class="col-sm-3">
-                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getArrivalManagerPhoneNum() != null ? order.getArrivalManagerPhoneNum() : "" %>">
+                           <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getUserPhoneNumber() != null ? order.getUserPhoneNumber() : "" %>">
                        </div>
                    </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label"><a class="text-danger">* 차량톤급:</a></label>
                        <div class="col-sm-3">
                            <select name="carWeight" class="form-control" required>
-                               <option value="이륜차">이륜차</option>
-                               <option value="1톤">1톤</option>
-                               <option value="1.4톤">1.4톤</option>
-                               <option value="2.5톤">2.5톤</option>
-                               <option value="3.5톤">3.5톤</option>
-                               <option value="5톤">5톤</option>
-                               <option value="5톤 축">5톤 축</option>
-                               <option value="8톤">8톤</option>
-                               <option value="11톤">11톤</option>
-                               <option value="11톤 축">11톤 축</option>
-                               <option value="15톤">15톤</option>
-                               <option value="18톤">18톤</option>
-                               <option value="25톤">25톤</option>
-                           </select>
+					            <option value="이륜차" <%= "이륜차".equals( order.getCarWeight() ) ? "selected" : "" %>>이륜차</option>
+					            <option value="1톤" <%= "1톤".equals( order.getCarWeight() ) ? "selected" : "" %>>1톤</option>
+					            <option value="1.4톤" <%= "1.4톤".equals( order.getCarWeight() ) ? "selected" : "" %>>1.4톤</option>
+					            <option value="2.5톤" <%= "2.5톤".equals( order.getCarWeight() ) ? "selected" : "" %>>2.5톤</option>
+					            <option value="3.5톤" <%= "3.5톤".equals( order.getCarWeight() ) ? "selected" : "" %>>3.5톤</option>
+					            <option value="5톤" <%= "5톤".equals( order.getCarWeight() ) ? "selected" : "" %>>5톤</option>
+					            <option value="5톤 축" <%= "5톤 축".equals( order.getCarWeight() ) ? "selected" : "" %>>5톤 축</option>
+					            <option value="8톤" <%= "8톤".equals( order.getCarWeight() ) ? "selected" : "" %>>8톤</option>
+					            <option value="11톤" <%= "11톤".equals( order.getCarWeight() ) ? "selected" : "" %>>11톤</option>
+					            <option value="11톤 축" <%= "11톤 축".equals( order.getCarWeight() ) ? "selected" : "" %>>11톤 축</option>
+					            <option value="15톤" <%= "15톤".equals( order.getCarWeight() ) ? "selected" : "" %>>15톤</option>
+					            <option value="18톤" <%= "18톤".equals( order.getCarWeight() ) ? "selected" : "" %>>18톤</option>
+					            <option value="25톤" <%= "25톤".equals( order.getCarWeight() ) ? "selected" : "" %>>25톤</option>
+					        </select>
                        </div>
                        <label class="col-sm-2 control-label"><a class="text-danger">* 차량종류:</a></label>
                        <div class="col-sm-3">
                            <select name="kindOfCar" class="form-control" required>
-                               <option value="카고">카고</option>
-                               <option value="윙바디">윙바디</option>
-                               <option value="탑">탑</option>
-                               <option value="냉동/냉장">냉동/냉장</option>
-                           </select>
+					            <option value="카고" <%= "카고".equals( order.getKindOfCar() ) ? "selected" : "" %>>카고</option>
+					            <option value="윙바디" <%= "윙바디".equals( order.getKindOfCar() ) ? "selected" : "" %>>윙바디</option>
+					            <option value="탑" <%= "탑".equals( order.getKindOfCar() ) ? "selected" : "" %>>탑</option>
+					            <option value="냉동/냉장" <%= "냉동/냉장".equals( order.getKindOfCar() ) ? "selected" : "" %>>냉동/냉장</option>
+					        </select>
                        </div>
                    </div>
                    <div class="form-group row">
@@ -215,17 +216,17 @@
                        <label class="col-sm-2 control-label">상하차 방식:</label>
                        <div class="col-sm-3">
                            <select name="upDown" class="form-control" required>
-                               <option value="지게차">지게차</option>
-                               <option value="수작업">수작업</option>
-                               <option value="일부 수작업">일부 수작업</option>
-                               <option value="호이스트">호이스트</option>
-                           </select>
+							    <option value="지게차" <%= "지게차".equals( order.getUpDown() ) ? "selected" : "" %>>지게차</option>
+							    <option value="수작업" <%= "수작업".equals( order.getUpDown() ) ? "selected" : "" %>>수작업</option>
+							    <option value="일부 수작업" <%= "일부 수작업".equals( order.getUpDown() ) ? "selected" : "" %>>일부 수작업</option>
+							    <option value="호이스트" <%= "호이스트".equals( order.getUpDown() ) ? "selected" : "" %>>호이스트</option>
+							</select>
                        </div>
                    </div>
                    <div class="form-group row">
                     	<label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="number" name="refNumber" class="form-control" value="<%= order.getRefNumber() %>">
+                            <input type="number" name="refNumber" class="form-control" value="<%= order.getRefNumber() != 0 ? order.getRefNumber() : "" %>">
                         </div>
                     	<label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
@@ -235,7 +236,7 @@
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기타:</label>
                         <div class="col-sm-10">
-                            <input type="text" name="etc" class="form-control">
+                            <input type="text" name="etc" class="form-control" value="<%= order.getEtc() != null ? order.getEtc() : "" %>">
                         </div>
 				</div>
             </div>
@@ -248,21 +249,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
                         <div class="col-sm-4">
-                            <input type="date" name="startDate" id="startDate" class="form-control" required>
+                            <input type="date" name="startDate" id="startDate" class="form-control" required value="<%= order.getStartDate() == null ? "" : order.getStartDate() %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">출발지명:</label>
+                        <label class="col-sm-2 control-label"><a class="text-danger">* 출발지명:</a></label>
                         <div class="col-sm-3">
-                            <select name="departureName" class="form-control" required>
-                            	<%
-		                        	for( int i = 0; i < userList.size(); i++ ) {
-		                        %>
-                                <option><%= userList.get(i).getUserName() %></option>
-                                <%
-		                        	}
-                                %>
-                            </select>
+                            <input type="text" name="departureName" id="departureName" class="form-control" required value="<%= order.getDepartureName() == null ? "" : order.getDepartureName() %>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -292,23 +285,23 @@
                     <div class="form-group row">
                     	 <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureTown" class="form-control">
+                        	<input type="text" name="departureTown" class="form-control" value="<%= order.getDepartureTown() == null ? "" : order.getDepartureTown() %>">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">상세주소:</label>
                         <div class="col-sm-8">
-                            <input type="text" name="departureDetailedAddress" class="form-control">
+                            <input type="text" name="departureDetailedAddress" class="form-control" value="<%= order.getDepartureDetailedAddress() == null ? "" : order.getDepartureDetailedAddress() %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자:</label>
+                    	<label class="col-sm-2 control-label">출발지 담당자:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureManager" class="form-control">
+                        	<input type="text" name="departureManager" class="form-control" value="<%= order.getDepartureManager() == null ? "" : order.getDepartureManager() %>">
                         </div>
                         <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureManagerPhoneNum" class="form-control">
+                        	<input type="text" name="departureManagerPhoneNum" class="form-control" value="<%= order.getDepartureManagerPhoneNum() == null ? "" : order.getDepartureManagerPhoneNum() %>">
                         </div>
                     </div>
             </div>
@@ -321,21 +314,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 도착지 도착일시:</a></label>
                         <div class="col-sm-4">
-                            <input type="date" name="endDate" id="endDate" class="form-control" required>
+                            <input type="date" name="endDate" id="endDate" class="form-control" required value="<%= order.getEndDate() == null ? "" : order.getEndDate() %>">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">도착지명:</label>
                         <div class="col-sm-3">
-                            <select name="arrivalName" class="form-control" required>
-                            	<%
-		                        	for( int i = 0; i < userList.size(); i++ ) {
-		                        %>
-                                <option <%= userList.get(i).equals(order.getUserName()) ? "selected" : "" %>><%= userList.get(i).getUserName() %></option>
-                                <%
-		                        	}
-                                %>
-                            </select>
+                            <input type="text" name="arrivalName" id="arrivalName" class="form-control" required value="<%= order.getArrivalName() == null ? "" : order.getArrivalName() %>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -365,23 +350,23 @@
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalTown" class="form-control">
+                        	<input type="text" name="arrivalTown" class="form-control" value="<%= order.getArrivalTown() == null ? "" : order.getArrivalTown() %>">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">상세주소:</label>
                         <div class="col-sm-8">
-                            <input type="text" name="arrivalDetailedAddress" class="form-control">
+                            <input type="text" name="arrivalDetailedAddress" class="form-control" value="<%= order.getArrivalDetailedAddress() == null ? "" : order.getArrivalDetailedAddress() %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자:</label>
+                    	<label class="col-sm-2 control-label">도착지 담당자:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalManager" class="form-control">
+                        	<input type="text" name="arrivalManager" class="form-control" value="<%= order.getArrivalManager() == null ? "" : order.getArrivalManager() %>">
                         </div>
                         <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalManagerPhoneNum" class="form-control">
+                        	<input type="text" name="arrivalManagerPhoneNum" class="form-control" value="<%= order.getArrivalManagerPhoneNum() == null ? "" : order.getArrivalManagerPhoneNum() %>">
                         </div>
                     </div>
             </div>
@@ -397,11 +382,15 @@
 		                    <input type="text" name="destinationAddress" class="form-control">	                	
 	                	</div>
 	                	<div class="col-sm-3">
-		                    이착 : <input type="checkbox" name="option1" value="이착">
-		                    혼적 : <input type="checkbox" name="option2" value="혼적">
-		                    왕복 : <input type="checkbox" name="option3" value="왕복">
-		                    착불 : <input type="checkbox" name="option4" value="착불">
-	                    </div>
+						    이착 : <input type="checkbox" name="option1" value="이착" 
+						        <%= "이착".equals(order.getOption1()) ? "checked" : "" %> >
+						    혼적 : <input type="checkbox" name="option2" value="혼적" 
+						        <%= "혼적".equals(order.getOption2()) ? "checked" : "" %> >
+						    왕복 : <input type="checkbox" name="option3" value="왕복" 
+						        <%= "왕복".equals(order.getOption3()) ? "checked" : "" %> >
+						    착불 : <input type="checkbox" name="option4" value="착불" 
+						        <%= "착불".equals(order.getOption4()) ? "checked" : "" %> >
+						</div>
 	            </div>
             </div>
         </div>
@@ -413,29 +402,29 @@
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">차량번호: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="carNumber" class="form-control">          	
+	                    <input type="text" name="carNumber" class="form-control" value="<%= order.getCarNumber() == null ? "" : order.getCarNumber() %>">          	
                 	</div>
                 </div>
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기사명: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="driverName" class="form-control">            	
+	                    <input type="text" name="driverName" class="form-control" value="<%= order.getDriverName() == null ? "" : order.getDriverName() %>">            	
                 	</div>
                 </div>
 	            <div class="form-group row">
 	                <label class="col-sm-2 control-label">기사연락처: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="carNumber" class="form-control">            	
+	                    <input type="text" name="carNumber" class="form-control" value="<%= order.getDriverPhoneNum() == null ? "" : order.getDriverPhoneNum() %>">            	
                 	</div>
 	            </div>
 	            <div class="form-group row">
 	            	<label class="col-sm-2 control-label">기본운임: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="basicFare" class="form-control">            	
+	                    <input type="text" name="basicFare" class="form-control" value="<%= order.getBasicFare() == 0 ? "" : order.getBasicFare() %>">            	
                 	</div>
 	                <label class="col-sm-2 control-label">추가운임: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="addFare" class="form-control">            	
+	                    <input type="text" name="addFare" class="form-control" value="<%= order.getAddFare() == 0 ? "" : order.getAddFare() %>">            	
                 	</div>
 	            </div>
             </div>

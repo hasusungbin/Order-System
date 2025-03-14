@@ -11,13 +11,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width", initial-scale="1">
+<meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
             document.getElementById("startDate").value = today;
             document.getElementById("endDate").value = today;
+            
+            // ✅ 값 변경이 자동 제출을 발생시키지 않도록 수정
+            document.getElementById("startDate").addEventListener('change', (event) => event.preventDefault());
+            document.getElementById("endDate").addEventListener('change', (event) => event.preventDefault());
         });
 </script>
 <title>로지스톡 운송 오더 시스템</title>
@@ -70,24 +74,60 @@ function deleteSelectedOrders() {
 		
 		OrderDAO orderDAO = new OrderDAO();
 		orderDAO.setSession(session);
+		UserDAO userDAO = new UserDAO();
 		String userType = orderDAO.getUserType();
+		String userCompany = userDAO.getUserCompany(userID);
+		System.out.println(userCompany + ": userCompany");
 		
 		String pageNumberStr = request.getParameter("pageNumber");
 	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
 	    int pageSize = 10;
-		
+	    
 		String startDate = request.getParameter("startDate");
+		//System.out.println(startDate + ": startDate");
 	    String endDate = request.getParameter("endDate");
+	   // System.out.println(endDate + ": endDate");
 	    String refNumberStr = request.getParameter("refNumber");
+	   // System.out.println(refNumberStr + ": refNumberStr");
 	    Integer refNumber = (refNumberStr != null && !refNumberStr.isEmpty()) ? Integer.parseInt(refNumberStr) : null;
 	    String userName = request.getParameter("userName");
 	    String departureName = request.getParameter("departureName");
+	   // System.out.println(departureName + ": departureName");
 	    String arrivalName = request.getParameter("arrivalName");
+	    //System.out.println(arrivalName + ": arrivalName");
+	    String departureCities = request.getParameter("departureCities");
+	    //System.out.println(departureCities + ": departureCities");
 	    String arrivalCities = request.getParameter("arrivalCities");
+	    //System.out.println(arrivalCities + ": arrivalCities");
 	    String orderNumber = request.getParameter("orderNumber");
+	    //System.out.println(orderNumber + ": orderNumber");
+	    if ("".equals(refNumberStr)) {
+	    	refNumberStr = null;
+	    }
 	    
+	    if ("".equals(userName)) {
+	    	userName = null;
+	    }
 	    
+	    if ("".equals(departureName)) {
+	    	departureName = null;
+	    }
 	    
+	    if ("".equals(arrivalName)) {
+	    	arrivalName = null;
+	    }
+	    
+	    if ("".equals(departureCities)) {
+	    	departureCities = null;
+	    }
+	    
+	    if ("".equals(arrivalCities)) {
+	    	arrivalName = null;
+	    }
+	    
+	    if ("".equals(orderNumber)) {
+	    	orderNumber = null;
+	    }
 	    try {
 	        if (refNumberStr != null && !refNumberStr.isEmpty()) {
 	            refNumber = Integer.parseInt(refNumberStr);
@@ -96,10 +136,27 @@ function deleteSelectedOrders() {
 	        refNumber = 0; // 숫자가 아닌 값이 들어오면 무시
 	    }
 	    
-	    int totalCount = orderDAO.getTotalCount( startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber);
-	    int totalPages = (int) Math.ceil((double) totalCount / pageSize); 
-		
-	    List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, arrivalName, arrivalCities, orderNumber, userType);
+	    List<Order> orderList = null;
+	    int totalCount = 0;
+	    int totalPages = 0;
+	    
+	    String searchClicked = request.getParameter("searchClicked");
+	    boolean isSearchClicked = "true".equals(searchClicked);
+	    
+	    if (isSearchClicked) {
+	        totalCount = orderDAO.getTotalCount(
+	            startDate, endDate, refNumber, userName, departureName,
+	            arrivalName, arrivalCities, orderNumber
+	        );
+	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+	        orderList = orderDAO.getPagedList(
+	            pageNumber, pageSize, startDate, endDate, refNumber, userName,
+	            departureName, arrivalName, arrivalCities, orderNumber, userType, userCompany
+	        );
+	    }			
+
+	    
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -130,7 +187,7 @@ function deleteSelectedOrders() {
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 	<%
 		if (userID == null) {
@@ -189,7 +246,6 @@ function deleteSelectedOrders() {
                         </div>
                         <label class="col-sm-2 control-label">담당자명:</label>
                         <%
-	                        UserDAO userDAO = new UserDAO();
 	                    	userDAO.setSession(session);
 	                    	
 	                    	String userType2 = userDAO.getUserType();
@@ -200,6 +256,7 @@ function deleteSelectedOrders() {
                         %>
                         <div class="col-sm-3">
                             <select id="userName" name="userName"  class="form-control">
+                            		<option value="">--선택--</option>
                                 <%
 							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
 							    %>
@@ -225,18 +282,36 @@ function deleteSelectedOrders() {
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">출발지 명:</label>
                         <div class="col-sm-3">
-                            <select name="departureName" class="form-control">
-                                <option value="">Master data</option>
-                            </select>
+                        	<input type="text" name="departureName" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">도착지 명:</label>
                         <div class="col-sm-3">
-                            <select name="arrivalName" class="form-control">
-                                <option value="">Master data</option>
-                            </select>
+							<input type="text" name="arrivalName" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 control-label">출발지 시/도:</label>
+                        <div class="col-sm-3">
+							<select name="departureCities" class="form-control" required>
+                                <option value="서울특별시">서울특별시</option>
+                                <option value="경기도">경기도</option>
+                                <option value="인천광역시">인천광역시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대전광역시">대전광역시</option>
+                                <option value="광주광역시">광주광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="울산광역시">울산광역시</option>
+                                <option value="충청북도">충청북도</option>
+                                <option value="충청남도">충청남도</option>
+                                <option value="경상북도">경상북도</option>
+                                <option value="경상남도">경상남도</option>
+                                <option value="전라북도">전라북도</option>
+                                <option value="전라남도">전라남도</option>
+                                <option value="강원도">강원도</option>
+                                <option value="제주도">제주도</option>
+                                <option value="세종특별자치시">세종특별자치시</option>
+                            </select>
+                        </div>
                         <label class="col-sm-2 control-label">도착지 시/도:</label>
                         <div class="col-sm-3">
 							<select name="arrivalCities" class="form-control" required>
@@ -259,32 +334,31 @@ function deleteSelectedOrders() {
                                 <option value="세종특별자치시">세종특별자치시</option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label">오더번호:</label>
+                    </div>
+                    <div class="form-group row">
+                    	<label class="col-sm-2 control-label">오더번호:</label>
                         <div class="col-sm-3">
                             <input type="text" name="orderNumber" class="form-control">
                             <input type="hidden" name="pageNumber" class="form-control" value="1">
                         </div>
+                    <%
+                    	if( "admin".equals(userType) ) {
+                    %>
+	                    	<label class="col-sm-2 control-label">회사:</label>
+	                    	<div class="col-sm-3">
+	                    		<input type="text" name="userCompany" class="form-control">
+	                    	</div>
+                    <%
+                    	}
+                    %>
                     </div>
-                    <div class="text-center">
-                    	<button type="submit" class="btn btn-primary" onclick="submitForm('orderModify.jsp')">조회</button>
-                    	<button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
-                    </div>
-                    <div class="text-center" style="margin-top:5%;">
-	                	<%-- <%
-	                		for( int i = 0; i < orderList.size(); i++ ) {
-	               		%>
-		                	<input type="hidden" name="startDate" value="<%= orderList.get(i).getStartDate() != null ? orderList.get(i).getStartDate() : "" %>">
-		                	<input type="hidden" name="endDate" value="<%= orderList.get(i).getEndDate() != null ? orderList.get(i).getEndDate() : "" %>">
-						    <input type="hidden" name="refNumber" value="<%= orderList.get(i).getRefNumber() != 0 ? orderList.get(i).getRefNumber() : "" %>">
-						    <input type="hidden" name="userName" value="<%= orderList.get(i).getUserName() != null ? orderList.get(i).getUserName() : "" %>">
-						    <input type="hidden" name="departureName" value="<%= orderList.get(i).getDepartureName() != null ? orderList.get(i).getDepartureName() : "" %>">
-						    <input type="hidden" name="arrivalName" value="<%= orderList.get(i).getArrivalName() != null ? orderList.get(i).getArrivalName() : "" %>">
-						    <input type="hidden" name="arrivalCities" value="<%= orderList.get(i).getArrivalCities() != null ? orderList.get(i).getArrivalCities() : "" %>">
-						    <input type="hidden" name="orderNumber" value="<%= orderList.get(i).getOrderNumber() != null ? orderList.get(i).getOrderNumber() : "" %>">
-						<%
-	                		}
-	                	%> --%>					    
-                </div>
+                    <div class="form-group text-center" style="display: flex; justify-content: center; gap: 10px;">
+		                <div class="col-sm-3">
+		                	<input type="hidden" name="searchClicked" value="true">
+	                    	<button type="submit" class="btn btn-primary" onclick="submitForm('orderModify.jsp')">조회</button>
+	                    	<button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
+	                    </div>
+                   	</div>
                 </form>
             </div>
         </div>
@@ -296,7 +370,8 @@ function deleteSelectedOrders() {
 		                            (departureName != null && !departureName.isEmpty()) || 
 		                            (arrivalName != null && !arrivalName.isEmpty()) || 
 		                            (arrivalCities != null && !arrivalCities.isEmpty()) || 
-		                            (orderNumber != null && !orderNumber.isEmpty());
+		                            (orderNumber != null && !orderNumber.isEmpty()) ||
+		                            (userCompany != null && !userCompany.isEmpty());
 		
 		    boolean showResults = hasSearchData && (orderList != null && !orderList.isEmpty());
 		%>

@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class Arrival {
 	
+	private int arrivalID;
 	private String arrivalName;
 	private String arrivalCities;
 	private String arrivalTown;
@@ -14,13 +15,12 @@ public class Arrival {
 	private String etc;
 	private Date regDate;
 	private String userCompany;
-	private int arrivalID;
 	
 	
 	public Arrival() {
 	}
 	
-	public Arrival( long orderNumber, String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress,
+	public Arrival( String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress,
 			String arrivalManager, String arrivalManagerPhoneNum, String etc, String userCompany ) {
 		this.arrivalName = arrivalName;
 		this.arrivalCities = arrivalCities;
@@ -35,68 +35,86 @@ public class Arrival {
 	public String getArrivalName() {
 		return arrivalName;
 	}
-	public void setArrivalName(String arrivalName) {
+	
+	public void setArrivalName( String arrivalName ) {
 		this.arrivalName = arrivalName;
 	}
+	
 	public String getArrivalCities() {
 		return arrivalCities;
 	}
-	public void setArrivalCities(String arrivalCities) {
+	
+	public void setArrivalCities( String arrivalCities ) {
 		this.arrivalCities = arrivalCities;
 	}
+	
 	public String getArrivalTown() {
 		return arrivalTown;
 	}
-	public void setArrivalTown(String arrivalTown) {
+	
+	public void setArrivalTown( String arrivalTown ) {
 		this.arrivalTown = arrivalTown;
 	}
+	
 	public String getArrivalDetailedAddress() {
 		return arrivalDetailedAddress;
 	}
-	public void setArrivalDetailedAddress(String arrivalDetailedAddress) {
+	
+	public void setArrivalDetailedAddress( String arrivalDetailedAddress ) {
 		this.arrivalDetailedAddress = arrivalDetailedAddress;
 	}
+	
 	public String getArrivalManager() {
 		return arrivalManager;
 	}
-	public void setArrivalManager(String arrivalManager) {
+	
+	public void setArrivalManager( String arrivalManager ) {
 		this.arrivalManager = arrivalManager;
 	}
+	
 	public String getArrivalManagerPhoneNum() {
 		return arrivalManagerPhoneNum;
 	}
-	public void setArrivalManagerPhoneNum(String arrivalManagerPhoneNum) {
+	
+	public void setArrivalManagerPhoneNum( String arrivalManagerPhoneNum ) {
 		this.arrivalManagerPhoneNum = arrivalManagerPhoneNum;
 	}
+	
 	public String getEtc() {
 		return etc;
 	}
-	public void setEtc(String etc) {
+	
+	public void setEtc( String etc ) {
 		this.etc = etc;
 	}
+	
 	public Date getRegDate() {
 		return regDate;
 	}
-	public void setRegDate(Date regDate) {
+	
+	public void setRegDate( Date regDate ) {
 		this.regDate = regDate;
 	}
+	
 	public String getUserCompany() {
 		return userCompany;
 	}
-	public void setUserCompany(String userCompany) {
+	
+	public void setUserCompany( String userCompany ) {
 		this.userCompany = userCompany;
 	}
+	
 	public String getFormattedRegDate() {
-        if (regDate == null) return "";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
-        return sdf.format(regDate);
+        if ( regDate == null ) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy년 M월 d일" );
+        return sdf.format( regDate );
     }
-
+	
 	public int getArrivalID() {
 		return arrivalID;
 	}
-
-	public void setArrivalID(int arrivalID) {
+	
+	public void setArrivalID( int arrivalID ) {
 		this.arrivalID = arrivalID;
 	}
 }

@@ -7,6 +7,8 @@
 <%@ page import="departure.Departure" %>
 <%@ page import="arrival.ArrivalDAO" %>
 <%@ page import="arrival.Arrival" %>
+<%@ page import="carInfo.CarInfoDAO" %>
+<%@ page import="carInfo.CarInfo" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.ibatis.session.SqlSession" %>
@@ -15,7 +17,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width", initial-scale="1">
+<meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- jQuery 공식 CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -46,7 +48,7 @@
             var userType = '<%= session.getAttribute("userType") %>';
             var userCompany = '<%= session.getAttribute("userCompany") %>';
             window.open("searchArrival.jsp?userType=" + userType + "&userCompany=" + userCompany,
-                        "ArrivalSearch", "width=800,height=500");
+                        "ArrivalSearch", "width=800,height=600");
         }
 </script>
 <script>
@@ -59,65 +61,7 @@
                 console.error("❌ jQuery 로드 실패");
             }
         });
-    </script>
-<!-- <script>
-    function insertOrder() {
-        const orderData = {
-            userName: document.getElementById("userName").value,
-            orderDate: document.getElementById("orderDate").value,
-            carWeight: document.getElementById("carWeight").value,
-            kindOfCar: document.getElementById("kindOfCar").value,
-            refNumber: document.getElementById("refNumber").value,
-            userPhoneNumber: document.getElementById("userPhoneNumber").value,
-            fixedCarNumber: document.getElementById("fixedCarNumber").value,
-            upDown: document.getElementById("upDown").value,
-            item: document.getElementById("item").value,
-            etc: document.getElementById("etc").value,
-            startDate: document.getElementById("startDate").value,
-            endDate: document.getElementById("endDate").value,
-            departureName: document.getElementById("departureName").value,
-            arrivalName: document.getElementById("arrivalName").value,
-            departureCities: document.getElementById("departureCities").value,
-            arrivalCities: document.getElementById("arrivalCities").value,
-            departureTown: document.getElementById("departureTown").value,
-            arrivalTown: document.getElementById("arrivalTown").value,
-            departureDetailedAddress: document.getElementById("departureDetailedAddress").value,
-            arrivalDetailedAddress: document.getElementById("arrivalDetailedAddress").value,
-            departureManager: document.getElementById("departureManager").value,
-            arrivalManager: document.getElementById("arrivalManager").value,
-            departureManagerPhoneNum: document.getElementById("departureManagerPhoneNum").value,
-            arrivalManagerPhoneNum: document.getElementById("arrivalManagerPhoneNum").value,
-            option1: document.getElementById("option1").value,
-            option2: document.getElementById("option2").value,
-            option3: document.getElementById("option3").value,
-            option4: document.getElementById("option4").value,
-            destinationAddress: document.getElementById("destinationAddress").value,
-            userCompany: document.getElementById("userCompany").value
-        };
-
-        $.ajax({
-            type: "POST",
-            url: "writeAction.jsp",
-            data: orderData,
-            success: function(response) {
-            	let result = response.trim();  // ✅ 응답값 공백 제거
-                console.log("Result: ", result);
-                if (response.trim() === "SUCCESS") {
-                    alert("오더 작성 완료");
-                    window.location.replace("main.jsp");
-                } else if (response.trim() === "DUPLICATE") {
-                    alert("이미 존재하는 출/도착지입니다. 오더만 등록되었습니다.");
-                } else {
-                    alert("오더 작성에 실패했습니다.");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error: ", error);
-                alert("서버 오류 발생!");
-            }
-        });
-    }
-</script> -->
+</script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -179,7 +123,7 @@
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
@@ -293,9 +237,19 @@
                    <div class="form-group row">
                    	<label class="col-sm-2 control-label">고정차량:</label>
                        <div class="col-sm-3">
-                           <select name="fixedCarNumber" class="form-control">
-                               <option value="">Master data</option>
-                           </select>
+                       <select name="fixedCarNumber" class="form-control">
+                       		<option value="">--선택--</option>
+                       <%
+                       	CarInfoDAO carInfoDAO = new CarInfoDAO();
+                       	List<CarInfo> carInfoList = carInfoDAO.getCarInfosByCompany( userType2, userCompany );
+                       	
+                       	for( CarInfo carInfo : carInfoList) {
+                       %>
+                               <option value="<%= carInfo.getCarNumber() %>"><%= carInfo.getCarNumber() %></option>
+                       <%
+                       	}
+                       %>
+                       </select>
                        </div>
                        <label class="col-sm-2 control-label">상하차 방식:</label>
                        <div class="col-sm-3">
@@ -339,7 +293,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">출발지명:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="departureName" id="departureName" class="form-control" required>
+                            <input type="text" name="departureName" id="departureName" class="form-control">
                         </div>
                         <button type="button" onclick="openDeparturePopup()">🔍</button>
                     </div>
@@ -370,7 +324,7 @@
                     <div class="form-group row">
                     	 <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureTown" class="form-control">
+                        	<input type="text" name="departureTown" id="departureTown" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -404,9 +358,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label"><a class="text-danger">도착지명:</a></label>
-                        <div class="col-sm-4">
-                        	<input type="text" name="arrivalName" id="arrivalName" class="form-control" required>
+                        <label class="col-sm-2 control-label">도착지명:</label>
+                        <div class="col-sm-3">
+                        	<input type="text" name="arrivalName" id="arrivalName" class="form-control">
                         </div>
                         <button type="button" onclick="openArrivalPopup()">🔍</button>
                     </div>

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Departure {
 	
-	private long orderNumber;
+	private int departureID;
 	private String departureName;
 	private String departureCities;
 	private String departureTown;
@@ -20,9 +20,8 @@ public class Departure {
 	public Departure() {
 	}
 	
-	public Departure( long orderNumber, String departureName, String departureCities, String departureTown, String departureDetailedAddress,
+	public Departure( String departureName, String departureCities, String departureTown, String departureDetailedAddress,
 			String departureManager, String departureManagerPhoneNum, String etc, String userCompany ) {
-		this.orderNumber = orderNumber;
 		this.departureName = departureName;
 		this.departureCities = departureCities;
 		this.departureTown = departureTown;
@@ -32,29 +31,37 @@ public class Departure {
 		this.etc = etc;
 		this.userCompany = userCompany;
 	}
+	
 	public String getEtc() {
 		return etc;
 	}
+	
 	public void setEtc(String etc) {
 		this.etc = etc;
 	}
+	
 	public Date getRegDate() {
 		return regDate;
 	}
+	
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
 	}
+	
 	public String getUserCompany() {
 		return userCompany;
 	}
+	
 	public void setUserCompany(String userCompany) {
 		this.userCompany = userCompany;
 	}
+	
 	public String getFormattedRegDate() {
         if (regDate == null) return "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 M월 d일");
         return sdf.format(regDate);
     }
+	
 	public String getDepartureName() {
 		return departureName;
 	}
@@ -103,11 +110,11 @@ public class Departure {
 		this.departureManagerPhoneNum = departureManagerPhoneNum;
 	}
 
-	public long getOrderNumber() {
-		return orderNumber;
+	public int getDepartureID() {
+		return departureID;
 	}
 
-	public void setOrderNumber(long orderNumber) {
-		this.orderNumber = orderNumber;
+	public void setDepartureID(int departureID) {
+		this.departureID = departureID;
 	}
 }

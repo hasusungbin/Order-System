@@ -3,7 +3,7 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="java.util.List, java.util.Arrays" %>
 <% request.setCharacterEncoding( "UTF-8" ); %>
-<%@ page import="arrival.ArrivalDAO" %>
+<%@ page import="departure.DepartureDAO" %>
 
 <!DOCTYPE html>
 <html>
@@ -13,15 +13,15 @@
 </head>
 <body>
 	<%
-		String[] arrivalIDs = request.getParameterValues("arrivalIDs");
-		if (arrivalIDs != null && arrivalIDs.length > 0) {
-	        ArrivalDAO arrivalDAO = new ArrivalDAO();
-	        boolean success = arrivalDAO.deleteArrival(Arrays.asList(arrivalIDs));
+		String[] departureIDs = request.getParameterValues("departureIDs");
+		if (departureIDs != null && departureIDs.length > 0) {
+			DepartureDAO arrivalDAO = new DepartureDAO();
+	        boolean success = arrivalDAO.deleteDeparture(Arrays.asList(departureIDs));
 		if (success) { 
 		
 %>
             <script>
-                alert("선택한 도착지가 삭제되었습니다.");
+                alert("선택한 출발지가 삭제되었습니다.");
                 window.location.href = "arrivalModify.jsp"; // 조회 페이지로 리디렉트
             </script>
 <%
@@ -36,7 +36,7 @@
     } else {
 %>
         <script>
-            alert("삭제할 도착지를 선택해주세요.");
+            alert("삭제할 출발지를 선택해주세요.");
             history.back();
         </script>
 <%

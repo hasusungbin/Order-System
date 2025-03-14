@@ -5,6 +5,8 @@
 <%@ page import="departure.Departure" %>
 <%@ page import="arrival.ArrivalDAO" %>
 <%@ page import="arrival.Arrival" %>
+<%@ page import="carInfo.CarInfoDAO" %>
+<%@ page import="carInfo.CarInfo" %>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="insertOrder.MybatisUtil" %>
 
@@ -53,15 +55,17 @@
 	String userCompany = request.getParameter("userCompany");
 	
 	try (SqlSession sqlSession = MybatisUtil.getSession()) {
-	
+		
+		CarInfoDAO carInfoDAO = new CarInfoDAO();
+		CarInfo carInfo = carInfoDAO.getCarInfoByCarNumber(fixedCarNumber);
 	    // === Order 처리 ===
 	    OrderDAO orderDAO = new OrderDAO(sqlSession);
 	    int result1 = orderDAO.writeOrder(
 	        userID, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber,
-	        fixedCarNumber, upDown, item, etc, startDate, endDate, departureName, arrivalName,
+	        fixedCarNumber != null ? fixedCarNumber : carInfo.getCarNumber(), upDown, item, etc, startDate, endDate, departureName, arrivalName,
 	        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
 	        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
-	        arrivalManagerPhoneNum, option1, option2, option3, option4, destinationAddress, userCompany
+	        arrivalManagerPhoneNum, carInfo.getDriverName(), carInfo.getDriverPhoneNumber(), option1, option2, option3, option4, destinationAddress, userCompany
 	    );
 	
 	    if (result1 <= 0) {

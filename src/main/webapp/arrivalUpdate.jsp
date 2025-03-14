@@ -15,22 +15,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width", initial-scale="1">
 <link rel="stylesheet" href="css/bootstrap.css">
-<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("orderDate").value = today;
-        });
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("startDate").value = today;
-        });
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("endDate").value = today;
-        });
-</script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -86,15 +70,14 @@
 						aria-expanded="false">운송오더 조회<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">
-						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-						<li><a href="carInfo.jsp">차량정보 등록</a></li>
+						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
 					</ul>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li><a href="userModify.jsp">담당자 등록</a></li>
-				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li class="active"><a href="arrivalModify.jsp">출/도착지 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
@@ -122,12 +105,12 @@
 	</script>
 <form action="arrivalUpdateAction.jsp" method="post" name="f">
 		<%
-            String arrivalName = request.getParameter("arrivalName");
-            Arrival arrival = arrivalDAO.getArrivalByName( arrivalName ); 
+            String arrivalID = request.getParameter("arrivalID");
+            Arrival arrival = arrivalDAO.getArrivalByID( arrivalID ); 
         %>
 	<div class="container">
         <div class="panel panel-primary">
-            <div class="panel-heading">출/도착지 수정</div>
+            <div class="panel-heading">도착지 수정</div>
             <div class="panel-body">
 	            <div class="text-right">
 	            	<div class="btn-group">
@@ -135,48 +118,58 @@
 	            	</div>
 	            </div>
                    <div class="form-group row">
-	                   <label class="col-sm-2 control-label">출/도착지 구분:</label>
+                   		<label class="col-sm-2 control-label">도착지 명칭:</label>
 	                     <div class="col-sm-3">
-	                     	<select name="type" class="form-control" required>
-                                <option value="출발지">출발지</option>
-                                <option value="도착지">도착지</option>
-                            </select>
-	                     </div>
-	               </div>
-                   <div class="form-group row">
-                   		<label class="col-sm-2 control-label">명칭:</label>
-	                     <div class="col-sm-3">
-	                         <input type="text" id="arrivalName" name="arrivalName" class="form-control" autocomplete="off" placeholder="명칭은 중복이 불가합니다." readonly value="<%= arrival.getArrivalName() %>">
+	                     	<input type="hidden" id="arrivalID" name="arrivalID" class="form-control" value="<%= arrival.getArrivalID() %>">
+	                         <input type="text" id="arrivalName" name="arrivalName" class="form-control" autocomplete="off" value="<%= arrival.getArrivalName() == null ? "" : arrival.getArrivalName() %>">
 	                     </div>
                         <label class="col-sm-2 control-label">* 시/도:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalCities" class="form-control" autocomplete="off" placeholder="시/도 입력" required value="<%= arrival.getArrivalCities() %>">
+                        	<select name="arrivalCities" class="form-control" required>
+                                <option value="서울특별시" <%= "서울특별시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>서울특별시</option>
+                                <option value="경기도" <%= "경기도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>경기도</option>
+                                <option value="인천광역시" <%= "인천광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>인천광역시</option>
+                                <option value="부산광역시" <%= "부산광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>부산광역시</option>
+                                <option value="대전광역시" <%= "대전광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>대전광역시</option>
+                                <option value="광주광역시" <%= "광주광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>광주광역시</option>
+                                <option value="대구광역시" <%= "대구광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>대구광역시</option>
+                                <option value="울산광역시" <%= "울산광역시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>울산광역시</option>
+                                <option value="충청북도" <%= "충청북도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>충청북도</option>
+                                <option value="충청남도" <%= "충청남도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>충청남도</option>
+                                <option value="경상북도" <%= "경상북도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>경상북도</option>
+                                <option value="경상남도" <%= "경상남도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>경상남도</option>
+                                <option value="전라북도" <%= "전라북도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="전라남도" <%= "전라남도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>전라북도</option>
+                                <option value="강원도" <%= "강원도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>강원도</option>
+                                <option value="제주도" <%= "제주도".equals(arrival.getArrivalCities()) ? "selected" : "" %>>제주도</option>
+                                <option value="세종특별자치시" <%= "세종특별자치시".equals(arrival.getArrivalCities()) ? "selected" : "" %>>세종특별자치시</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
-                    	<label class="col-sm-2 control-label">담당자 명:</label>
+                    	<label class="col-sm-2 control-label">도착지 담당자 명:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="arrivalManager" class="form-control" placeholder="담당자명 입력" required value="<%= arrival.getArrivalManager() %>">
+                            <input type="text" name="arrivalManager" class="form-control" placeholder="담당자명 입력" value="<%= arrival.getArrivalManager() == null ? "" : arrival.getArrivalManager() %>">
                         </div>
                     	<label class="col-sm-2 control-label">시/군/구:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구 입력" required value="<%= arrival.getArrivalTown() %>">
+                            <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구 입력" required value="<%= arrival.getArrivalTown() == null ? "" : arrival.getArrivalTown() %>">
                         </div>
                     </div>
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">담당자 연락처:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="arrivalManagerPhoneNum" class="form-control" placeholder="담당자 연락처(- 제외)입력" required value="<%= arrival.getArrivalManagerPhoneNum() %>">
+                            <input type="text" name="arrivalManagerPhoneNum" class="form-control" placeholder="담당자 연락처(- 제외)입력" value="<%= arrival.getArrivalManagerPhoneNum() == null ? "" : arrival.getArrivalManagerPhoneNum() %>">
                         </div>
                     	<label class="col-sm-2 control-label">상세주소:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="arrivalDetailedAddress" class="form-control" placeholder="상세주소 입력" required value="<%= arrival.getArrivalDetailedAddress() %>">
+                            <input type="text" name="arrivalDetailedAddress" class="form-control" placeholder="상세주소 입력" value="<%= arrival.getArrivalDetailedAddress() == null ? "" : arrival.getArrivalDetailedAddress() %>">
                         </div>
                     </div>
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">기타사항:</label>
                         <div class="col-sm-8">
-                            <input type="text" name="etc" class="form-control" placeholder="기타사항 입력" value="<%= arrival.getEtc() %>">
+                            <input type="text" name="etc" class="form-control" placeholder="기타사항 입력" value="<%= arrival.getEtc() == null ? "" : arrival.getEtc() %>">
                         </div>
                     </div>
                 </div>

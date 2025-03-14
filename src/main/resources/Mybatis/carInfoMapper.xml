@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CarInfoDAO">
+	<select id="getCarInfosByCompany" parameterType="map" resultType="carInfo.CarInfo">
+        SELECT *
+        FROM carinfo
+        <where>
+            <if test="userType != 'admin'">
+                userCompany = #{userCompany}
+            </if>
+        </where>
+        ORDER BY carNumber DESC
+    </select>
+	
+	<insert id="insertCarInfo" parameterType="carInfo.CarInfo">
+		INSERT INTO carinfo (
+			carNumber,
+			driverName,
+			carWeight,
+			driverPhoneNumber,
+			kindOfCar,
+			regDate,
+			userCompany
+		)
+		VALUES (
+		#{carNumber},
+        #{driverName, jdbcType=VARCHAR},
+        #{carWeight, jdbcType=INTEGER},
+        #{driverPhoneNumber, jdbcType=VARCHAR},
+        #{kindOfCar, jdbcType=VARCHAR},
+        NOW(),
+        #{userCompany}
+		)
+	</insert>
+	
+	<select id="getCarInfoByCarNumber" resultType="carInfo.CarInfo">
+        SELECT * FROM carinfo WHERE carNumber = #{carNumber}
+    </select>
+	
+	<update id="updateCarInfo">
+        UPDATE carinfo
+        <set>
+			driverName = #{driverName},
+			carWeight = #{carWeight},
+			driverPhoneNumber = #{driverPhoneNumber},
+			kindOfCar = #{kindOfCar},
+			userCompany = #{userCompany}
+		</set>
+        WHERE carNumber = #{carNumber}
+    </update>
+	
+	<delete id="deleteCarInfo">
+        DELETE FROM carinfo WHERE carNumber IN 
+        <foreach item="carNumber" collection="list" open="(" separator="," close=")">
+            #{carNumber}
+        </foreach>
+    </delete>
+</mapper>

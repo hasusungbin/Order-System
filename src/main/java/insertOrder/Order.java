@@ -5,10 +5,10 @@ import java.sql.Date;
 public class Order {
 	
 	private String orderNumber;
+	private String kindOfCar;
 	private String userName;
 	private String orderDate;
 	private String carWeight;
-	private String kindOfCar;
 	private int refNumber;
 	private String userPhoneNumber;
 	private String fixedCarNumber;

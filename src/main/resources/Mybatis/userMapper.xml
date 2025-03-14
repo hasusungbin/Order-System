@@ -93,4 +93,10 @@
         FROM USER
         WHERE userType != 'admin'
     </select>
+	
+	<select id="getUserTypeByID" parameterType="String" resultType="String">
+		SELECT userType
+		FROM user
+		WHERE userID = #{userID}
+	</select>
 </mapper>

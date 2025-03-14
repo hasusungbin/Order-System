@@ -91,7 +91,7 @@
 			<ul class="nav navbar-nav">
 				<li><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">

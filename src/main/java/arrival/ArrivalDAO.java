@@ -74,16 +74,17 @@ public class ArrivalDAO {
         }
     }
     
-    public Arrival getArrivalByName( String arrivalName ) {
+    public Arrival getArrivalByID( String arrivalID ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-            return session.selectOne("ArrivalDAO.getArrivalByName", arrivalName);
+            return session.selectOne("ArrivalDAO.getArrivalByID", arrivalID);
         }
     }
     
-    public int updateArrival( String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress, String arrivalManager, String arrivalManagerPhoneNum, String etc) {
+    public int updateArrival( int arrivalID, String arrivalName, String arrivalCities, String arrivalTown, String arrivalDetailedAddress, String arrivalManager, String arrivalManagerPhoneNum, String etc) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	sqlSession = MybatisUtil.getSession();
             Map<String, Object> params = new HashMap<>();
+            params.put("arrivalID", arrivalID);
             params.put("arrivalName", arrivalName);
             params.put("arrivalCities", arrivalCities);
             params.put("arrivalTown", arrivalTown);
@@ -98,10 +99,10 @@ public class ArrivalDAO {
         }
     }
     
-    public boolean deleteArrival(List<String> orderNumbers) {
+    public boolean deleteArrival(List<String> arrivalIDs) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	sqlSession = MybatisUtil.getSession();
-            int deletedRows = sqlSession.delete("ArrivalDAO.deleteArrival", orderNumbers);
+            int deletedRows = sqlSession.delete("ArrivalDAO.deleteArrival", arrivalIDs);
             sqlSession.commit(); // 삭제 반영
             return deletedRows > 0;
         } catch (Exception e) {

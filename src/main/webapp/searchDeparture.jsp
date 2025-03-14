@@ -2,8 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
-<%@ page import="arrival.ArrivalDAO" %>
-<%@ page import="arrival.Arrival" %>
+<%@ page import="departure.DepartureDAO" %>
+<%@ page import="departure.Departure" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 
@@ -62,14 +62,14 @@
 	        return '';
 	    }
         // 부모창에 값 세팅 함수
-        function selectArrival(arrivalName, arrivalCities, arrivalTown, arrivalDetailedAddress, arrivalManager, arrivalManagerPhoneNum) {
+        function selectDeparture(departureName, departureCities, departureTown, departureDetailedAddress, departureManager, departureManagerPhoneNum) {
         	if (window.opener && !window.opener.closed) {
-                window.opener.document.getElementById("arrivalName").value = arrivalName;
-                window.opener.document.getElementById("arrivalCities").value = arrivalCities;
-                window.opener.document.getElementById("arrivalTown").value = arrivalTown;
-                window.opener.document.getElementById("arrivalDetailedAddress").value = arrivalDetailedAddress;
-                window.opener.document.getElementById("arrivalManager").value = arrivalManager;
-                window.opener.document.getElementById("arrivalManagerPhoneNum").value = arrivalManagerPhoneNum;
+                window.opener.document.getElementById("departureName").value = departureName;
+                window.opener.document.getElementById("departureCities").value = departureCities;
+                window.opener.document.getElementById("departureTown").value = departureTown;
+                window.opener.document.getElementById("departureDetailedAddress").value = departureDetailedAddress;
+                window.opener.document.getElementById("departureManager").value = departureManager;
+                window.opener.document.getElementById("departureManagerPhoneNum").value = departureManagerPhoneNum;
             } else {
                 alert("부모창이 열려있지 않습니다.");
             }
@@ -92,17 +92,18 @@
 		
 		String userType = request.getParameter("userType");
 	    String userCompany = request.getParameter("userCompany");
-	    String arrivalName = request.getParameter("arrivalName");
-	    String arrivalCities = request.getParameter("arrivalCities");
-	    String arrivalTown = request.getParameter("arrivalTown");
-	    String arrivalManager = request.getParameter("arrivalManager");
+	    String departureName = request.getParameter("departureName");
+	    String departureCities = request.getParameter("departureCities");
+	    String departureTown = request.getParameter("departureTown");
+	    String departureManager = request.getParameter("departureManager");
 
-	    List<Arrival> arrivalList = new ArrayList<>();
+	    List<Departure> departureList = new ArrayList<>();
 	    if (request.getParameter("search") != null) {
-	        ArrivalDAO arrivalDAO = new ArrivalDAO();
-	        arrivalList = arrivalDAO.getSearchArrivalByCompany(
-	            userType, userCompany, arrivalName, arrivalCities, arrivalTown, arrivalManager
+	    	DepartureDAO departureDAO = new DepartureDAO();
+	    	departureList = departureDAO.getSearchDepartureByCompany( 
+	            userType, userCompany, departureName, departureCities, departureTown, departureManager
 	        );
+	    	
 	    }
 	%>
 	<%
@@ -125,18 +126,18 @@
 	
     <!-- 조회 패널 -->
     <div class="panel panel-primary">
-        <div class="panel-heading">도착지 조회</div>
+        <div class="panel-heading">출발지 조회</div>
         <div class="panel-body">
-            <form method="GET" action="searchArrival.jsp">
+            <form method="GET" action="searchDeparture.jsp">
                 <div class="form-group row">
-                    <label class="col-sm-2 control-label">도착지 명:</label>
+                    <label class="col-sm-2 control-label">출발지 명:</label>
                     <div class="col-sm-4">
                     	<input type="hidden" name="search" value="true">
-                        <input type="text" name="arrivalName" class="form-control" placeholder="도착지 명" value="<%= arrivalName != null ? arrivalName : "" %>">
+                        <input type="text" id="departureName" name="departureName" class="form-control" placeholder="도착지 명" value="<%= departureName != null ? departureName : "" %>">
                     </div>
                     <label class="col-sm-2 control-label">시/도:</label>
                     <div class="col-sm-4">
-                        <select name="arrivalCities" class="form-control" required>
+                        <select id="departureCities" name="departureCities" class="form-control" required>
 	                        <option value="서울특별시">서울특별시</option>
 	                        <option value="경기도">경기도</option>
 	                        <option value="인천광역시">인천광역시</option>
@@ -161,11 +162,11 @@
                 <div class="form-group row">
                     <label class="col-sm-2 control-label">시/군/구:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalTown" class="form-control" placeholder="시/군/구" value="<%= arrivalTown != null ? arrivalTown : "" %>">
+                        <input type="text" id="departureTown" name="departureTown" class="form-control" placeholder="시/군/구" value="<%= departureTown != null ? departureTown : "" %>">
                     </div>
-                    <label class="col-sm-2 control-label">담당자:</label>
+                    <label class="col-sm-2 control-label">출발지 담당자:</label>
                     <div class="col-sm-4">
-                        <input type="text" name="arrivalManager" class="form-control" placeholder="담당자" value="<%= arrivalManager != null ? arrivalManager : "" %>">
+                        <input type="text" id="departureManager" name="departureManager" class="form-control" placeholder="담당자" value="<%= departureManager != null ? departureManager : "" %>">
                     </div>
                 </div>
 
@@ -173,8 +174,8 @@
                 <div class="form-group text-center">
                     <button type="submit" class="btn btn-primary">조회</button>
                 </div>
-                <input type="hidden" name="userType" class="form-control" placeholder="담당자" value="<%= userType %>">
-                <input type="hidden" name="userCompany" class="form-control" placeholder="담당자" value="<%= userCompany %>">
+                <input type="hidden" name="userType" class="form-control" value="<%= userType %>">
+                <input type="hidden" name="userCompany" class="form-control" value="<%= userCompany %>">
             </form>
         </div>
     </div>
@@ -197,25 +198,25 @@
                 </thead>
                 <tbody>
                     <%
-					    if (arrivalList != null && !arrivalList.isEmpty()) {
-					        for (Arrival arrival : arrivalList) {
+					    if ( departureList != null && !departureList.isEmpty() ) {
+					        for ( Departure departure : departureList ) {
 					%>
 					            <tr>
-					                <td><%= arrival.getArrivalName() %></td>
-					                <td><%= arrival.getArrivalCities() %></td>
-					                <td><%= arrival.getArrivalTown() %></td>
-					                <td><%= arrival.getArrivalDetailedAddress() %></td>
-					                <td><%= arrival.getArrivalManager() %></td>
-					                <td><%= arrival.getArrivalManagerPhoneNum() %></td>
+					                <td><%= departure.getDepartureName() != null ? departure.getDepartureName() : "" %></td>
+					                <td><%= departure.getDepartureCities() != null ? departure.getDepartureCities() : "" %></td>
+					                <td><%= departure.getDepartureTown() != null ? departure.getDepartureTown() : "" %></td>
+					                <td><%= departure.getDepartureDetailedAddress() != null ? departure.getDepartureDetailedAddress() : "" %></td>
+					                <td><%= departure.getDepartureManager() != null ? departure.getDepartureManager() : "" %></td>
+					                <td><%= departure.getDepartureManagerPhoneNum() != null ? departure.getDepartureManagerPhoneNum() : "" %></td>
 					                <td>
 					                    <button class="btn btn-primary"
-					                            onclick="selectArrival(
-					                                '<%= arrival.getArrivalName() %>',
-					                                '<%= arrival.getArrivalCities() %>',
-					                                '<%= arrival.getArrivalTown() %>',
-					                                '<%= arrival.getArrivalDetailedAddress() %>',
-					                                '<%= arrival.getArrivalManager() %>',
-					                                '<%= arrival.getArrivalManagerPhoneNum() %>'
+					                            onclick="selectDeparture(
+					                                '<%= departure.getDepartureName() %>',
+					                                '<%= departure.getDepartureCities() %>',
+					                                '<%= departure.getDepartureTown()  %>',
+					                                '<%= departure.getDepartureDetailedAddress() %>',
+					                                '<%= departure.getDepartureManager() %>',
+					                                '<%= departure.getDepartureManagerPhoneNum() %>'
 					                            )">
 					                        선택
 					                    </button>

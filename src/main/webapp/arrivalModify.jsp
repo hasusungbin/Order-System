@@ -40,11 +40,45 @@
         form.method = "POST";
         form.action = "deleteArrivalAction.jsp";
 
-        selectedArrival.forEach(orderNumber => {
+        selectedArrival.forEach(arrivalID => {
             let input = document.createElement("input");
             input.type = "hidden";
-            input.name = "orderNumbers";
-            input.value = orderNumber;
+            input.name = "arrivalIDs";
+            input.value = arrivalID;
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    function deleteSelectedDeparture() {
+        let selectedDeparture = [];
+        
+        // 체크된 체크박스 가져오기
+        document.querySelectorAll('input[name="departureCheckbox"]:checked').forEach((checkbox) => {
+        	selectedDeparture.push(checkbox.value);
+        });
+
+        if (selectedDeparture.length === 0) {
+            alert("삭제할 출발지를 선택해주세요.");
+            return;
+        }
+
+        if (!confirm("선택한 출발지를 삭제하시겠습니까?")) {
+            return;
+        }
+
+        // 폼 생성 후 POST 요청
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = "deleteDepartureAction.jsp";
+
+        selectedDeparture.forEach(departureID => {
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "departureIDs";
+            input.value = departureID;
             form.appendChild(input);
         });
 
@@ -81,6 +115,8 @@
 		
 
 	    // DAO 생성 및 출/도착지 리스트 조회
+	    DepartureDAO departureDAO = new DepartureDAO();
+	    List<Departure> departureList = departureDAO.getDeparturesByCompany(userType, userCompany);
 	    ArrivalDAO arrivalDAO = new ArrivalDAO();
 	    List<Arrival> arrivalList = arrivalDAO.getArrivalsByCompany(userType, userCompany);
 	%>
@@ -113,7 +149,7 @@
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li class="active"><a href="arrivalModify.jsp">출/도착지 등록</a></li>
-				<li><a href="carModify.jsp">고정차량 등록</a></li>
+				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
 	<%
 		if (userID == null) {
@@ -229,16 +265,53 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">출/도착지 리스트
+            <div class="panel-heading">출발지 리스트
 	            <div class="text-right">
-					<button onclick="deleteSelectedArrival()" class="btn btn-danger">출/도착지 삭제</button>
+					<button onclick="deleteSelectedDeparture()" class="btn btn-danger">출발지 삭제</button>
 	            </div>
             </div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
 				    <tr style="font-size: 10px;">
 				        <th>체크</th>
-				        <th>출/도착지 구분</th>
+				        <th>출발지 번호</th>
+				        <th>명칭</th>
+				        <th>시/도</th>
+				        <th>시/군/구</th>
+				        <th>상세주소</th>
+				        <th>담당자명</th>
+				        <th>담당자 연락처</th>
+				        <th>기타사항</th>
+				        <th>등록일자</th>
+				    </tr>
+					<% for (Departure departure : departureList) { %>
+				        <tr>
+				            <td><input type="checkbox" name="departureCheckbox" value="<%= departure.getDepartureID() %>"></td>  
+				            <td><a href="departureUpdate.jsp?departureID=<%= departure.getDepartureID() %>"><%= departure.getDepartureID() %></a></td>
+				            <td><%= departure.getDepartureName() %></td>
+				            <td><%= departure.getDepartureCities() %></td>
+				            <td><%= departure.getDepartureManager() == null ? "" : departure.getDepartureManager() %></td>
+				            <td><%= departure.getDepartureTown() == null ? "" : departure.getDepartureTown() %></td>
+				            <td><%= departure.getDepartureManagerPhoneNum() == null ? "" : departure.getDepartureManagerPhoneNum() %></td>
+				            <td><%= departure.getDepartureDetailedAddress() == null ? "" : departure.getDepartureDetailedAddress() %></td>
+				            <td><%= departure.getEtc() == null ? "" : departure.getEtc() %></td>
+				            <td><%= departure.getFormattedRegDate() %></td>
+				        </tr>
+			    	<% } %>
+				</table>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">도착지 리스트
+	            <div class="text-right">
+					<button onclick="deleteSelectedArrival()" class="btn btn-danger">도착지 삭제</button>
+	            </div>
+            </div>
+            <div class="panel-body">
+				<table class="table table-bordered table-hover" border="1">
+				    <tr style="font-size: 10px;">
+				        <th>체크</th>
+				        <th>도착지 번호</th>
 				        <th>명칭</th>
 				        <th>시/도</th>
 				        <th>시/군/구</th>
@@ -254,11 +327,11 @@
 				            <td><a href="arrivalUpdate.jsp?arrivalID=<%= arrival.getArrivalID() %>"><%= arrival.getArrivalID() %></a></td>
 				            <td><%= arrival.getArrivalName() %></td>
 				            <td><%= arrival.getArrivalCities() %></td>
-				            <td><%= arrival.getArrivalManager() %></td>
+				            <td><%= arrival.getArrivalManager() == null ? "" : arrival.getArrivalManager() %></td>
 				            <td><%= arrival.getArrivalTown() %></td>
-				            <td><%= arrival.getArrivalManagerPhoneNum() %></td>
-				            <td><%= arrival.getArrivalDetailedAddress() %></td>
-				            <td><%= arrival.getEtc() %></td>
+				            <td><%= arrival.getArrivalManagerPhoneNum() == null ? "" : arrival.getArrivalManagerPhoneNum() %></td>
+				            <td><%= arrival.getArrivalDetailedAddress() == null ? "" : arrival.getArrivalDetailedAddress() %></td>
+				            <td><%= arrival.getEtc() == null ? "" : arrival.getArrivalManager() %></td>
 				            <td><%= arrival.getFormattedRegDate() %></td>
 				        </tr>
 			    	<% } %>
