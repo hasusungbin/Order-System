@@ -3,21 +3,27 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="insertOrder.OrderDAO" %>
 <%@ page import="insertOrder.Order" %>
+<%@ page import="carInfo.CarInfoDAO" %>
+<%@ page import="carInfo.CarInfo" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="user.UserDAO" %>
 <%@ page import="user.User" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width", initial-scale="1">
+<meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Moment.js (필수) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<!-- Bootstrap Datetimepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("orderDate").value = today;
-        });
         
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
@@ -29,6 +35,22 @@
             document.getElementById("endDate").value = today;
         });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectBox = document.getElementById('fixedCarNumber'); // 고정차량 select box ID
+        const inputFields = document.querySelectorAll('.hide-on-select'); // 숨길 input 태그 클래스
+
+        selectBox.addEventListener('change', () => {
+            if (selectBox.value !== '') {
+                // ✅ 값이 있을 때 숨기기
+                inputFields.forEach(input => input.style.display = 'none');
+            } else {
+                // ✅ 값이 없을 때 다시 표시
+                inputFields.forEach(input => input.style.display = '');
+            }
+        });
+    });
+</script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -39,8 +61,10 @@
 		}
 		
 		OrderDAO orderDAO = new OrderDAO();
+		UserDAO userDAO = new UserDAO();
 		orderDAO.setSession(session);
 		String userType = orderDAO.getUserType();
+		String userCompany = userDAO.getUserCompany( userID );
 	%>
 	
 	<%
@@ -76,15 +100,7 @@
 				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-					</ul>
-				</li>
+				<li class="active"><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li><a href="userModify.jsp">담당자 등록</a></li>
@@ -108,7 +124,6 @@
 	</ul>
 		</div>	
 	</nav>
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
 	<script>
 		function rtn() {
@@ -134,13 +149,33 @@
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
                        		<input type="hidden" name="orderNumber" value="<%= order.getOrderNumber() %>">
-                           <input type="date" name="orderDate" id="orderDate" class="form-control" required value="<%= order.getOrderDate() == null ? "" : order.getOrderDate() %>">
+                       		<%
+	                       		String formattedOrderDate = "";
+	                       	    if (order.getOrderDate() != null && !order.getOrderDate().trim().isEmpty()) {
+	                       	        try {
+	
+	                       	            // ✅ String → Date 변환 (포맷을 정확히 맞추기)
+	                       	            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // DB 저장 형식 확인
+	                       	            Date date = inputFormat.parse(order.getOrderDate().trim()); // 공백 제거 후 변환
+	
+	                       	            // ✅ Date → String 변환 (input type=datetime-local 형식에 맞추기)
+	                       	            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+	                       	            formattedOrderDate = outputFormat.format(date);
+	
+	                       	            // ✅ 변환된 값 디버깅 로그 출력
+	                       	            System.out.println("formattedOrderDate: " + formattedOrderDate);
+	
+	                       	        } catch (Exception e) {
+	                       	            e.printStackTrace(); // 변환 오류 확인
+	                       	        }
+	                       	    }
+							%>
+                       		<input type="datetime-local" name="orderDate" id="orderDate" class="form-control" required value="<%= formattedOrderDate %>">
                        </div>
                    </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label"><a class="text-danger">* 담당자명:</a></label>
                        <%
-	                        UserDAO userDAO = new UserDAO();
 	                    	userDAO.setSession(session);
 	                    	
 	                    	String userType2 = userDAO.getUserType();
@@ -209,9 +244,22 @@
                    <div class="form-group row">
                    	<label class="col-sm-2 control-label">고정차량:</label>
                        <div class="col-sm-3">
-                           <select name="fixedCarNumber" class="form-control">
-                               <option value="">Master data</option>
-                           </select>
+                       		<select id="fixedCarNumber" name="fixedCarNumber" class="form-control">
+	                       		<option value="">--선택--</option>
+			                       <%
+			                       	CarInfoDAO carInfoDAO = new CarInfoDAO();
+			                       	List<CarInfo> carInfoList = carInfoDAO.getCarInfosByCompany( userType2, userCompany );
+			                       	
+			                       	for( CarInfo carInfo : carInfoList) {
+				                       	String selectedCarNumber = carInfo.getCarNumber();
+				                       	String carNumber = carInfo.getCarNumber();
+				                       	boolean isSelected = carNumber != null && carNumber.equals(selectedCarNumber);
+			                       %>
+			                               <option value="<%= carInfo.getCarNumber() %>" <%= isSelected ? "selected" : "" %>><%= carInfo.getCarNumber() %></option>
+			                       <%
+			                       	}
+			                       %>
+                       		</select>
                        </div>
                        <label class="col-sm-2 control-label">상하차 방식:</label>
                        <div class="col-sm-3">
@@ -253,9 +301,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label"><a class="text-danger">* 출발지명:</a></label>
+                        <label class="col-sm-2 control-label">출발지명:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="departureName" id="departureName" class="form-control" required value="<%= order.getDepartureName() == null ? "" : order.getDepartureName() %>">
+                            <input type="text" name="departureName" id="departureName" class="form-control" value="<%= order.getDepartureName() == null ? "" : order.getDepartureName() %>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -320,7 +368,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">도착지명:</label>
                         <div class="col-sm-3">
-                            <input type="text" name="arrivalName" id="arrivalName" class="form-control" required value="<%= order.getArrivalName() == null ? "" : order.getArrivalName() %>">
+                            <input type="text" name="arrivalName" id="arrivalName" class="form-control" value="<%= order.getArrivalName() == null ? "" : order.getArrivalName() %>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -402,19 +450,19 @@
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">차량번호: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="carNumber" class="form-control" value="<%= order.getCarNumber() == null ? "" : order.getCarNumber() %>">          	
+	                    <input type="text" name="carNumber" class="form-control hide-on-select" value="<%= order.getCarNumber() == null ? "" : order.getCarNumber() %>">          	
                 	</div>
                 </div>
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기사명: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="driverName" class="form-control" value="<%= order.getDriverName() == null ? "" : order.getDriverName() %>">            	
+	                    <input type="text" name="driverName" class="form-control hide-on-select" value="<%= order.getDriverName() == null ? "" : order.getDriverName() %>">            	
                 	</div>
                 </div>
 	            <div class="form-group row">
 	                <label class="col-sm-2 control-label">기사연락처: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="carNumber" class="form-control" value="<%= order.getDriverPhoneNum() == null ? "" : order.getDriverPhoneNum() %>">            	
+	                    <input type="text" name="driverPhoneNum" class="form-control hide-on-select" value="<%= order.getDriverPhoneNum() == null ? "" : order.getDriverPhoneNum() %>">            	
                 	</div>
 	            </div>
 	            <div class="form-group row">

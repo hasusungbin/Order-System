@@ -120,6 +120,24 @@
 	    ArrivalDAO arrivalDAO = new ArrivalDAO();
 	    List<Arrival> arrivalList = arrivalDAO.getArrivalsByCompany(userType, userCompany);
 	%>
+	
+	<%
+		if (userID == null) {
+	%>
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="login.jsp" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false">세션이 만료되었습니다. 다시 접속해주세요.<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li class="active"><a href="login.jsp">로그인</a></li>
+					</ul>
+				</li>
+			</ul>
+	<%
+		} else {
+	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed"
@@ -136,38 +154,13 @@
 				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-					</ul>
-				</li>
+				<li><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li class="active"><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
-	<%
-		if (userID == null) {
-	%>
-			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">접속하기<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="login.jsp">로그인</a></li>
-					</ul>
-				</li>
-			</ul>
-	<%
-		} else {
-	%>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle"
@@ -179,11 +172,9 @@
 					</ul>
 				</li>
 			</ul>
-	<%
-		}	
-	%>
+
 	<ul class="nav navbar-nav">
-		<li><p>환영합니다. <%= userID %>님.</p><li>
+		<li><p style="margin-top: 15px;">환영합니다. <%= userID %>님.</p><li>
 	</ul>
 		</div>	
 	</nav>
@@ -265,11 +256,12 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">출발지 리스트
-	            <div class="text-right">
-					<button onclick="deleteSelectedDeparture()" class="btn btn-danger">출발지 삭제</button>
-	            </div>
-            </div>
+            <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+			    <p style="font-weight: bold; margin: 0;">출발지 리스트</p>
+			    <div>
+			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">출발지 삭제</button>
+			    </div>
+			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
 				    <tr style="font-size: 10px;">
@@ -302,11 +294,12 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">도착지 리스트
-	            <div class="text-right">
-					<button onclick="deleteSelectedArrival()" class="btn btn-danger">도착지 삭제</button>
-	            </div>
-            </div>
+            <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+			    <p style="font-weight: bold; margin: 0;">도착지 리스트</p>
+			    <div>
+			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">도착지 삭제</button>
+			    </div>
+			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
 				    <tr style="font-size: 10px;">
@@ -339,7 +332,9 @@
             </div>
         </div>
     </div>
-	
+	<%
+		}	
+	%>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/search.js"></script>

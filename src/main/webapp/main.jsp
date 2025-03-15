@@ -13,6 +13,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.ibatis.session.SqlSession" %>
 <%@ page import="org.apache.ibatis.session.SqlSessionFactory" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.TimeZone" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,9 +23,15 @@
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- jQuery 공식 CDN -->
+<!-- Bootstrap 3 JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Moment.js (필수) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<!-- Bootstrap Datetimepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function() { 
             var today = new Date().toISOString().split('T')[0];
             document.getElementById("orderDate").value = today;
         });
@@ -62,6 +71,20 @@
             }
         });
 </script>
+<script>
+    $(document).ready(function () {
+        $('#datetimepicker').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm', // 날짜 및 시간 형식 (24시간제)
+            showTodayButton: true, // 오늘 날짜 선택 버튼 추가
+            stepping: 30 // 30분 단위로 선택 가능
+        });
+    });
+</script>
+<style>
+	#datetimepicker {
+	    max-width: 300px; /* 전체 너비 조정 */
+	}
+</style>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -110,15 +133,7 @@
 				<li class="active"><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-					</ul>
-				</li>
+				<li><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
@@ -136,18 +151,61 @@
 					</ul>
 				</li>
 			</ul>
-	
+
 		<ul class="nav navbar-nav">
 		<li><p style="margin-top: 15px;">환영합니다. <%= userID %>님</p><li>
 	</ul>
 		</div>	
 	</nav>
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-	<script src="js/bootstrap.js"></script>
 	<script>
 		function rtn() {
 			f.reset();
 		}
+	</script>
+	<%
+	    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+	    String formattedOrderDate = outputFormat.format(new Date());
+	%>
+	<script>
+	    document.addEventListener("DOMContentLoaded", function() {
+	        const orderDateInput = document.getElementById("orderDate");
+	        if (!orderDateInput.value) {
+	            orderDateInput.value = "<%= formattedOrderDate %>";
+	        }
+	    });
+	</script>
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    let datetimeInput = document.getElementById("datetimepicker");
+
+	    datetimeInput.addEventListener("change", function () {
+	        let inputValue = this.value;
+
+	        // 입력된 값이 비어있지 않은 경우만 처리
+	        if (inputValue) {
+	            let date = new Date(inputValue);
+
+	            // 현재 분 값 가져오기
+	            let minutes = date.getMinutes();
+
+	            // 30분 단위로 반올림
+	            let roundedMinutes = Math.round(minutes / 30) * 30;
+
+	            // 원래 날짜와 시간은 유지하면서 분만 조정
+	            date.setMinutes(roundedMinutes);
+	            date.setSeconds(0);
+
+	            // 올바른 형식(YYYY-MM-DDTHH:MM)으로 변환 후 반영
+	            let year = date.getFullYear();
+	            let month = String(date.getMonth() + 1).padStart(2, '0');
+	            let day = String(date.getDate()).padStart(2, '0');
+	            let hours = String(date.getHours()).padStart(2, '0');
+	            let mins = String(date.getMinutes()).padStart(2, '0');
+
+	            this.value = `${year}-${month}-${day}T${hours}:${mins}`;
+	        }
+	    });
+	});
 	</script>
 <form action="writeAction.jsp" method="post" name="f">
 	<div class="container">
@@ -163,7 +221,7 @@
                    <div class="form-group row">
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
                        <div class="col-sm-4">
-                           <input type="date" name="orderDate" id="orderDate" class="form-control" required>
+                           <input type="datetime-local" name="orderDate" id="orderDate" class="form-control" required value="<%= formattedOrderDate %>">
                            <input type="hidden" name="userType" id="userType" value="<%= userType %>">
                            <input type="hidden" name="userCompany" id="userCompany" value="<%= userCompany %>">
                        </div>

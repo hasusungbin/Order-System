@@ -39,12 +39,32 @@
 	
 	
 	<select id="getSearchOrderList" parameterType="map" resultType="insertOrder.Order">
-	SELECT *
-    FROM cargoorder
-    WHERE 1=1
+	SELECT 
+		orderNumber,
+		DATE_FORMAT(orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
+		refNumber,
+		departureName,
+		departureCities,
+		departureTown,
+		arrivalName,
+		arrivalCities,
+		arrivalTown,
+		carWeight,
+		kindOfCar,
+		upDown,
+		carNumber,
+		driverName,
+		driverPhoneNum,
+		basicFare + addFare AS totalFare,
+		userName,
+		regDate,
+		userCompany
+	FROM cargoorder
+	WHERE 1=1
     <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
     <if test="startDate != null and endDate != null">
-        AND orderDate BETWEEN #{startDate} AND #{endDate}
+        AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00') 
+                         AND CONCAT(#{endDate}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
@@ -52,10 +72,9 @@
         AND refNumber = #{refNumber}
     </if>
 
-    <!-- ✅ 담당자명 -->
     <if test="userName != null and userName != ''">
-        AND (userName LIKE CONCAT('%', #{userName}, '%') OR #{userName} IS NULL)
-    </if>
+		AND userName LIKE CONCAT('%', IFNULL(#{userName}, ''), '%')
+	</if>
 
     <!-- ✅ 출발지명 -->
     <if test="departureName != null and departureName != ''">
@@ -106,13 +125,37 @@
 
 
 <select id="getPagedList" parameterType="map" resultType="insertOrder.Order">
-    SELECT *
-    FROM cargoorder
-    WHERE 1=1
+    SELECT 
+		orderNumber,
+		DATE_FORMAT(orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
+		refNumber,
+		departureName,
+		departureCities,
+		departureTown,
+		arrivalName,
+		arrivalCities,
+		arrivalTown,
+		carWeight,
+		kindOfCar,
+		upDown,
+		carNumber,
+		driverName,
+		driverPhoneNum,
+		basicFare + addFare AS totalFare,
+		userName,
+		regDate,
+		option1,
+		option2,
+		option3,
+		option4,
+		userCompany
+	FROM cargoorder
+	WHERE 1=1
     
     <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
     <if test="startDate != null and endDate != null">
-        AND orderDate BETWEEN #{startDate} AND #{endDate}
+        AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00') 
+                         AND CONCAT(#{endDate}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->

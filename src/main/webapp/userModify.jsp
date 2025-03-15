@@ -9,22 +9,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width", initial-scale="1">
+<meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
 <title>로지스톡 운송 오더 시스템</title>
-<!-- <script>
-        function validateForm() {
-            let userId = document.getElementById("userID").value;
-            let userPw = document.getElementById("userPassword").value;
-
-            if (userId === "" || userPw === "") {
-                alert("ID와 PW를 입력하세요.");
-                return false;
-            }
-
-            return true;
-        }
-</script> -->
 <script>
     function deleteSelectedUsers() {
         let selectedUsers = [];
@@ -85,11 +72,29 @@
 		UserDAO userDAO = new UserDAO();
 		userDAO.setSession(session);
 		String userType = userDAO.getUserType();
-		String userCompany = userDAO.getUserCompany();
+		String userCompany = userDAO.getUserCompany( userID );
 		
 	    //List<User> userList = userDAO.getUserByCompany(userCompany);
 	    
 	    List<User> userList = userDAO.getModifyUserList(userType, userID, userCompany);
+	%>
+	
+	<%
+		if (userID == null) {
+	%>
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="login.jsp" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false">세션이 만료되었습니다. 다시 접속해주세요.<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li class="active"><a href="login.jsp">로그인</a></li>
+					</ul>
+				</li>
+			</ul>
+	<%
+		} else {
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -107,38 +112,13 @@
 				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-					</ul>
-				</li>
+				<li><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li class="active" <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
-	<%
-		if (userID == null) {
-	%>
-			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">접속하기<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="login.jsp">로그인</a></li>
-					</ul>
-				</li>
-			</ul>
-	<%
-		} else {
-	%>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle"
@@ -154,7 +134,7 @@
 		}	
 	%>
 	<ul class="nav navbar-nav">
-		<li><p>환영합니다. <%= userID %>님.</p><li>
+		<li><p style="margin-top: 15px;">환영합니다. <%= userID %>님.</p><li>
 	</ul>
 		</div>	
 	</nav>
@@ -193,13 +173,38 @@
                     	<label class="col-sm-2 control-label">회사명:</label>
                         <div class="col-sm-3">
                             <select name="userCompany" class="form-control">
-									<option value="">--선택--</option>
+                            	<%
+                            		if( userType.equals("admin") ) {
+                            	%>
+								<option value="KCC글라스">KCC글라스</option>
+								<option value="(주)쎄레코">(주)쎄레코</option>
+								<option value="(주)JKC 코퍼레이션">(주)JKC 코퍼레이션</option>
+								<option value="코스모프로">코스모프로</option>
+								<option value="(주)발렉스">(주)발렉스</option>
+								<%
+	                            	} else if( userCompany.equals("KCC글라스") ) {
+								%>	
 									<option value="KCC글라스">KCC글라스</option>
+								<%
+	                            	} else if( userCompany.equals("(주)쎄레코") ) {
+								%>
 									<option value="(주)쎄레코">(주)쎄레코</option>
+								<%
+	                            	} else if( userCompany.equals("(주)JKC 코퍼레이션") ) {
+								%>
 									<option value="(주)JKC 코퍼레이션">(주)JKC 코퍼레이션</option>
+								<%
+	                            	} else if( userCompany.equals("코스모프로") ) {
+								%>
 									<option value="코스모프로">코스모프로</option>
+								<%
+	                            	} else if( userCompany.equals("(주)발렉스") ) {
+								%>
 									<option value="(주)발렉스">(주)발렉스</option>
-								</select>
+								<%
+	                            	}
+								%>
+							</select>
                         </div>
                         <label class="col-sm-2 control-label">부서명:</label>
                         <div class="col-sm-3">
@@ -210,7 +215,7 @@
                     	<label class="col-sm-2 control-label"><a class="text-danger">* 담당자 등급:</a></label>
                         <div class="col-sm-3">
                             <select name="userType" class="form-control" required>
-                                <option value="sales">영업사원</option>
+                                <option value="sales">출하담당자</option>
                                 <option value="manager">총괄 매니저</option>
                             </select>
                         </div>
@@ -219,11 +224,12 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">당담자 리스트
-	            <div class="text-right">
-					<button onclick="deleteSelectedUsers()" class="btn btn-danger">담당자 삭제</button>
-	            </div>
-            </div>
+        	<div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+			    <p style="font-weight: bold; margin: 0;">당담자 리스트</p>
+			    <div>
+			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">담당자 삭제</button>
+			    </div>
+			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
 				    <tr style="font-size: 10px;">

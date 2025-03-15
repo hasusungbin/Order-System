@@ -291,7 +291,6 @@ public class OrderDAO {
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
-	            System.out.println("userType???: " + orderNumber);
 
 	            return session.selectList("OrderDAO.getPagedList", params);
 	        }
@@ -308,18 +307,14 @@ public class OrderDAO {
 	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
 	            params.put("refNumber", refNumber);
-	            System.out.println("refNumber: " + refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
-	            System.out.println("departureName: " + departureName);
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
 	            params.put("userType", userType);
 	            params.put("userCompany", userCompany);
 	            params.put("userID", userID);
-	            System.out.println("userType: " + userType);
-	            //System.out.println("userCompany: " + userCompany);
 
 	            return session.selectList("OrderDAO.getSearchOrderList", params);
 	        }

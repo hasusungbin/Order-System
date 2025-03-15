@@ -42,6 +42,7 @@
 		UserDAO userDAO = new UserDAO();
 		orderDAO.setSession(session);
 		String userType = orderDAO.getUserType();
+		String userCompany = userDAO.getUserCompany( userID );
 	%>
 	
 	<%
@@ -77,19 +78,10 @@
 				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-						<li><a href="carInfo.jsp">차량정보 등록</a></li>
-					</ul>
-				</li>
+				<li><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li><a href="userModify.jsp">담당자 등록</a></li>
+				<li class="active"><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
@@ -154,10 +146,39 @@
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">회사명:</label>
                         <div class="col-sm-3">
-                            <select name="userCompany" class="form-control" required>
-                                <option value="logistalk">로지스톡</option>
-                                <option value="KCC">KCC</option>
-                            </select>
+                            <select name="userCompany" class="form-control">
+                            <%
+                            	if( userCompany.equals("") ) {
+                            %>
+								<option value="KCC글라스" <%= "KCC글라스".equals( user.getUserCompany() ) ? "selected" : "" %>>KCC글라스</option>
+								<option value="(주)쎄레코" <%= "(주)쎄레코".equals( user.getUserCompany() ) ? "selected" : "" %>>(주)쎄레코</option>
+								<option value="(주)JKC 코퍼레이션" <%= "(주)JKC 코퍼레이션".equals( user.getUserCompany() ) ? "selected" : "" %>>(주)JKC 코퍼레이션</option>
+								<option value="코스모프로" <%= "코스모프로".equals( user.getUserCompany() ) ? "selected" : "" %>>코스모프로</option>
+								<option value="(주)발렉스" <%= "(주)발렉스".equals( user.getUserCompany() ) ? "selected" : "" %>>(주)발렉스</option>
+							<%
+                            	} else if( userCompany.equals("KCC글라스") ) {
+							%>	
+								<option value="KCC글라스" <%= "KCC글라스".equals( user.getUserCompany() ) ? "selected" : "" %>>KCC글라스</option>
+							<%
+                            	} else if( userCompany.equals("(주)쎄레코") ) {
+							%>
+								<option value="(주)쎄레코" <%= "(주)쎄레코".equals( user.getUserCompany() ) ? "selected" : "" %>>KCC글라스</option>
+							<%
+                            	} else if( userCompany.equals("(주)JKC 코퍼레이션") ) {
+							%>
+								<option value="(주)JKC 코퍼레이션" <%= "(주)JKC 코퍼레이션".equals( user.getUserCompany() ) ? "selected" : "" %>>(주)JKC 코퍼레이션</option>
+							<%
+                            	} else if( userCompany.equals("코스모프로") ) {
+							%>
+								<option value="코스모프로" <%= "코스모프로".equals( user.getUserCompany() ) ? "selected" : "" %>>코스모프로</option>
+							<%
+                            	} else if( userCompany.equals("(주)발렉스") ) {
+							%>
+								<option value="(주)발렉스" <%= "(주)발렉스".equals( user.getUserCompany() ) ? "selected" : "" %>>(주)발렉스</option>
+							<%
+                            	}
+							%>
+							</select>
                         </div>
                         <label class="col-sm-2 control-label">부서명:</label>
                         <div class="col-sm-3">
@@ -168,7 +189,7 @@
                     	<label class="col-sm-2 control-label">담당자 등급:</label>
                         <div class="col-sm-3">
                             <select name="userType" class="form-control" required>
-                                <option value="sales">영업사원</option>
+                                <option value="sales">출하담당자</option>
                                 <option value="manager">총괄 매니저</option>
                             </select>
                         </div>

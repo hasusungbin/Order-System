@@ -13,6 +13,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
+<style>
+	.d-flex {
+	    display: flex !important;
+	    flex-wrap: nowrap;
+	    align-items: center;
+	}
+</style>
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
@@ -76,31 +83,24 @@ function deleteSelectedOrders() {
 		orderDAO.setSession(session);
 		UserDAO userDAO = new UserDAO();
 		String userType = orderDAO.getUserType();
+		
+		//String userCompany = request.getParameter("userCompany");
 		String userCompany = userDAO.getUserCompany(userID);
-		System.out.println(userCompany + ": userCompany");
 		
 		String pageNumberStr = request.getParameter("pageNumber");
 	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
 	    int pageSize = 10;
 	    
 		String startDate = request.getParameter("startDate");
-		//System.out.println(startDate + ": startDate");
 	    String endDate = request.getParameter("endDate");
-	   // System.out.println(endDate + ": endDate");
 	    String refNumberStr = request.getParameter("refNumber");
-	   // System.out.println(refNumberStr + ": refNumberStr");
 	    Integer refNumber = (refNumberStr != null && !refNumberStr.isEmpty()) ? Integer.parseInt(refNumberStr) : null;
 	    String userName = request.getParameter("userName");
 	    String departureName = request.getParameter("departureName");
-	   // System.out.println(departureName + ": departureName");
 	    String arrivalName = request.getParameter("arrivalName");
-	    //System.out.println(arrivalName + ": arrivalName");
 	    String departureCities = request.getParameter("departureCities");
-	    //System.out.println(departureCities + ": departureCities");
 	    String arrivalCities = request.getParameter("arrivalCities");
-	    //System.out.println(arrivalCities + ": arrivalCities");
 	    String orderNumber = request.getParameter("orderNumber");
-	    //System.out.println(orderNumber + ": orderNumber");
 	    if ("".equals(refNumberStr)) {
 	    	refNumberStr = null;
 	    }
@@ -149,14 +149,38 @@ function deleteSelectedOrders() {
 	            arrivalName, arrivalCities, orderNumber
 	        );
 	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
-
-	        orderList = orderDAO.getPagedList(
-	            pageNumber, pageSize, startDate, endDate, refNumber, userName,
-	            departureName, arrivalName, arrivalCities, orderNumber, userType, userCompany
-	        );
+			if( userType.equals("admin") ) {
+		        orderList = orderDAO.getPagedList(
+		            pageNumber, pageSize, startDate, endDate, refNumber, userName,
+		            departureName, arrivalName, arrivalCities, orderNumber, userType, request.getParameter("userCompany")
+		        );				
+			} else {
+				orderList = orderDAO.getPagedList(
+			            pageNumber, pageSize, startDate, endDate, refNumber, userName,
+			            departureName, arrivalName, arrivalCities, orderNumber, userType, userCompany
+			        );	
+			}
 	    }			
 
 	    
+	%>
+	
+	<%
+		if (userID == null) {
+	%>
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="login.jsp" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false">세션이 만료되었습니다. 다시 접속해주세요.<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li class="active"><a href="login.jsp">로그인</a></li>
+					</ul>
+				</li>
+			</ul>
+	<%
+		} else {
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -174,38 +198,14 @@ function deleteSelectedOrders() {
 				<li><a href="main.jsp">운송오더 등록</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">운송오더 조회<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li class="active"><a href="orderModify.jsp">조회 및 수정(취소)</a></li>
-					</ul>
-				</li>
+				<li class="active"><a href="orderModify.jsp">운송오더 조회/취소</a></li>
 			</ul>
 			<ul class="nav navbar-nav">
 				<li <%= "sales".equals( userType ) ? "style='display:none;'" : ""%>><a href="userModify.jsp">담당자 등록</a></li>
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
-	<%
-		if (userID == null) {
-	%>
-			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">접속하기<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="login.jsp">로그인</a></li>
-					</ul>
-				</li>
-			</ul>
-	<%
-		} else {
-	%>
+	
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle"
@@ -221,7 +221,7 @@ function deleteSelectedOrders() {
 		}	
 	%>
 	<ul class="nav navbar-nav">
-		<li><p>환영합니다. <%= userID %>님.</p><li>
+		<li><p style="margin-top: 15px;">환영합니다. <%= userID %>님.</p><li>
 	</ul>
 		</div>	
 	</nav>
@@ -231,14 +231,13 @@ function deleteSelectedOrders() {
             <div class="panel-body">
                 <form id="searchForm" action="./orderModify.jsp">
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label" style="font-size:12px;">운송요청일(출발일 ~ 도착일):</label>
-                        <div class="col-sm-4">
-                            <input type="date" name="startDate" id="startDate" class="form-control" required>
-                        </div>
-                        <div class="col-sm-4">
-                            <input type="date" name="endDate" id="endDate" class="form-control" required>
-                        </div>
-                    </div>
+					    <label class="col-sm-2 col-form-label" style="font-size:14px;"><a class="text-danger">* 운송요청일:</a></label>
+					    <div class="col-sm-8 d-flex align-items-center" style="gap: 10px;">
+					        <input type="date" name="startDate" id="startDate" class="form-control" required style="max-width: 180px;">
+					        <span>~</span>
+					        <input type="date" name="endDate" id="endDate" class="form-control" required style="max-width: 180px;">
+					    </div>
+					</div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
@@ -256,7 +255,6 @@ function deleteSelectedOrders() {
                         %>
                         <div class="col-sm-3">
                             <select id="userName" name="userName"  class="form-control">
-                            		<option value="">--선택--</option>
                                 <%
 							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
 							    %>
@@ -269,6 +267,9 @@ function deleteSelectedOrders() {
 							    <%
 							            }
 							        } else if( "admin".equals(userType) ) {
+							    %>
+							    	<option value="">--선택--</option>
+							    <%
 							        	for( int i = 0; i < userList.size(); i++ ) {
 							    %>
 							    	<option><%= userList.get(i).getUserName() %></option>
@@ -346,7 +347,14 @@ function deleteSelectedOrders() {
                     %>
 	                    	<label class="col-sm-2 control-label">회사:</label>
 	                    	<div class="col-sm-3">
-	                    		<input type="text" name="userCompany" class="form-control">
+	                    		<select name="userCompany" class="form-control">
+	                    			<option value="">--선택--</option>
+		                    		<option value="KCC글라스">KCC글라스</option>
+									<option value="(주)쎄레코">(주)쎄레코</option>
+									<option value="(주)JKC 코퍼레이션">(주)JKC 코퍼레이션</option>
+									<option value="코스모프로">코스모프로</option>
+									<option value="(주)발렉스">(주)발렉스</option>
+								</select>
 	                    	</div>
                     <%
                     	}
@@ -355,6 +363,7 @@ function deleteSelectedOrders() {
                     <div class="form-group text-center" style="display: flex; justify-content: center; gap: 10px;">
 		                <div class="col-sm-3">
 		                	<input type="hidden" name="searchClicked" value="true">
+		                	<input type="hidden" name="userType" value="<%= userType %>">
 	                    	<button type="submit" class="btn btn-primary" onclick="submitForm('orderModify.jsp')">조회</button>
 	                    	<button type="button" class="btn btn-success" onclick="submitForm('downloadExcel')">엑셀 다운로드</button>
 	                    </div>
@@ -376,16 +385,17 @@ function deleteSelectedOrders() {
 		    boolean showResults = hasSearchData && (orderList != null && !orderList.isEmpty());
 		%>
         <div class="panel panel-default">
-            <div class="panel-heading">조회 결과
-	            <div class="text-right">
-					<button onclick="deleteSelectedOrders()" class="btn btn-danger">요청취소</button>
-	            </div>
-            </div>
-            <div class="panel-body">
+            <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+			    <p style="font-weight: bold; margin: 0;">조회 결과</p>
+			    <div>
+			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">요청취소</button>
+			    </div>
+			</div>
+            <div class="panel-body" style="overflow-x: auto; white-space: nowrap;">
             	<% if (showResults) { %> <!-- 조회 조건이 있을 때만 테이블 표시 -->
                 <table class="table table-bordered table-hover">
                     <thead>
-                        <tr style="font-size: 10px;">
+                        <tr style="font-size: 11px;">
                             <th>체크</th>
                         	<th>오더번호</th>
                             <th>운송요청일</th>
@@ -396,12 +406,24 @@ function deleteSelectedOrders() {
                             <th>도착지 주소</th>
                             <th>화물톤급</th>
                             <th>차량종류</th>
+                            <th>상하차 방식</th>
                             <th>차량번호</th>
                             <th>기사명</th>
                             <th>기사연락처</th>
                             <th>운송비 금액</th>
                             <th>담당자명</th>
                             <th>등록일</th>
+                            <th>옵션1</th>
+		                    <th>옵션2</th>
+		                    <th>옵션3</th>
+		                    <th>옵션4</th>
+		                    <%
+		                    	if( userType.equals("admin") ) {
+		                    %>
+		                    	<th>회사명</th>
+		                    <%
+		                    	}
+		                    %>
                         </tr>
                     </thead>
                     <tbody>
@@ -417,12 +439,24 @@ function deleteSelectedOrders() {
 			                    <td><%= order.getArrivalCities() + " " + order.getArrivalTown() %></td>
 			                    <td><%= order.getCarWeight() %></td>
 			                    <td><%= order.getKindOfCar() %></td>
+			                    <td><%= order.getUpDown() %></td>
 			                    <td><%= order.getCarNumber() != null ? order.getCarNumber() : "" %></td>
 			                    <td><%= order.getDriverName() != null ? order.getDriverName() : "" %></td>
 			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
 			                    <td><%= order.getBasicFare() + order.getAddFare() %></td>
 			                    <td><%= order.getUserName() %></td>
 			                    <td><%= order.getRegDate() %></td>
+			                    <td><%= order.getOption1() != null ? order.getOption1() : "" %></td>
+			                    <td><%= order.getOption2() != null ? order.getOption2() : "" %></td>
+			                    <td><%= order.getOption3() != null ? order.getOption3() : "" %></td>
+			                    <td><%= order.getOption4() != null ? order.getOption4() : "" %></td>
+			                    <%
+			                    	if( userType.equals("admin") ) {
+			                    %>
+			                    	<td><%= order.getUserCompany() %></td>
+			                    <%
+			                    	}
+			                    %>
 			                </tr>
 			            <% } %>
            			</tbody>
