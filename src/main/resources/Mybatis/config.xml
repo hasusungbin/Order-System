@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "file:///D:/tomcat9/webapps/Orders_Project/WEB-INF/classes/dtd/mybatis-3-config.dtd">
 
 <configuration>
 	<settings>
@@ -12,10 +12,10 @@
         <environment id="development">
             <transactionManager type="JDBC" />
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.jdbc.Driver" />
-                <property name="url" value="jdbc:mysql://localhost:3306/ORDERS?serverTimezone=UTC&amp;useSSL=false" />
-                <property name="username" value="root" />
-                <property name="password" value="root" />
+                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://168.126.135.168:3306/ORDERS?serverTimezone=UTC&amp;useSSL=false" />
+                <property name="username" value="dev" />
+                <property name="password" value="dev" />
             </dataSource>
         </environment>
     </environments>

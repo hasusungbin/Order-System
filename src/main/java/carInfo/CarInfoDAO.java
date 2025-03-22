@@ -36,8 +36,6 @@ public class CarInfoDAO {
     public List<CarInfo> getCarInfosByCompany(String userType, String userCompany) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	sqlSession = MybatisUtil.getSession();
-        	System.out.println(userType + ": userType");
-        	System.out.println(userCompany + ": userCompany");
         	Map<String, Object> params = new HashMap<>();
             params.put("userType", userType);
             params.put("userCompany", userCompany);

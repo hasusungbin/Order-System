@@ -165,12 +165,28 @@
 	<%
 	    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 	    String formattedOrderDate = outputFormat.format(new Date());
+	    String formattedStartDate = outputFormat.format(new Date());
+	    String formattedEndDate = outputFormat.format(new Date());
 	%>
 	<script>
 	    document.addEventListener("DOMContentLoaded", function() {
 	        const orderDateInput = document.getElementById("orderDate");
 	        if (!orderDateInput.value) {
 	            orderDateInput.value = "<%= formattedOrderDate %>";
+	        }
+	    });
+	    
+	    document.addEventListener("DOMContentLoaded", function() {
+	        const startDateInput = document.getElementById("startDate");
+	        if (!startDateInput.value) {
+	            startDateInput.value = "<%= formattedStartDate %>";
+	        }
+	    });
+	    
+	    document.addEventListener("DOMContentLoaded", function() {
+	        const endDateInput = document.getElementById("endDate");
+	        if (!endDateInput.value) {
+	            endDateInput.value = "<%= formattedEndDate %>";
 	        }
 	    });
 	</script>
@@ -219,8 +235,8 @@
 	            	</div>
 	            </div>
                    <div class="form-group row">
-                       <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
-                       <div class="col-sm-4">
+                       <label class="col-sm-2 control-label" ><a class="text-danger">* 오더등록일:</a></label>
+                       <div class="col-sm-3">
                            <input type="datetime-local" name="orderDate" id="orderDate" class="form-control" required value="<%= formattedOrderDate %>">
                            <input type="hidden" name="userType" id="userType" value="<%= userType %>">
                            <input type="hidden" name="userCompany" id="userCompany" value="<%= userCompany %>">
@@ -344,17 +360,21 @@
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
-                        <div class="col-sm-4">
-                            <input type="date" name="startDate" id="startDate" class="form-control" required>
+                        <div class="col-sm-3">
+                            <input type="datetime-local" name="startDate" id="startDate" class="form-control" required value="<%= formattedStartDate %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">출발지명:</label>
-                        <div class="col-sm-3">
-                            <input type="text" name="departureName" id="departureName" class="form-control">
-                        </div>
-                        <button type="button" onclick="openDeparturePopup()">🔍</button>
-                    </div>
+					    <label class="col-sm-2 control-label">출발지명:</label>
+					    <div class="col-sm-3">
+					        <div class="input-group">
+					            <input type="text" name="departureName" id="departureName" class="form-control">
+					            <span class="input-group-btn">
+					                <button type="button" onclick="openDeparturePopup()" class="btn btn-default">🔍</button>
+					            </span>
+					        </div>
+					    </div>
+					</div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">
@@ -411,17 +431,21 @@
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 도착지 도착일시:</a></label>
-                        <div class="col-sm-4">
-                            <input type="date" name="endDate" id="endDate" class="form-control" required>
+                        <div class="col-sm-3">
+                            <input type="datetime-local" name="endDate" id="endDate" class="form-control" required value="<%= formattedEndDate %>">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 control-label">도착지명:</label>
-                        <div class="col-sm-3">
-                        	<input type="text" name="arrivalName" id="arrivalName" class="form-control">
-                        </div>
-                        <button type="button" onclick="openArrivalPopup()">🔍</button>
-                    </div>
+					    <label class="col-sm-2 control-label">도착지명:</label>
+					    <div class="col-sm-3">
+					        <div class="input-group">
+					            <input type="text" name="arrivalName" id="arrivalName" class="form-control">
+					            <span class="input-group-btn">
+					                <button type="button" onclick="openArrivalPopup()" class="btn btn-default">🔍</button>
+					            </span>
+					        </div>
+					    </div>
+					</div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">

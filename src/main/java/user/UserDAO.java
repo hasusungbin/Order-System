@@ -40,9 +40,7 @@ public class UserDAO {
                 new User(userID, userPassword));
 
             if (user != null) {
-                System.out.println("로그인 성공: " + user.getUserID());
             } else {
-                System.out.println("로그인 실패: 아이디 또는 비밀번호 오류");
             }
         } catch (Exception e) {
             e.printStackTrace();

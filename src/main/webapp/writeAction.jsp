@@ -1,3 +1,4 @@
+<%@page import="org.apache.poi.util.SystemOutLogger"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.apache.ibatis.session.SqlSession" %>
 <%@ page import="insertOrder.OrderDAO" %>
@@ -55,23 +56,36 @@
 	String userCompany = request.getParameter("userCompany");
 	
 	try (SqlSession sqlSession = MybatisUtil.getSession()) {
-		
-		CarInfoDAO carInfoDAO = new CarInfoDAO();
-		CarInfo carInfo = carInfoDAO.getCarInfoByCarNumber(fixedCarNumber);
-	    // === Order 처리 ===
 	    OrderDAO orderDAO = new OrderDAO(sqlSession);
-	    int result1 = orderDAO.writeOrder(
-	        userID, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber,
-	        fixedCarNumber != null ? fixedCarNumber : carInfo.getCarNumber(), upDown, item, etc, startDate, endDate, departureName, arrivalName,
-	        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
-	        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
-	        arrivalManagerPhoneNum, carInfo.getDriverName(), carInfo.getDriverPhoneNumber(), option1, option2, option3, option4, destinationAddress, userCompany
-	    );
-	
-	    if (result1 <= 0) {
-	        sqlSession.rollback(); // ✅ 실패 시 rollback
-	        throw new Exception("오더 작성 실패");
+		CarInfoDAO carInfoDAO = new CarInfoDAO();
+		if( !fixedCarNumber.equals("") ) {
+			CarInfo carInfo = carInfoDAO.getCarInfoByCarNumber(fixedCarNumber);
+		    // === Order 처리 ===
+			    int result1 = orderDAO.writeOrder(
+			        userID, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber,
+			        fixedCarNumber != null ? fixedCarNumber : carInfo.getCarNumber(), upDown, item, etc, startDate, endDate, departureName, arrivalName,
+			        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
+			        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
+			        arrivalManagerPhoneNum, carInfo.getDriverName(), carInfo.getDriverPhoneNumber(), option1, option2, option3, option4, destinationAddress, userCompany
+			    );
+			    if (result1 <= 0) {
+			        sqlSession.rollback(); // ✅ 실패 시 rollback
+			        throw new Exception("오더 작성 실패");
+			}
+		} else if( fixedCarNumber.equals("") ) {
+	    	int result2 = orderDAO.writeOrder(
+			        userID, kindOfCar, userName, orderDate, carWeight, refNumber, userPhoneNumber,
+			        upDown, item, etc, startDate, endDate, departureName, arrivalName,
+			        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
+			        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
+			        arrivalManagerPhoneNum, option1, option2, option3, option4, destinationAddress, userCompany
+			    );
+			    if (result2 <= 0) {
+			        sqlSession.rollback(); // ✅ 실패 시 rollback
+			        throw new Exception("오더 작성 실패");
+			    }
 	    }
+	
 	
 	    // === Arrival 처리 ===
 	    ArrivalDAO arrivalDAO = new ArrivalDAO(sqlSession);

@@ -10,6 +10,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="refresh" content="5">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
@@ -23,12 +24,12 @@
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
-            document.getElementById("startDate").value = today;
             document.getElementById("endDate").value = today;
+            document.getElementById("endDate2").value = today;
             
             // ✅ 값 변경이 자동 제출을 발생시키지 않도록 수정
-            document.getElementById("startDate").addEventListener('change', (event) => event.preventDefault());
             document.getElementById("endDate").addEventListener('change', (event) => event.preventDefault());
+            document.getElementById("endDate2").addEventListener('change', (event) => event.preventDefault());
         });
 </script>
 <title>로지스톡 운송 오더 시스템</title>
@@ -91,8 +92,8 @@ function deleteSelectedOrders() {
 	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
 	    int pageSize = 10;
 	    
-		String startDate = request.getParameter("startDate");
-	    String endDate = request.getParameter("endDate");
+		String endDate = request.getParameter("endDate");
+	    String endDate2 = request.getParameter("endDate2");
 	    String refNumberStr = request.getParameter("refNumber");
 	    Integer refNumber = (refNumberStr != null && !refNumberStr.isEmpty()) ? Integer.parseInt(refNumberStr) : null;
 	    String userName = request.getParameter("userName");
@@ -145,18 +146,18 @@ function deleteSelectedOrders() {
 	    
 	    if (isSearchClicked) {
 	        totalCount = orderDAO.getTotalCount(
-	            startDate, endDate, refNumber, userName, departureName,
+	            endDate, endDate2, refNumber, userName, departureName,
 	            arrivalName, arrivalCities, orderNumber
 	        );
 	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
 			if( userType.equals("admin") ) {
 		        orderList = orderDAO.getPagedList(
-		            pageNumber, pageSize, startDate, endDate, refNumber, userName,
+		            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
 		            departureName, arrivalName, arrivalCities, orderNumber, userType, request.getParameter("userCompany")
 		        );				
 			} else {
 				orderList = orderDAO.getPagedList(
-			            pageNumber, pageSize, startDate, endDate, refNumber, userName,
+			            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
 			            departureName, arrivalName, arrivalCities, orderNumber, userType, userCompany
 			        );	
 			}
@@ -217,9 +218,6 @@ function deleteSelectedOrders() {
 					</ul>
 				</li>
 			</ul>
-	<%
-		}	
-	%>
 	<ul class="nav navbar-nav">
 		<li><p style="margin-top: 15px;">환영합니다. <%= userID %>님.</p><li>
 	</ul>
@@ -231,11 +229,11 @@ function deleteSelectedOrders() {
             <div class="panel-body">
                 <form id="searchForm" action="./orderModify.jsp">
                     <div class="form-group row">
-					    <label class="col-sm-2 col-form-label" style="font-size:14px;"><a class="text-danger">* 운송요청일:</a></label>
+					    <label class="col-sm-2 col-form-label" style="font-size:14px;"><a class="text-danger">* 도착지 도착일시:</a></label>
 					    <div class="col-sm-8 d-flex align-items-center" style="gap: 10px;">
-					        <input type="date" name="startDate" id="startDate" class="form-control" required style="max-width: 180px;">
-					        <span>~</span>
 					        <input type="date" name="endDate" id="endDate" class="form-control" required style="max-width: 180px;">
+					        <span>~</span>
+					        <input type="date" name="endDate2" id="endDate2" class="form-control" required style="max-width: 180px;">
 					    </div>
 					</div>
                     <div class="form-group row">
@@ -372,8 +370,8 @@ function deleteSelectedOrders() {
             </div>
         </div>
         <%
-		    boolean hasSearchData = (startDate != null && !startDate.isEmpty()) || 
-		                            (endDate != null && !endDate.isEmpty()) || 
+		    boolean hasSearchData = (endDate != null && !endDate.isEmpty()) || 
+		                            (endDate2 != null && !endDate2.isEmpty()) || 
 		                            (refNumberStr != null && !refNumberStr.isEmpty()) || 
 		                            (userName != null && !userName.isEmpty()) || 
 		                            (departureName != null && !departureName.isEmpty()) || 
@@ -398,7 +396,7 @@ function deleteSelectedOrders() {
                         <tr style="font-size: 11px;">
                             <th>체크</th>
                         	<th>오더번호</th>
-                            <th>운송요청일</th>
+                            <th>도착지 도착일시</th>
                             <th>참조번호</th>
                             <th>출발지명</th>
                             <th>출발지 주소</th>
@@ -453,7 +451,7 @@ function deleteSelectedOrders() {
 			                    <%
 			                    	if( userType.equals("admin") ) {
 			                    %>
-			                    	<td><%= order.getUserCompany() %></td>
+			                    	<td><%= order.getUserCompany() != null ? order.getUserCompany() : "왜이래" %></td>
 			                    <%
 			                    	}
 			                    %>
@@ -476,7 +474,9 @@ function deleteSelectedOrders() {
             </div>
         </div>
     </div>
-	
+	<%
+		}	
+	%>
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
 	<script src="js/search.js"></script>

@@ -170,7 +170,6 @@ public class OrderDAO {
 
 	        // ✅ orderNumber 생성 (날짜 + 밀리초)
 	        String orderNumber = datePart + timePart;
-	        System.out.println("Generated orderNumber: " + orderNumber);
 
 	        // ✅ SQL 작성 (orderID는 제외)
 	        String sql = "INSERT INTO cargoorder (" +
@@ -226,18 +225,15 @@ public class OrderDAO {
 	        if (affectedRows > 0) {
 	            // ✅ 커밋
 	            conn.commit();
-	            System.out.println("✅ INSERT 성공 및 트랜잭션 커밋 완료");
 	        } else {
 	            // ❌ 실패 시 롤백
 	            conn.rollback();
-	            System.out.println("❌ INSERT 실패 → 트랜잭션 롤백");
 	        }
 
 	    } catch (Exception e) {
 	        if (conn != null) {
 	            try {
 	                conn.rollback(); 
-	                System.out.println("❌ 트랜잭션 롤백 발생");
 	            } catch (SQLException rollbackEx) {
 	                rollbackEx.printStackTrace();
 	            }
@@ -249,13 +245,122 @@ public class OrderDAO {
 	            if (pstmt != null) pstmt.close();
 	            if (conn != null) conn.setAutoCommit(true);
 	            if (sqlSession != null) sqlSession.close();
-	            System.out.println("✅ 세션 종료 및 리소스 반환 완료");
 	        } catch (SQLException closeEx) {
 	            closeEx.printStackTrace();
 	        }
 	    }
 	    return affectedRows;
 	}
+	
+	public int writeOrder(
+	        String userID, String kindOfCar, String userName, String orderDate, String carWeight,
+	        int refNumber, String userPhoneNumber, String upDown, String item,
+	        String etc, String startDate, String endDate, String departureName, String arrivalName,
+	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
+	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
+	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
+	        String option1, String option2, String option3, String option4, String destinationAddress,
+	        String userCompany) {
+
+	    int affectedRows = 0;
+	    SqlSession sqlSession = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+
+	    try {
+	        // ✅ 트랜잭션 가능한 세션 열기
+	        sqlSession = MybatisUtil.getSession();
+	        conn = sqlSession.getConnection(); 
+	        conn.setAutoCommit(false);
+
+	        // ✅ 현재 날짜 (yyMMdd 형식) 생성 → "250313"
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
+	        String datePart = dateFormat.format(new Date());
+
+	        // ✅ 밀리초 값에서 뒤 6자리 사용 → 동시성 문제 방지
+	        String timePart = String.valueOf(System.currentTimeMillis()).substring(7);
+
+	        // ✅ orderNumber 생성 (날짜 + 밀리초)
+	        String orderNumber = datePart + timePart;
+
+	        // ✅ SQL 작성 (orderID는 제외)
+	        String sql = "INSERT INTO cargoorder (" +
+	                "orderNumber, kindOfCar, userName, orderDate, carWeight, refNumber, " +
+	                "userPhoneNumber, upDown, item, etc, " +
+	                "startDate, endDate, departureName, arrivalName, " +
+	                "departureCities, arrivalCities, departureTown, arrivalTown, " +
+	                "departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, " +
+	                "departureManagerPhoneNum, arrivalManagerPhoneNum, option1, option2, option3, option4, " +
+	                "destinationAddress, userCompany) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	        // ✅ PreparedStatement 생성
+	        pstmt = conn.prepareStatement(sql);
+
+	        pstmt.setString(1, orderNumber);
+	        pstmt.setString(2, kindOfCar);
+	        pstmt.setString(3, userName);
+	        pstmt.setString(4, orderDate);
+	        pstmt.setString(5, carWeight);
+	        pstmt.setInt(6, refNumber);
+	        pstmt.setString(7, userPhoneNumber);
+	        pstmt.setString(8, upDown);
+	        pstmt.setString(9, item);
+	        pstmt.setString(10, etc);
+	        pstmt.setString(11, startDate);
+	        pstmt.setString(12, endDate);
+	        pstmt.setString(13, departureName);
+	        pstmt.setString(14, arrivalName);
+	        pstmt.setString(15, departureCities);
+	        pstmt.setString(16, arrivalCities);
+	        pstmt.setString(17, departureTown);
+	        pstmt.setString(18, arrivalTown);
+	        pstmt.setString(19, departureDetailedAddress);
+	        pstmt.setString(20, arrivalDetailedAddress);
+	        pstmt.setString(21, departureManager);
+	        pstmt.setString(22, arrivalManager);
+	        pstmt.setString(23, departureManagerPhoneNum);
+	        pstmt.setString(24, arrivalManagerPhoneNum);
+	        pstmt.setString(25, option1);
+	        pstmt.setString(26, option2);
+	        pstmt.setString(27, option3);
+	        pstmt.setString(28, option4);
+	        pstmt.setString(29, destinationAddress);
+	        pstmt.setString(30, userCompany);
+
+	        // ✅ 쿼리 실행
+	        affectedRows = pstmt.executeUpdate();
+
+	        if (affectedRows > 0) {
+	            // ✅ 커밋
+	            conn.commit();
+	        } else {
+	            // ❌ 실패 시 롤백
+	            conn.rollback();
+	        }
+
+	    } catch (Exception e) {
+	        if (conn != null) {
+	            try {
+	                conn.rollback(); 
+	            } catch (SQLException rollbackEx) {
+	                rollbackEx.printStackTrace();
+	            }
+	        }
+	        e.printStackTrace();
+
+	    } finally {
+	        try {
+	            if (pstmt != null) pstmt.close();
+	            if (conn != null) conn.setAutoCommit(true);
+	            if (sqlSession != null) sqlSession.close();
+	        } catch (SQLException closeEx) {
+	            closeEx.printStackTrace();
+	        }
+	    }
+	    return affectedRows;
+	}
+	
 	
 	public List<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
 		int pageSize = 10;
@@ -276,15 +381,15 @@ public class OrderDAO {
 			}
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
 	            
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
-	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
+	            params.put("endDate2", endDate2);
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
@@ -296,7 +401,7 @@ public class OrderDAO {
 	        }
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
@@ -304,8 +409,8 @@ public class OrderDAO {
 	            String userID = getUserID();
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
-	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
+	            params.put("endDate2", endDate2);
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
@@ -320,11 +425,11 @@ public class OrderDAO {
 	        }
 	}
 	
-	public int getTotalCount( String startDate, String endDate, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+	public int getTotalCount( String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	Map<String, Object> params = new HashMap<>();
-        	params.put("startDate", startDate);
-            params.put("endDate", endDate);
+        	params.put("endDate", endDate);
+            params.put("endDate2", endDate2);
             params.put("refNumber", refNumber);
             params.put("userName", userName);
             params.put("departureName", departureName);
@@ -340,7 +445,6 @@ public class OrderDAO {
 	
 	public Order getOrderById( String orderNumber ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
-        	System.out.println(orderNumber + ": orderNumber");
             return session.selectOne("OrderDAO.getOrderById", orderNumber);
         }
     }
@@ -402,23 +506,19 @@ public class OrderDAO {
 
 	        // ✅ 업데이트 실행
 	        affectedRows = sqlSession.update("OrderDAO.updateOrder", params);
-	        System.out.println("✅ UPDATE affectedRows: " + affectedRows);
 
 	        if (affectedRows > 0) {
 	            // ✅ 트랜잭션 커밋
 	            sqlSession.commit();
-	            System.out.println("✅ 트랜잭션 커밋 성공");
 	        } else {
 	            // ❌ 업데이트 실패 시 롤백
 	            sqlSession.rollback();
-	            System.out.println("❌ UPDATE 실패 → 트랜잭션 롤백");
 	            return -1;
 	        }
 	    } catch (Exception e) {
 	        if (sqlSession != null) {
 	            try {
 	                sqlSession.rollback(); // ❌ 예외 발생 시 롤백
-	                System.out.println("❌ SQL 실행 오류 발생: " + e.getMessage());
 	            } catch (Exception rollbackEx) {
 	                rollbackEx.printStackTrace();
 	            }
@@ -429,7 +529,6 @@ public class OrderDAO {
 	        if (sqlSession != null) {
 	            try {
 	                sqlSession.close(); // ✅ 세션 닫기
-	                System.out.println("✅ 세션 닫기 완료");
 	            } catch (Exception closeEx) {
 	                closeEx.printStackTrace();
 	            }

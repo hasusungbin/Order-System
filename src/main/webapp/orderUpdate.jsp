@@ -24,18 +24,6 @@
 <!-- Bootstrap Datetimepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 <script>
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("startDate").value = today;
-        });
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById("endDate").value = today;
-        });
-</script>
-<script>
     document.addEventListener('DOMContentLoaded', () => {
         const selectBox = document.getElementById('fixedCarNumber'); // 고정차량 select box ID
         const inputFields = document.querySelectorAll('.hide-on-select'); // 숨길 input 태그 클래스
@@ -147,7 +135,7 @@
 	            </div>
                    <div class="form-group row">
                        <label class="col-sm-2 control-label" ><a class="text-danger">* 운송요청일:</a></label>
-                       <div class="col-sm-4">
+                       <div class="col-sm-3">
                        		<input type="hidden" name="orderNumber" value="<%= order.getOrderNumber() %>">
                        		<%
 	                       		String formattedOrderDate = "";
@@ -163,7 +151,6 @@
 	                       	            formattedOrderDate = outputFormat.format(date);
 	
 	                       	            // ✅ 변환된 값 디버깅 로그 출력
-	                       	            System.out.println("formattedOrderDate: " + formattedOrderDate);
 	
 	                       	        } catch (Exception e) {
 	                       	            e.printStackTrace(); // 변환 오류 확인
@@ -296,8 +283,28 @@
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 출발지 도착일시:</a></label>
-                        <div class="col-sm-4">
-                            <input type="date" name="startDate" id="startDate" class="form-control" required value="<%= order.getStartDate() == null ? "" : order.getStartDate() %>">
+                        <div class="col-sm-3">
+                        	<%
+	                       		String formattedStartDate = "";
+	                       	    if (order.getStartDate() != null && !order.getStartDate().trim().isEmpty()) {
+	                       	        try {
+	
+	                       	            // ✅ String → Date 변환 (포맷을 정확히 맞추기)
+	                       	            SimpleDateFormat inputFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // DB 저장 형식 확인
+	                       	            Date date2 = inputFormat2.parse(order.getStartDate().trim()); // 공백 제거 후 변환
+	
+	                       	            // ✅ Date → String 변환 (input type=datetime-local 형식에 맞추기)
+	                       	            SimpleDateFormat outputFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+	                       	            formattedStartDate = outputFormat2.format(date2);
+	
+	                       	            // ✅ 변환된 값 디버깅 로그 출력
+	
+	                       	        } catch (Exception e) {
+	                       	            e.printStackTrace(); // 변환 오류 확인
+	                       	        }
+	                       	    }
+							%>
+                            <input type="datetime-local" name="startDate" id="startDate" class="form-control" required value="<%= formattedStartDate %>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -361,8 +368,28 @@
             <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 도착지 도착일시:</a></label>
-                        <div class="col-sm-4">
-                            <input type="date" name="endDate" id="endDate" class="form-control" required value="<%= order.getEndDate() == null ? "" : order.getEndDate() %>">
+                        <div class="col-sm-3">
+                        	<%
+	                       		String formattedEndDate = "";
+	                       	    if (order.getEndDate() != null && !order.getEndDate().trim().isEmpty()) {
+	                       	        try {
+	
+	                       	            // ✅ String → Date 변환 (포맷을 정확히 맞추기)
+	                       	            SimpleDateFormat inputFormat3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // DB 저장 형식 확인
+	                       	            Date date3 = inputFormat3.parse(order.getEndDate().trim()); // 공백 제거 후 변환
+	
+	                       	            // ✅ Date → String 변환 (input type=datetime-local 형식에 맞추기)
+	                       	            SimpleDateFormat outputFormat3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+	                       	            formattedEndDate = outputFormat3.format(date3);
+	
+	                       	            // ✅ 변환된 값 디버깅 로그 출력
+	
+	                       	        } catch (Exception e) {
+	                       	            e.printStackTrace(); // 변환 오류 확인
+	                       	        }
+	                       	    }
+							%>
+                            <input type="datetime-local" name="endDate" id="endDate" class="form-control" required value="<%= formattedEndDate %>">
                         </div>
                     </div>
                     <div class="form-group row">

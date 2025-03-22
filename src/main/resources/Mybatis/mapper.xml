@@ -62,9 +62,9 @@
 	FROM cargoorder
 	WHERE 1=1
     <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
-    <if test="startDate != null and endDate != null">
-        AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00') 
-                         AND CONCAT(#{endDate}, ' 23:59:59')
+    <if test="endDate != null and endDate2 != null">
+        AND orderDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
+                         AND CONCAT(#{endDate2}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
@@ -128,6 +128,7 @@
     SELECT 
 		orderNumber,
 		DATE_FORMAT(orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
+		DATE_FORMAT(endDate, '%Y-%m-%d %H:%i') AS endDate,
 		refNumber,
 		departureName,
 		departureCities,
@@ -152,10 +153,10 @@
 	FROM cargoorder
 	WHERE 1=1
     
-    <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
-    <if test="startDate != null and endDate != null">
-        AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00') 
-                         AND CONCAT(#{endDate}, ' 23:59:59')
+    <!-- ✅ 운송요청일 (도착일) -->
+    <if test="endDate != null and endDate2 != null">
+        AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00') 
+                         AND CONCAT(#{endDate2}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
