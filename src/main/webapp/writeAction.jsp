@@ -17,18 +17,12 @@
 	
 	String userID = (String) session.getAttribute("userID");
 	
-	// 데이터 파싱 (숫자 기본값 처리)
-	int refNumber = 0;
-	try {
-	    refNumber = Integer.parseInt(request.getParameter("refNumber"));
-	} catch (NumberFormatException e) {
-	    refNumber = 0; // 파싱 실패 시 기본값 설정
-	}
-	
+
 	String userName = request.getParameter("userName");
 	String orderDate = request.getParameter("orderDate");
 	String carWeight = request.getParameter("carWeight");
 	String kindOfCar = request.getParameter("kindOfCar");
+	String refNumber = request.getParameter("refNumber");
 	String userPhoneNumber = request.getParameter("userPhoneNumber");
 	String fixedCarNumber = request.getParameter("fixedCarNumber");
 	String upDown = request.getParameter("upDown");

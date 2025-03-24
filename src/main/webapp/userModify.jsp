@@ -227,12 +227,12 @@
         	<div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
 			    <p style="font-weight: bold; margin: 0;">당담자 리스트</p>
 			    <div>
-			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">담당자 삭제</button>
+			        <button onclick="deleteSelectedUsers()" class="btn btn-danger">담당자 삭제</button>
 			    </div>
 			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
-				    <tr style="font-size: 10px;">
+				    <tr style="font-size: 14px;">
 				        <th>체크</th>
 				        <th>담당자명</th>
 				        <th>담당자 연락처</th>
@@ -241,7 +241,7 @@
 				        <th>등록일자</th>
 				    </tr>
 				<% for (User user : userList) { %>
-			        <tr>
+			        <tr style="font-size: 14px;">
 			            <td><input type="checkbox" name="userCheckbox" value="<%= user.getUserID() %>"></td>
 			            <td><a href="userUpdate.jsp?userID=<%= user.getUserID() %>"><%= user.getUserName() %></a></td>
 			            <td><%= user.getUserPhoneNumber() != null ? user.getUserPhoneNumber() : "" %></td>

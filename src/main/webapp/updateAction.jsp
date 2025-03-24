@@ -1,3 +1,4 @@
+<%@page import="org.apache.poi.util.SystemOutLogger"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="insertOrder.OrderDAO" %>
@@ -69,6 +70,12 @@
 				script.println( "</script>" );
 			} else {
 				OrderDAO orderDAO = new OrderDAO();
+				if (order.getFixedCarNumber() == null) {
+				    order.setFixedCarNumber("");
+				}
+				System.out.println(order.getCarNumber() + ": CarNumber");
+				System.out.println(order.getDriverName() + ": DriverName");
+				System.out.println(order.getDriverPhoneNum() + ": DriverPhoneNum");
 				int result = orderDAO.updateOrder( order.getOrderNumber(), order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),

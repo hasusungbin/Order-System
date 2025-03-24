@@ -259,12 +259,12 @@
             <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
 			    <p style="font-weight: bold; margin: 0;">출발지 리스트</p>
 			    <div>
-			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">출발지 삭제</button>
+			        <button onclick="deleteSelectedDeparture()" class="btn btn-danger">출발지 삭제</button>
 			    </div>
 			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
-				    <tr style="font-size: 10px;">
+				    <tr style="font-size: 14px;">
 				        <th>체크</th>
 				        <th>출발지 번호</th>
 				        <th>명칭</th>
@@ -282,10 +282,10 @@
 				            <td><a href="departureUpdate.jsp?departureID=<%= departure.getDepartureID() %>"><%= departure.getDepartureID() %></a></td>
 				            <td><%= departure.getDepartureName() %></td>
 				            <td><%= departure.getDepartureCities() %></td>
-				            <td><%= departure.getDepartureManager() == null ? "" : departure.getDepartureManager() %></td>
 				            <td><%= departure.getDepartureTown() == null ? "" : departure.getDepartureTown() %></td>
-				            <td><%= departure.getDepartureManagerPhoneNum() == null ? "" : departure.getDepartureManagerPhoneNum() %></td>
 				            <td><%= departure.getDepartureDetailedAddress() == null ? "" : departure.getDepartureDetailedAddress() %></td>
+				            <td><%= departure.getDepartureManager() == null ? "" : departure.getDepartureManager() %></td>
+				            <td><%= departure.getDepartureManagerPhoneNum() == null ? "" : departure.getDepartureManagerPhoneNum() %></td>
 				            <td><%= departure.getEtc() == null ? "" : departure.getEtc() %></td>
 				            <td><%= departure.getFormattedRegDate() %></td>
 				        </tr>
@@ -297,12 +297,12 @@
             <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
 			    <p style="font-weight: bold; margin: 0;">도착지 리스트</p>
 			    <div>
-			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">도착지 삭제</button>
+			        <button onclick="deleteSelectedArrival()" class="btn btn-danger">도착지 삭제</button>
 			    </div>
 			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
-				    <tr style="font-size: 10px;">
+				    <tr style="font-size: 14px;">
 				        <th>체크</th>
 				        <th>도착지 번호</th>
 				        <th>명칭</th>
@@ -320,11 +320,11 @@
 				            <td><a href="arrivalUpdate.jsp?arrivalID=<%= arrival.getArrivalID() %>"><%= arrival.getArrivalID() %></a></td>
 				            <td><%= arrival.getArrivalName() %></td>
 				            <td><%= arrival.getArrivalCities() %></td>
-				            <td><%= arrival.getArrivalManager() == null ? "" : arrival.getArrivalManager() %></td>
 				            <td><%= arrival.getArrivalTown() %></td>
-				            <td><%= arrival.getArrivalManagerPhoneNum() == null ? "" : arrival.getArrivalManagerPhoneNum() %></td>
 				            <td><%= arrival.getArrivalDetailedAddress() == null ? "" : arrival.getArrivalDetailedAddress() %></td>
-				            <td><%= arrival.getEtc() == null ? "" : arrival.getArrivalManager() %></td>
+				            <td><%= arrival.getArrivalManager() == null ? "" : arrival.getArrivalManager() %></td>
+				            <td><%= arrival.getArrivalManagerPhoneNum() == null ? "" : arrival.getArrivalManagerPhoneNum() %></td>
+				            <td><%= arrival.getEtc() == null ? "" : arrival.getEtc() %></td>
 				            <td><%= arrival.getFormattedRegDate() %></td>
 				        </tr>
 			    	<% } %>

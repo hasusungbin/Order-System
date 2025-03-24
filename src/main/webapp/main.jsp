@@ -338,7 +338,7 @@
                    <div class="form-group row">
                     <label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="number" name="refNumber" class="form-control">
+                            <input type="text" name="refNumber" class="form-control">
                         </div>
                     <label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
@@ -368,7 +368,7 @@
 					    <label class="col-sm-2 control-label">출발지명:</label>
 					    <div class="col-sm-3">
 					        <div class="input-group">
-					            <input type="text" name="departureName" id="departureName" class="form-control">
+					            <input type="text" id="departureName" name="departureName" class="form-control">
 					            <span class="input-group-btn">
 					                <button type="button" onclick="openDeparturePopup()" class="btn btn-default">🔍</button>
 					            </span>
@@ -378,7 +378,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label"><a class="text-danger">* 시/도:</a></label>
                         <div class="col-sm-3">
-                            <select name="departureCities" class="form-control" required>
+                            <select id="departureCities" name="departureCities" class="form-control" required>
                                 <option value="서울특별시">서울특별시</option>
                                 <option value="경기도">경기도</option>
                                 <option value="인천광역시">인천광역시</option>
@@ -402,23 +402,23 @@
                     <div class="form-group row">
                     	 <label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureTown" id="departureTown" class="form-control" required>
+                        	<input type="text" id="departureTown" name="departureTown" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">상세주소:</label>
                         <div class="col-sm-8">
-                            <input type="text" name="departureDetailedAddress" class="form-control">
+                            <input type="text" id="departureDetailedAddress" name="departureDetailedAddress" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">출발지 담당자:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureManager" class="form-control">
+                        	<input type="text" id="departureManager" name="departureManager" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="departureManagerPhoneNum" class="form-control">
+                        	<input type="text" id="departureManagerPhoneNum" name="departureManagerPhoneNum" class="form-control">
                         	<input type="hidden" name="departureEtc" value="">
                         </div>
                     </div>
@@ -439,7 +439,7 @@
 					    <label class="col-sm-2 control-label">도착지명:</label>
 					    <div class="col-sm-3">
 					        <div class="input-group">
-					            <input type="text" name="arrivalName" id="arrivalName" class="form-control">
+					            <input type="text" id="arrivalName" name="arrivalName" class="form-control">
 					            <span class="input-group-btn">
 					                <button type="button" onclick="openArrivalPopup()" class="btn btn-default">🔍</button>
 					            </span>
@@ -473,23 +473,23 @@
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label"><a class="text-danger">* 시/군/구:</a></label>
                         <div class="col-sm-3">
-                        	<input type="text" id="arrivalTown" name="arrivalTown" class="form-control">
+                        	<input type="text" id="arrivalTown" name="arrivalTown" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">상세주소:</label>
                         <div class="col-sm-8">
-                            <input type="text" name="arrivalDetailedAddress" class="form-control">
+                            <input type="text" id="arrivalDetailedAddress" name="arrivalDetailedAddress" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
                     	<label class="col-sm-2 control-label">도착지 담당자:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalManager" class="form-control">
+                        	<input type="text" id="arrivalManager" name="arrivalManager" class="form-control">
                         </div>
                         <label class="col-sm-2 control-label">연락처:</label>
                         <div class="col-sm-3">
-                        	<input type="text" name="arrivalManagerPhoneNum" class="form-control">
+                        	<input type="text" id="arrivalManagerPhoneNum" name="arrivalManagerPhoneNum" class="form-control">
                         	<input type="hidden" name="arrivalEtc" value="">
                         </div>
                     </div>

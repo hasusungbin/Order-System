@@ -39,87 +39,104 @@
 	
 	
 	<select id="getSearchOrderList" parameterType="map" resultType="insertOrder.Order">
-	SELECT 
-		orderNumber,
-		DATE_FORMAT(orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
-		refNumber,
-		departureName,
-		departureCities,
-		departureTown,
-		arrivalName,
-		arrivalCities,
-		arrivalTown,
-		carWeight,
-		kindOfCar,
-		upDown,
-		carNumber,
-		driverName,
-		driverPhoneNum,
-		basicFare + addFare AS totalFare,
-		userName,
-		regDate,
-		userCompany
-	FROM cargoorder
-	WHERE 1=1
+    SELECT 
+        co.orderNumber,
+        DATE_FORMAT(co.orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
+        co.refNumber,
+        co.fixedCarNumber,
+        co.departureName,
+        co.departureCities,
+        co.departureTown,
+        co.arrivalName,
+        co.arrivalCities,
+        co.arrivalTown,
+        co.carWeight,
+        co.kindOfCar,
+        co.upDown,
+        co.carNumber,
+        co.driverName,
+        co.driverPhoneNum,
+        co.basicFare,
+        co.addFare,
+        co.userName,
+        co.regDate,
+        co.destinationAddress,
+        co.option1,
+        co.option2,
+        co.option3,
+        co.option4,
+        co.userCompany,
+        ci.driverName AS carinfoDriverName, -- ✅ carinfo 테이블의 driverName 추가
+		ci.driverPhoneNumber as carinfoDriverPhoneNumber
+    FROM 
+        cargoorder co
+    LEFT JOIN 
+        carinfo ci ON co.fixedCarNumber = ci.carNumber -- ✅ carinfo 테이블 JOIN
+    WHERE 
+        1=1
+        
     <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
     <if test="endDate != null and endDate2 != null">
-        AND orderDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
-                         AND CONCAT(#{endDate2}, ' 23:59:59')
+        AND co.endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
+                            AND CONCAT(#{endDate2}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
     <if test="refNumber != null">
-        AND refNumber = #{refNumber}
+        AND co.refNumber = #{refNumber}
     </if>
 
     <if test="userName != null and userName != ''">
-		AND userName LIKE CONCAT('%', IFNULL(#{userName}, ''), '%')
-	</if>
+        AND co.userName LIKE CONCAT('%', IFNULL(#{userName}, ''), '%')
+    </if>
 
     <!-- ✅ 출발지명 -->
     <if test="departureName != null and departureName != ''">
-        AND (departureName LIKE CONCAT('%', #{departureName}, '%') OR #{departureName} IS NULL)
+        AND (co.departureName LIKE CONCAT('%', #{departureName}, '%') OR #{departureName} IS NULL)
     </if>
 	
-	<!-- ✅ 출발지 시/도 -->
+    <!-- ✅ 출발지 시/도 -->
     <if test="departureCities != null and departureCities != ''">
-        AND (departureCities LIKE CONCAT('%', #{departureCities}, '%') OR #{departureCities} IS NULL)
+        AND (co.departureCities LIKE CONCAT('%', #{departureCities}, '%') OR #{departureCities} IS NULL)
     </if>
 
     <!-- ✅ 도착지명 -->
     <if test="arrivalName != null and arrivalName != ''">
-        AND (arrivalName LIKE CONCAT('%', #{arrivalName}, '%') OR #{arrivalName} IS NULL)
+        AND (co.arrivalName LIKE CONCAT('%', #{arrivalName}, '%') OR #{arrivalName} IS NULL)
     </if>
 
     <!-- ✅ 도착지 시/도 -->
     <if test="arrivalCities != null and arrivalCities != ''">
-        AND (arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%') OR #{arrivalCities} IS NULL)
+        AND (co.arrivalCities LIKE CONCAT('%', #{arrivalCities}, '%') OR #{arrivalCities} IS NULL)
     </if>
+    
     <!-- ✅ 오더번호 -->
     <if test="orderNumber != null and orderNumber.trim() != ''">
-        AND (CAST(orderNumber AS CHAR) LIKE CONCAT('%', #{orderNumber}, '%') OR #{orderNumber} IS NULL)
+        AND (CAST(co.orderNumber AS CHAR) LIKE CONCAT('%', #{orderNumber}, '%') OR #{orderNumber} IS NULL)
     </if>
+
     <!-- ✅ userCompany -->
     <if test="userCompany != null and userCompany != ''">
-        AND (userCompany LIKE CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
+        AND (co.userCompany LIKE CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
     </if>
+
     <!-- ✅ 권한별 조회 조건 -->
     <if test="userType != null">
         <if test="userType == 'sales'">
-            AND userName = #{userName}  <!-- ✅ sales는 본인 오더만 -->
+            AND co.userName = #{userName}  <!-- ✅ sales는 본인 오더만 -->
         </if>
         <if test="userType == 'manager'">
-            AND (userCompany like CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
+            AND (co.userCompany like CONCAT('%', #{userCompany}, '%') OR #{userCompany} IS NULL)
         </if>
         <if test="userType == 'admin'">
-			<!-- ✅ sales는 본인 오더만 -->
+            <!-- ✅ admin은 전체 조회 가능 -->
         </if>
     </if>
-	<if test="userType == null or userType == ''">
+    <if test="userType == null or userType == ''">
         <!-- userType이 null인 경우 쿼리 수행하지 않게 강제 필터 -->
     </if>
 
-    ORDER BY orderID DESC
+    ORDER BY co.orderID DESC
     LIMIT #{pageSize} OFFSET #{offset}
 </select>
 
@@ -145,6 +162,7 @@
 		basicFare + addFare AS totalFare,
 		userName,
 		regDate,
+		destinationAddress,
 		option1,
 		option2,
 		option3,
@@ -154,13 +172,13 @@
 	WHERE 1=1
     
     <!-- ✅ 운송요청일 (도착일) -->
-    <if test="endDate != null and endDate2 != null">
-        AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00') 
+    <if test="endDate != null">
+        AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
                          AND CONCAT(#{endDate2}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
-    <if test="refNumber != null">
+    <if test="refNumber != null and refNumber != ''">
         AND refNumber = #{refNumber}
     </if>
 
@@ -220,10 +238,11 @@
     <select id="getTotalCount" resultType="int">
         SELECT COUNT(*) FROM cargoorder
         WHERE 1=1
-		<if test="startDate != null and endDate != null">
-			AND orderDate BETWEEN #{startDate} AND #{endDate}
+		<if test="endDate != null">
+			AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
+							AND CONCAT(#{endDate2}, ' 23:59:59')
 		</if>
-        <if test="refNumber != 0">
+        <if test="refNumber != null">
             AND refNumber = #{refNumber}
         </if>
         <if test="userName != null and userName != ''">
@@ -307,9 +326,11 @@
 			<if test="userName != null">userName = #{userName}, </if>
 			<if test="orderDate != null"> orderDate = #{orderDate}, </if>
 			<if test="carWeight != null"> carWeight = #{carWeight}, </if>
-			<if test="refNumber != 0"> refNumber = #{refNumber}, </if>
+			<if test="refNumber != null"> refNumber = #{refNumber}, </if>
 			<if test="userPhoneNumber != null"> userPhoneNumber = #{userPhoneNumber}, </if>
-			<if test="fixedCarNumber != null"> fixedCarNumber = #{fixedCarNumber}, </if>
+			<if test="fixedCarNumber != null">
+				fixedCarNumber = #{fixedCarNumber},
+			</if>
 			<if test="upDown != null"> upDown = #{upDown}, </if>
 			<if test="item != null"> item = #{item}, </if>
 			<if test="etc != null"> etc = #{etc}, </if>
@@ -327,9 +348,9 @@
 			<if test="arrivalManager != null"> arrivalManager = #{arrivalManager}, </if>
 			<if test="departureManagerPhoneNum != null"> departureManagerPhoneNum = #{departureManagerPhoneNum}, </if>
 			<if test="arrivalManagerPhoneNum != null"> arrivalManagerPhoneNum = #{arrivalManagerPhoneNum}, </if>
-			<if test="carNumber != null"> carNumber = #{carNumber}, </if>
-			<if test="driverName != null"> driverName = #{driverName}, </if>
-			<if test="driverPhoneNum != null"> driverPhoneNum = #{driverPhoneNum}, </if>
+			carNumber = #{carNumber},
+			driverName = #{driverName},
+			driverPhoneNum = #{driverPhoneNum},
 			<if test="basicFare != null"> basicFare = #{basicFare}, </if>
 			<if test="addFare != null"> addFare = #{addFare}, </if>
 			<if test="option1 != null"> option1 = #{option1}, </if>

@@ -59,7 +59,7 @@ public class OrderDAO {
 					order.setUserName( rs.getString(3) );
 					order.setOrderDate( rs.getString(4) );
 					order.setCarWeight( rs.getString(5) );
-					order.setRefNumber( rs.getInt(6) );
+					order.setRefNumber( rs.getString(6) );
 					order.setUserPhoneNumber( rs.getString(7) );
 					order.setFixedCarNumber( rs.getString(8) );
 					order.setUpDown( rs.getString(9) );
@@ -141,7 +141,7 @@ public class OrderDAO {
 	
 	public int writeOrder(
 	        String userID, String kindOfCar, String userName, String orderDate, String carWeight,
-	        int refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
+	        String refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
 	        String etc, String startDate, String endDate, String departureName, String arrivalName,
 	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
@@ -190,7 +190,7 @@ public class OrderDAO {
 	        pstmt.setString(3, userName);
 	        pstmt.setString(4, orderDate);
 	        pstmt.setString(5, carWeight);
-	        pstmt.setInt(6, refNumber);
+	        pstmt.setString(6, refNumber);
 	        pstmt.setString(7, userPhoneNumber);
 	        pstmt.setString(8, fixedCarNumber);
 	        pstmt.setString(9, upDown);
@@ -254,7 +254,7 @@ public class OrderDAO {
 	
 	public int writeOrder(
 	        String userID, String kindOfCar, String userName, String orderDate, String carWeight,
-	        int refNumber, String userPhoneNumber, String upDown, String item,
+	        String refNumber, String userPhoneNumber, String upDown, String item,
 	        String etc, String startDate, String endDate, String departureName, String arrivalName,
 	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
@@ -302,7 +302,7 @@ public class OrderDAO {
 	        pstmt.setString(3, userName);
 	        pstmt.setString(4, orderDate);
 	        pstmt.setString(5, carWeight);
-	        pstmt.setInt(6, refNumber);
+	        pstmt.setString(6, refNumber);
 	        pstmt.setString(7, userPhoneNumber);
 	        pstmt.setString(8, upDown);
 	        pstmt.setString(9, item);
@@ -362,7 +362,7 @@ public class OrderDAO {
 	}
 	
 	
-	public List<Order> getSearchList( String startDate, String endDate, int refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
+	public List<Order> getSearchList( String startDate, String endDate, String refNumber, String userName, String departureName, String arrivalName, String arrivalCities, int pageNumber, String orderNumber ) {
 		int pageSize = 10;
 		try ( SqlSession session = MybatisUtil.getSession() ) {
 			Map<String, Object> params = new HashMap<>();
@@ -381,11 +381,10 @@ public class OrderDAO {
 			}
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber ) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
-	            
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
 	            params.put("endDate", endDate);
@@ -393,6 +392,7 @@ public class OrderDAO {
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
+	            params.put("departureCities", departureCities);
 	            params.put("arrivalName", arrivalName);
 	            params.put("arrivalCity", arrivalCities);
 	            params.put("orderNumber", orderNumber);
@@ -401,7 +401,7 @@ public class OrderDAO {
 	        }
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
@@ -414,8 +414,9 @@ public class OrderDAO {
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
+	            params.put("departureCities", departureCities);
 	            params.put("arrivalName", arrivalName);
-	            params.put("arrivalCity", arrivalCities);
+	            params.put("arrivalCities", arrivalCities);
 	            params.put("orderNumber", orderNumber);
 	            params.put("userType", userType);
 	            params.put("userCompany", userCompany);
@@ -425,7 +426,7 @@ public class OrderDAO {
 	        }
 	}
 	
-	public int getTotalCount( String endDate, String endDate2, Integer refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+	public int getTotalCount( String endDate, String endDate2, String refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	Map<String, Object> params = new HashMap<>();
         	params.put("endDate", endDate);
@@ -451,7 +452,7 @@ public class OrderDAO {
 	
 	public int updateOrder(
 	        String orderNumber, String kindOfCar, String userName, String orderDate, String carWeight,
-	        Integer refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
+	        String refNumber, String userPhoneNumber, String fixedCarNumber, String upDown, String item,
 	        String etc, String startDate, String endDate, String departureName, String arrivalName,
 	        String departureCities, String arrivalCities, String departureTown, String arrivalTown,
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,

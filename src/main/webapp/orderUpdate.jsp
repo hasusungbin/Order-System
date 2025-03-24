@@ -23,7 +23,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <!-- Bootstrap Datetimepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', () => {
         const selectBox = document.getElementById('fixedCarNumber'); // 고정차량 select box ID
         const inputFields = document.querySelectorAll('.hide-on-select'); // 숨길 input 태그 클래스
@@ -37,6 +37,33 @@
                 inputFields.forEach(input => input.style.display = '');
             }
         });
+    });
+</script> -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const carNumberInput = document.getElementById('carNumber'); // 일반 차량번호 입력 필드
+        const fixedCarSelect = document.getElementById('fixedCarNumber'); // 고정 차량 선택 필드
+
+        function validateCarInput() {
+            const carNumberValue = carNumberInput.value.trim(); // 공백 제거
+            const fixedCarValue = fixedCarSelect.value.trim(); // 공백 제거
+            
+            // ✅ 둘 다 값이 존재하면 alert 발생
+            if (carNumberValue !== '' && fixedCarValue !== '') {
+                alert("고정차량과 일반차량 중 한 곳만 입력해야 합니다.");
+                
+                // ⚠️ focus를 설정해서 사용자가 수정하도록 유도
+                carNumberInput.focus(); 
+                
+                // ✅ 중복 입력 상태를 방지하기 위해 기존 입력 초기화 (선택사항)
+                carNumberInput.value = '';
+                fixedCarSelect.value = '';
+            }
+        }
+
+        // ✅ 입력 필드나 select 값이 변경될 때마다 체크 실행
+        carNumberInput.addEventListener('input', validateCarInput);
+        fixedCarSelect.addEventListener('change', validateCarInput);
     });
 </script>
 <title>로지스톡 운송 오더 시스템</title>
@@ -232,17 +259,23 @@
                    	<label class="col-sm-2 control-label">고정차량:</label>
                        <div class="col-sm-3">
                        		<select id="fixedCarNumber" name="fixedCarNumber" class="form-control">
-	                       		<option value="">--선택--</option>
+	                       		<option value="" <%= order.getFixedCarNumber() == "" ? "selected" : "" %>>--선택--</option>
 			                       <%
 			                       	CarInfoDAO carInfoDAO = new CarInfoDAO();
 			                       	List<CarInfo> carInfoList = carInfoDAO.getCarInfosByCompany( userType2, userCompany );
 			                       	
 			                       	for( CarInfo carInfo : carInfoList) {
 				                       	String selectedCarNumber = carInfo.getCarNumber();
-				                       	String carNumber = carInfo.getCarNumber();
+				                       	String carNumber = order.getFixedCarNumber();
 				                       	boolean isSelected = carNumber != null && carNumber.equals(selectedCarNumber);
 			                       %>
+			                       		<% 
+			                       			if( carInfo.getCarNumber() != null ) {
+			                       		%>
 			                               <option value="<%= carInfo.getCarNumber() %>" <%= isSelected ? "selected" : "" %>><%= carInfo.getCarNumber() %></option>
+			                            <%
+			                       			}
+			                            %>
 			                       <%
 			                       	}
 			                       %>
@@ -261,7 +294,7 @@
                    <div class="form-group row">
                     	<label class="col-sm-2 control-label">참조번호:</label>
                         <div class="col-sm-3">
-                            <input type="number" name="refNumber" class="form-control" value="<%= order.getRefNumber() != 0 ? order.getRefNumber() : "" %>">
+                            <input type="text" name="refNumber" class="form-control" value="<%= order.getRefNumber() != null ? order.getRefNumber() : "" %>">
                         </div>
                     	<label class="col-sm-2 control-label">품목:</label>
                        <div class="col-sm-5">
@@ -454,7 +487,7 @@
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">이착지 주소:</label>
 	                	<div class="col-sm-3">
-		                    <input type="text" name="destinationAddress" class="form-control">	                	
+		                    <input type="text" name="destinationAddress" class="form-control" value="<%= order.getDestinationAddress() == null ? "" : order.getDestinationAddress() %>">              	
 	                	</div>
 	                	<div class="col-sm-3">
 						    이착 : <input type="checkbox" name="option1" value="이착" 
@@ -477,7 +510,7 @@
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">차량번호: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="carNumber" class="form-control hide-on-select" value="<%= order.getCarNumber() == null ? "" : order.getCarNumber() %>">          	
+	                    <input type="text" id="carNumber" name="carNumber" class="form-control hide-on-select" value="<%= order.getCarNumber() == null ? "" : order.getCarNumber() %>">          	
                 	</div>
                 </div>
                 <div class="form-group row">
@@ -501,10 +534,13 @@
                 	<div class="col-sm-3">
 	                    <input type="text" name="addFare" class="form-control" value="<%= order.getAddFare() == 0 ? "" : order.getAddFare() %>">            	
                 	</div>
+                	<div class="text-center">
+		                <button type="submit" class="btn btn-primary">저장</button>
+	            	</div>
+	            </div>
 	            </div>
             </div>
         </div>
-	</div>
 </form>
 	<%
 		}	

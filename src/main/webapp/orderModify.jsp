@@ -1,3 +1,4 @@
+<%@page import="org.apache.poi.util.SystemOutLogger"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" session="true"%>
 <%@ page import="java.io.PrintWriter" %>
@@ -10,7 +11,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="refresh" content="5">
+<meta http-equiv="refresh" content="20">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
@@ -85,7 +86,6 @@ function deleteSelectedOrders() {
 		UserDAO userDAO = new UserDAO();
 		String userType = orderDAO.getUserType();
 		
-		//String userCompany = request.getParameter("userCompany");
 		String userCompany = userDAO.getUserCompany(userID);
 		
 		String pageNumberStr = request.getParameter("pageNumber");
@@ -94,16 +94,15 @@ function deleteSelectedOrders() {
 	    
 		String endDate = request.getParameter("endDate");
 	    String endDate2 = request.getParameter("endDate2");
-	    String refNumberStr = request.getParameter("refNumber");
-	    Integer refNumber = (refNumberStr != null && !refNumberStr.isEmpty()) ? Integer.parseInt(refNumberStr) : null;
+	    String refNumber = request.getParameter("refNumber");
 	    String userName = request.getParameter("userName");
 	    String departureName = request.getParameter("departureName");
 	    String arrivalName = request.getParameter("arrivalName");
 	    String departureCities = request.getParameter("departureCities");
 	    String arrivalCities = request.getParameter("arrivalCities");
 	    String orderNumber = request.getParameter("orderNumber");
-	    if ("".equals(refNumberStr)) {
-	    	refNumberStr = null;
+	    if ("".equals(refNumber)) {
+	    	refNumber = null;
 	    }
 	    
 	    if ("".equals(userName)) {
@@ -129,13 +128,6 @@ function deleteSelectedOrders() {
 	    if ("".equals(orderNumber)) {
 	    	orderNumber = null;
 	    }
-	    try {
-	        if (refNumberStr != null && !refNumberStr.isEmpty()) {
-	            refNumber = Integer.parseInt(refNumberStr);
-	        }
-	    } catch (NumberFormatException e) {
-	        refNumber = 0; // 숫자가 아닌 값이 들어오면 무시
-	    }
 	    
 	    List<Order> orderList = null;
 	    int totalCount = 0;
@@ -145,22 +137,22 @@ function deleteSelectedOrders() {
 	    boolean isSearchClicked = "true".equals(searchClicked);
 	    
 	    if (isSearchClicked) {
-	        totalCount = orderDAO.getTotalCount(
+	        totalCount = orderDAO.getTotalCount( 
 	            endDate, endDate2, refNumber, userName, departureName,
 	            arrivalName, arrivalCities, orderNumber
 	        );
 	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
-			if( userType.equals("admin") ) {
+			/* if( userType.equals("admin") ) {
 		        orderList = orderDAO.getPagedList(
-		            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
-		            departureName, arrivalName, arrivalCities, orderNumber, userType, request.getParameter("userCompany")
+		            pageNumber, pageSize, endDate, endDate2, refNumber, userName, 
+		            departureName, departureCities, arrivalName, arrivalCities, orderNumber
 		        );				
-			} else {
+			} else { */
 				orderList = orderDAO.getPagedList(
 			            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
-			            departureName, arrivalName, arrivalCities, orderNumber, userType, userCompany
+			            departureName, departureCities, arrivalName, arrivalCities, orderNumber, userType, userCompany
 			        );	
-			}
+			/* } */
 	    }			
 
 	    
@@ -291,7 +283,8 @@ function deleteSelectedOrders() {
                     <div class="form-group row">
                         <label class="col-sm-2 control-label">출발지 시/도:</label>
                         <div class="col-sm-3">
-							<select name="departureCities" class="form-control" required>
+							<select name="departureCities" class="form-control">
+								<option value="">--선택--</option>
                                 <option value="서울특별시">서울특별시</option>
                                 <option value="경기도">경기도</option>
                                 <option value="인천광역시">인천광역시</option>
@@ -313,7 +306,8 @@ function deleteSelectedOrders() {
                         </div>
                         <label class="col-sm-2 control-label">도착지 시/도:</label>
                         <div class="col-sm-3">
-							<select name="arrivalCities" class="form-control" required>
+							<select name="arrivalCities" class="form-control">
+								<option value="">--선택--</option>
                                 <option value="서울특별시">서울특별시</option>
                                 <option value="경기도">경기도</option>
                                 <option value="인천광역시">인천광역시</option>
@@ -372,7 +366,7 @@ function deleteSelectedOrders() {
         <%
 		    boolean hasSearchData = (endDate != null && !endDate.isEmpty()) || 
 		                            (endDate2 != null && !endDate2.isEmpty()) || 
-		                            (refNumberStr != null && !refNumberStr.isEmpty()) || 
+		                            (refNumber != null && !refNumber.isEmpty()) || 
 		                            (userName != null && !userName.isEmpty()) || 
 		                            (departureName != null && !departureName.isEmpty()) || 
 		                            (arrivalName != null && !arrivalName.isEmpty()) || 
@@ -381,7 +375,7 @@ function deleteSelectedOrders() {
 		                            (userCompany != null && !userCompany.isEmpty());
 		
 		    boolean showResults = hasSearchData && (orderList != null && !orderList.isEmpty());
-		%>
+		    %>
         <div class="panel panel-default">
             <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
 			    <p style="font-weight: bold; margin: 0;">조회 결과</p>
@@ -393,7 +387,7 @@ function deleteSelectedOrders() {
             	<% if (showResults) { %> <!-- 조회 조건이 있을 때만 테이블 표시 -->
                 <table class="table table-bordered table-hover">
                     <thead>
-                        <tr style="font-size: 11px;">
+                        <tr style="font-size: 14px;">
                             <th>체크</th>
                         	<th>오더번호</th>
                             <th>도착지 도착일시</th>
@@ -411,6 +405,7 @@ function deleteSelectedOrders() {
                             <th>운송비 금액</th>
                             <th>담당자명</th>
                             <th>등록일</th>
+                            <th>이착지 주소</th>
                             <th>옵션1</th>
 		                    <th>옵션2</th>
 		                    <th>옵션3</th>
@@ -425,8 +420,16 @@ function deleteSelectedOrders() {
                         </tr>
                     </thead>
                     <tbody>
-			            <% for (Order order : orderList) { %>
-			                <tr style="font-size:10px;">
+			            <% for ( Order order : orderList ) { %> 
+			            	<%	
+				            	String carNumber = null;
+			            		if( order.getCarNumber() != null ) {
+			            			carNumber = order.getCarNumber();
+			            		} else if( order.getFixedCarNumber() != null ) {
+			            			carNumber = order.getFixedCarNumber();
+			            		}
+			            	%>
+			                <tr style="font-size:14px;">
 			                    <td><input type="checkbox" name="orderCheckbox" value="<%= order.getOrderNumber() %>"></td>
 			                    <td><a href="orderUpdate.jsp?orderNumber=<%= order.getOrderNumber() %>"><%= order.getOrderNumber() %></a></td>
 			                    <td><%= order.getOrderDate() %></td>
@@ -438,12 +441,13 @@ function deleteSelectedOrders() {
 			                    <td><%= order.getCarWeight() %></td>
 			                    <td><%= order.getKindOfCar() %></td>
 			                    <td><%= order.getUpDown() %></td>
-			                    <td><%= order.getCarNumber() != null ? order.getCarNumber() : "" %></td>
+			                    <td><%= carNumber != null ? carNumber : "" %></td>
 			                    <td><%= order.getDriverName() != null ? order.getDriverName() : "" %></td>
 			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
 			                    <td><%= order.getBasicFare() + order.getAddFare() %></td>
 			                    <td><%= order.getUserName() %></td>
 			                    <td><%= order.getRegDate() %></td>
+			                    <td><%= order.getDestinationAddress() != null ? order.getDestinationAddress() : "" %></td>
 			                    <td><%= order.getOption1() != null ? order.getOption1() : "" %></td>
 			                    <td><%= order.getOption2() != null ? order.getOption2() : "" %></td>
 			                    <td><%= order.getOption3() != null ? order.getOption3() : "" %></td>
@@ -451,7 +455,7 @@ function deleteSelectedOrders() {
 			                    <%
 			                    	if( userType.equals("admin") ) {
 			                    %>
-			                    	<td><%= order.getUserCompany() != null ? order.getUserCompany() : "왜이래" %></td>
+			                    	<td><%= order.getUserCompany() != null ? order.getUserCompany() : "" %></td>
 			                    <%
 			                    	}
 			                    %>

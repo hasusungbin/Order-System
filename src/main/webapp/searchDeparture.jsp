@@ -9,7 +9,7 @@
 
 <html>
 <head>
-    <title>도착지 조회</title>
+    <title>출발지 조회</title>
     <!-- Bootstrap 3 CDN 추가 -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -67,6 +67,7 @@
                 window.opener.document.getElementById("departureName").value = departureName;
                 window.opener.document.getElementById("departureCities").value = departureCities;
                 window.opener.document.getElementById("departureTown").value = departureTown;
+                //window.opener.document.getElementById("departureTown").value = departureTown;
                 window.opener.document.getElementById("departureDetailedAddress").value = departureDetailedAddress;
                 window.opener.document.getElementById("departureManager").value = departureManager;
                 window.opener.document.getElementById("departureManagerPhoneNum").value = departureManagerPhoneNum;
@@ -187,7 +188,7 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>도착지명</th>
+                        <th>출발지명</th>
                         <th>시/도</th>
                         <th>시/군/구</th>
                         <th>상세주소</th>
@@ -202,12 +203,12 @@
 					        for ( Departure departure : departureList ) {
 					%>
 					            <tr>
-					                <td><%= departure.getDepartureName() != null ? departure.getDepartureName() : "" %></td>
-					                <td><%= departure.getDepartureCities() != null ? departure.getDepartureCities() : "" %></td>
-					                <td><%= departure.getDepartureTown() != null ? departure.getDepartureTown() : "" %></td>
-					                <td><%= departure.getDepartureDetailedAddress() != null ? departure.getDepartureDetailedAddress() : "" %></td>
-					                <td><%= departure.getDepartureManager() != null ? departure.getDepartureManager() : "" %></td>
-					                <td><%= departure.getDepartureManagerPhoneNum() != null ? departure.getDepartureManagerPhoneNum() : "" %></td>
+					                <td><%= departure.getDepartureName() %></td>
+					                <td><%= departure.getDepartureCities() %></td>
+					                <td><%= departure.getDepartureTown() %></td>
+					                <td><%= departure.getDepartureDetailedAddress() %></td>
+					                <td><%= departure.getDepartureManager() %></td>
+					                <td><%= departure.getDepartureManagerPhoneNum() %></td>
 					                <td>
 					                    <button class="btn btn-primary"
 					                            onclick="selectDeparture(

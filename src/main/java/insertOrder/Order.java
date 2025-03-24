@@ -9,7 +9,7 @@ public class Order {
 	private String userName;
 	private String orderDate;
 	private String carWeight;
-	private int refNumber;
+	private String refNumber;
 	private String userPhoneNumber;
 	private String fixedCarNumber;
 	private String upDown;
@@ -86,11 +86,11 @@ public class Order {
 		this.kindOfCar = kindOfCar;
 	}
 
-	public int getRefNumber() {
+	public String getRefNumber() {
 		return refNumber;
 	}
 
-	public void setRefNumber(int refNumber) {
+	public void setRefNumber(String refNumber) {
 		this.refNumber = refNumber;
 	}
 

@@ -217,12 +217,12 @@
         	<div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
 			    <p style="font-weight: bold; margin: 0;">고정차량 리스트</p>
 			    <div>
-			        <button onclick="deleteSelectedOrders()" class="btn btn-danger">고정차량 삭제</button>
+			        <button onclick="deleteSelectedCarInfo()" class="btn btn-danger">고정차량 삭제</button>
 			    </div>
 			</div>
             <div class="panel-body">
 				<table class="table table-bordered table-hover" border="1">
-				    <tr style="font-size: 10px;">
+				    <tr style="font-size: 14px;">
 				    	<th>체크</th>
 				        <th>차량번호</th>
 				        <th>차량 톤급</th>
