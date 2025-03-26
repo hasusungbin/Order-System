@@ -96,9 +96,7 @@
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collpase" data-target="#bs-example-navbar-collapse-1"
-				aria-expended="false">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>	
@@ -179,6 +177,7 @@
                         	<select name="carWeight" class="form-control">
                         		<option value="">--선택--</option>
                             	<option value="이륜차">이륜차</option>
+                            	<option value="0.5톤">0.5톤</option>
                             	<option value="1톤">1톤</option>
 								<option value="1.4톤">1.4톤</option>
 								<option value="2.5톤">2.5톤</option>
@@ -204,6 +203,7 @@
                             <select name="kindOfCar" class="form-control">
                                <option value="">--선택--</option>
                                <option value="카고">카고</option>
+                               <option value="카고/윙">카고/윙</option>
                                <option value="윙바디">윙바디</option>
                                <option value="탑">탑</option>
                                <option value="냉동/냉장">냉동/냉장</option>

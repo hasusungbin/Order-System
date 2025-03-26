@@ -24,12 +24,13 @@
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- jQuery 공식 CDN -->
 <!-- Bootstrap 3 JS -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <!-- Moment.js (필수) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <!-- Bootstrap Datetimepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script>
         document.addEventListener("DOMContentLoaded", function() { 
             var today = new Date().toISOString().split('T')[0];
@@ -80,6 +81,22 @@
         });
     });
 </script>
+<script>
+  // 스크롤 감지
+  $(window).scroll(function () {
+    if ($(this).scrollTop() > 200) {
+      $('#scrollTopBtn').fadeIn();
+    } else {
+      $('#scrollTopBtn').fadeOut();
+    }
+  });
+
+  // 버튼 클릭 시 맨 위로 이동
+  $('#scrollTopBtn').click(function (e) {
+    e.preventDefault();
+    $('html, body').animate({ scrollTop: 0 }, 600);
+  });
+</script>
 <style>
 	#datetimepicker {
 	    max-width: 300px; /* 전체 너비 조정 */
@@ -119,15 +136,14 @@
 	%>
 		<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collpase" data-target="#bs-example-navbar-collapse-1"
-				aria-expended="false">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>	
 			</button>
 			<a class="navbar-brand" href="main.jsp">로지스톡 운송 오더 시스템</a>
 		</div>
+		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="main.jsp">운송오더 등록</a></li>
@@ -284,6 +300,7 @@
                        <div class="col-sm-3">
                            <select name="carWeight" class="form-control" required>
                                <option value="이륜차">이륜차</option>
+                               <option value="0.5톤">0.5톤</option>
                                <option value="1톤">1톤</option>
                                <option value="1.4톤">1.4톤</option>
                                <option value="2.5톤">2.5톤</option>
@@ -302,6 +319,7 @@
                        <div class="col-sm-3">
                            <select name="kindOfCar" class="form-control" required>
                                <option value="카고">카고</option>
+                               <option value="카고/윙">카고/윙</option>
                                <option value="윙바디">윙바디</option>
                                <option value="탑">탑</option>
                                <option value="냉동/냉장">냉동/냉장</option>
@@ -499,20 +517,26 @@
 	<div class="container">
         <div class="panel panel-primary">
             <div class="panel-heading">옵션</div>
-            <div class="panel-body">
-	            <div class="form-group row">
-                	<label class="col-sm-2 control-label">이착지 주소:</label>
-	                	<div class="col-sm-3">
-		                    <input type="text" name="destinationAddress" class="form-control">	                	
-	                	</div>
-	                	<div class="col-sm-3">
-		                    이착 : <input type="checkbox" name="option1" value="이착">
-		                    혼적 : <input type="checkbox" name="option2" value="혼적">
-		                    왕복 : <input type="checkbox" name="option3" value="왕복">
-		                    착불 : <input type="checkbox" name="option4" value="착불">
-	                    </div>
-	            </div>
-            </div>
+            <div class="panel-body" style="position: relative;">
+    <div class="form-group row">
+        <label class="col-sm-2 control-label">이착지 주소:</label>
+        <div class="col-sm-3">
+            <input type="text" name="destinationAddress" class="form-control">	                	
+        </div>
+        <div class="col-sm-3">
+            이착 : <input type="checkbox" name="option1" value="이착">
+            혼적 : <input type="checkbox" name="option2" value="혼적">
+            왕복 : <input type="checkbox" name="option3" value="왕복">
+            착불 : <input type="checkbox" name="option4" value="착불">
+        </div>
+    </div>
+
+    <!-- 오른쪽 하단 고정 버튼 -->
+    <a href="#" class="btn btn-primary btn-sm" id="scrollTopBtn"
+       style="display:none; position: absolute; bottom: 30px; right: 30px; z-index: 999;">
+        ↑ 맨 위로
+    </a>
+</div>
         </div>
 	</div>
 </form>

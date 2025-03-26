@@ -23,22 +23,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <!-- Bootstrap Datetimepicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const selectBox = document.getElementById('fixedCarNumber'); // 고정차량 select box ID
-        const inputFields = document.querySelectorAll('.hide-on-select'); // 숨길 input 태그 클래스
-
-        selectBox.addEventListener('change', () => {
-            if (selectBox.value !== '') {
-                // ✅ 값이 있을 때 숨기기
-                inputFields.forEach(input => input.style.display = 'none');
-            } else {
-                // ✅ 값이 없을 때 다시 표시
-                inputFields.forEach(input => input.style.display = '');
-            }
-        });
-    });
-</script> -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const carNumberInput = document.getElementById('carNumber'); // 일반 차량번호 입력 필드
@@ -101,9 +85,7 @@
 	%>
 		<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collpase" data-target="#bs-example-navbar-collapse-1"
-				aria-expended="false">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>	
@@ -231,6 +213,7 @@
                        <div class="col-sm-3">
                            <select name="carWeight" class="form-control" required>
 					            <option value="이륜차" <%= "이륜차".equals( order.getCarWeight() ) ? "selected" : "" %>>이륜차</option>
+					            <option value="0.5톤" <%= "0.5톤".equals( order.getCarWeight() ) ? "selected" : "" %>>0.5톤</option>
 					            <option value="1톤" <%= "1톤".equals( order.getCarWeight() ) ? "selected" : "" %>>1톤</option>
 					            <option value="1.4톤" <%= "1.4톤".equals( order.getCarWeight() ) ? "selected" : "" %>>1.4톤</option>
 					            <option value="2.5톤" <%= "2.5톤".equals( order.getCarWeight() ) ? "selected" : "" %>>2.5톤</option>
@@ -249,6 +232,7 @@
                        <div class="col-sm-3">
                            <select name="kindOfCar" class="form-control" required>
 					            <option value="카고" <%= "카고".equals( order.getKindOfCar() ) ? "selected" : "" %>>카고</option>
+					            <option value="카고/윙" <%= "카고/윙".equals( order.getKindOfCar() ) ? "selected" : "" %>>카고/윙</option>
 					            <option value="윙바디" <%= "윙바디".equals( order.getKindOfCar() ) ? "selected" : "" %>>윙바디</option>
 					            <option value="탑" <%= "탑".equals( order.getKindOfCar() ) ? "selected" : "" %>>탑</option>
 					            <option value="냉동/냉장" <%= "냉동/냉장".equals( order.getKindOfCar() ) ? "selected" : "" %>>냉동/냉장</option>

@@ -13,7 +13,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width", initial-scale="1">
+<meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap.css">
 <title>로지스톡 운송 오더 시스템</title>
 </head>
@@ -50,9 +50,7 @@
 	%>
 		<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collpase" data-target="#bs-example-navbar-collapse-1"
-				aria-expended="false">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>	
@@ -141,6 +139,7 @@
                         <div class="col-sm-3">
                             <select name="carWeight" class="form-control">
 					            <option value="이륜차" <%= "이륜차".equals( carInfo.getCarWeight() ) ? "selected" : "" %>>이륜차</option>
+					            <option value="0.5톤" <%= "0.5톤".equals( carInfo.getCarWeight() ) ? "selected" : "" %>>0.5톤</option>
 					            <option value="1톤" <%= "1톤".equals( carInfo.getCarWeight() ) ? "selected" : "" %>>1톤</option>
 					            <option value="1.4톤" <%= "1.4톤".equals( carInfo.getCarWeight() ) ? "selected" : "" %>>1.4톤</option>
 					            <option value="2.5톤" <%= "2.5톤".equals( carInfo.getCarWeight() ) ? "selected" : "" %>>2.5톤</option>
@@ -165,6 +164,7 @@
                         <div class="col-sm-3">
                         	<select name="kindOfCar" class="form-control">
 					            <option value="카고" <%= "카고".equals( carInfo.getKindOfCar() ) ? "selected" : "" %>>카고</option>
+					            <option value="카고/윙" <%= "카고/윙".equals( carInfo.getKindOfCar() ) ? "selected" : "" %>>카고/윙</option>
 					            <option value="윙바디" <%= "윙바디".equals( carInfo.getKindOfCar() ) ? "selected" : "" %>>윙바디</option>
 					            <option value="탑" <%= "탑".equals( carInfo.getKindOfCar() ) ? "selected" : "" %>>탑</option>
 					            <option value="냉동/냉장" <%= "냉동/냉장".equals( carInfo.getKindOfCar() ) ? "selected" : "" %>>냉동/냉장</option>

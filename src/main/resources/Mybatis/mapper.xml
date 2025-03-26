@@ -42,7 +42,8 @@
     SELECT 
         co.orderNumber,
         DATE_FORMAT(co.orderDate, '%Y-%m-%d %H:%i') AS orderDate,  -- ✅ 초 제거하고 시:분까지만 표시
-        co.refNumber,
+        co.endDate,
+		co.refNumber,
         co.fixedCarNumber,
         co.departureName,
         co.departureCities,

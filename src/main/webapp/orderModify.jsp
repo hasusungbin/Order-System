@@ -14,7 +14,18 @@
 <meta http-equiv="refresh" content="20">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<link rel="stylesheet" href="css/bootstrap.css">
+<!-- ✅ jQuery를 먼저 로드 -->
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<!-- ✅ Bootstrap CSS 로드 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- ✅ Bootstrap JS 로드 (jQuery 다음에 로드) -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<!-- Moment.js (필수) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<!-- Bootstrap Datetimepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 <style>
 	.d-flex {
 	    display: flex !important;
@@ -36,9 +47,9 @@
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
-<script>
+<!-- <script>
 	search.btn();
-</script>
+</script> -->
 <script>
 function deleteSelectedOrders() {
     let selectedOrders = [];
@@ -142,20 +153,12 @@ function deleteSelectedOrders() {
 	            arrivalName, arrivalCities, orderNumber
 	        );
 	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
-			/* if( userType.equals("admin") ) {
-		        orderList = orderDAO.getPagedList(
-		            pageNumber, pageSize, endDate, endDate2, refNumber, userName, 
-		            departureName, departureCities, arrivalName, arrivalCities, orderNumber
-		        );				
-			} else { */
-				orderList = orderDAO.getPagedList(
-			            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
-			            departureName, departureCities, arrivalName, arrivalCities, orderNumber, userType, userCompany
-			        );	
-			/* } */
+			orderList = orderDAO.getPagedList(
+		            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
+		            departureName, departureCities, arrivalName, arrivalCities, orderNumber, userType, userCompany
+		        );	
 	    }			
 
-	    
 	%>
 	
 	<%
@@ -177,9 +180,7 @@ function deleteSelectedOrders() {
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed"
-				data-toggle="collpase" data-target="#bs-example-navbar-collapse-1"
-				aria-expended="false">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>	
@@ -390,6 +391,7 @@ function deleteSelectedOrders() {
                         <tr style="font-size: 14px;">
                             <th>체크</th>
                         	<th>오더번호</th>
+                        	<th>오더 등록일</th>
                             <th>도착지 도착일시</th>
                             <th>참조번호</th>
                             <th>출발지명</th>
@@ -433,6 +435,7 @@ function deleteSelectedOrders() {
 			                    <td><input type="checkbox" name="orderCheckbox" value="<%= order.getOrderNumber() %>"></td>
 			                    <td><a href="orderUpdate.jsp?orderNumber=<%= order.getOrderNumber() %>"><%= order.getOrderNumber() %></a></td>
 			                    <td><%= order.getOrderDate() %></td>
+			                    <td><%= order.getEndDate() %></td>
 			                    <td><%= order.getRefNumber() %></td>
 			                    <td><%= order.getDepartureName() %></td>
 			                    <td><%= order.getDepartureCities() + " " + order.getDepartureTown() %></td>
@@ -481,7 +484,6 @@ function deleteSelectedOrders() {
 	<%
 		}	
 	%>
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
 	<script src="js/search.js"></script>
 	<script>
