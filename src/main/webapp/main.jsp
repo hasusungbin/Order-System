@@ -518,25 +518,24 @@
         <div class="panel panel-primary">
             <div class="panel-heading">옵션</div>
             <div class="panel-body" style="position: relative;">
-    <div class="form-group row">
-        <label class="col-sm-2 control-label">이착지 주소:</label>
-        <div class="col-sm-3">
-            <input type="text" name="destinationAddress" class="form-control">	                	
-        </div>
-        <div class="col-sm-3">
-            이착 : <input type="checkbox" name="option1" value="이착">
-            혼적 : <input type="checkbox" name="option2" value="혼적">
-            왕복 : <input type="checkbox" name="option3" value="왕복">
-            착불 : <input type="checkbox" name="option4" value="착불">
-        </div>
-    </div>
-
-    <!-- 오른쪽 하단 고정 버튼 -->
-    <a href="#" class="btn btn-primary btn-sm" id="scrollTopBtn"
-       style="display:none; position: absolute; bottom: 30px; right: 30px; z-index: 999;">
-        ↑ 맨 위로
-    </a>
-</div>
+			    <div class="form-group row">
+			        <label class="col-sm-2 control-label">이착지 주소:</label>
+			        <div class="col-sm-3">
+			            <input type="text" name="destinationAddress" class="form-control">	                	
+			        </div>
+			        <div class="col-sm-3">
+			            이착 : <input type="checkbox" name="option1" value="이착">
+			            혼적 : <input type="checkbox" name="option2" value="혼적">
+			            왕복 : <input type="checkbox" name="option3" value="왕복">
+			            착불 : <input type="checkbox" name="option4" value="착불">
+			        </div>
+			    </div>
+		    <!-- 오른쪽 하단 고정 버튼 -->
+		    <a href="#" class="btn btn-primary btn-sm" id="scrollTopBtn"
+		       style="display:none; position: absolute; bottom: 30px; right: 30px; z-index: 999;">
+		        ↑ 맨 위로
+		    </a>
+			</div>
         </div>
 	</div>
 </form>

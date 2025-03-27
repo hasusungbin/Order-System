@@ -27,7 +27,7 @@
     </select>
 	
 	<select id="isUserExists" parameterType="map" resultType="int">
-        SELECT COUNT(*) FROM user WHERE userID = #{userID} AND userPassword = #{userPassword}
+        SELECT COUNT(*) FROM user WHERE userID = #{userID}
     </select>
 	
 	<!-- 새로운 유저 등록 -->

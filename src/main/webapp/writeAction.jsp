@@ -48,6 +48,7 @@
 	String option4 = request.getParameter("option4");
 	String destinationAddress = request.getParameter("destinationAddress");
 	String userCompany = request.getParameter("userCompany");
+	System.out.println(userCompany + ": 유저 회사");
 	
 	try (SqlSession sqlSession = MybatisUtil.getSession()) {
 	    OrderDAO orderDAO = new OrderDAO(sqlSession);
@@ -83,37 +84,37 @@
 	
 	    // === Arrival 처리 ===
 	    ArrivalDAO arrivalDAO = new ArrivalDAO(sqlSession);
-	    if (arrivalDAO.checkDuplicateArrival(arrivalName) == 0) {
-	        Arrival arrival = new Arrival();
-	        arrival.setArrivalName(arrivalName);
-	        arrival.setArrivalCities(arrivalCities);
-	        arrival.setArrivalTown(arrivalTown);
-	        arrival.setArrivalDetailedAddress(arrivalDetailedAddress);
-	        arrival.setArrivalManager(arrivalManager);
-	        arrival.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
-	
-	        if (arrivalDAO.insertArrival(arrival) <= 0) {
-	            sqlSession.rollback(); // ✅ 실패 시 rollback
-	            throw new Exception("Arrival 등록 실패");
-	        }
-	    }
+    	System.out.println("도착지 들어옴");
+        Arrival arrival = new Arrival();
+        arrival.setArrivalName(arrivalName);
+        arrival.setArrivalCities(arrivalCities);
+        arrival.setArrivalTown(arrivalTown);
+        arrival.setArrivalDetailedAddress(arrivalDetailedAddress);
+        arrival.setArrivalManager(arrivalManager);
+        arrival.setArrivalManagerPhoneNum(arrivalManagerPhoneNum);
+        arrival.setUserCompany(userCompany);
+
+        if (arrivalDAO.insertArrival(arrival) <= 0) {
+            sqlSession.rollback(); // ✅ 실패 시 rollback
+            throw new Exception("Arrival 등록 실패");
+        }
 	
 	    // === Departure 처리 ===
 	    DepartureDAO departureDAO = new DepartureDAO(sqlSession);
-	    if (departureDAO.checkDuplicateDeparture(departureName) == 0) {
-	        Departure departure = new Departure();
-	        departure.setDepartureName(departureName);
-	        departure.setDepartureCities(departureCities);
-	        departure.setDepartureTown(departureTown);
-	        departure.setDepartureDetailedAddress(departureDetailedAddress);
-	        departure.setDepartureManager(departureManager);
-	        departure.setDepartureManagerPhoneNum(departureManagerPhoneNum);
-	
-	        if (departureDAO.insertDeparture(departure) <= 0) {
-	            sqlSession.rollback(); // ✅ 실패 시 rollback
-	            throw new Exception("Departure 등록 실패");
-	        }
-	    }
+    	System.out.println("출발지 들어옴");
+        Departure departure = new Departure();
+        departure.setDepartureName(departureName);
+        departure.setDepartureCities(departureCities);
+        departure.setDepartureTown(departureTown);
+        departure.setDepartureDetailedAddress(departureDetailedAddress);
+        departure.setDepartureManager(departureManager);
+        departure.setDepartureManagerPhoneNum(departureManagerPhoneNum);
+        departure.setUserCompany(userCompany);
+
+        if (departureDAO.insertDeparture(departure) <= 0) {
+            sqlSession.rollback(); // ✅ 실패 시 rollback
+            throw new Exception("Departure 등록 실패");
+        }
 	
 	    // ✅ 모든 작업 성공 시 커밋
 	    sqlSession.commit();

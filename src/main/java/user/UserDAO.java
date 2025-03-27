@@ -201,11 +201,10 @@ public class UserDAO {
         }
     }
     
-    public boolean isUserExists( String userID, String userPassword ) {
+    public boolean isUserExists( String userID ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
             Map<String, Object> params = new HashMap<>();
             params.put( "userID", userID );
-            params.put( "userPassword", userPassword );
             int count = session.selectOne( "UserDAO.isUserExists", params );
             return count > 0;
         }

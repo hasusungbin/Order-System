@@ -33,8 +33,8 @@
 <jsp:setProperty name="order" property="carNumber" />
 <jsp:setProperty name="order" property="driverName" />
 <jsp:setProperty name="order" property="driverPhoneNum" />
-<jsp:setProperty name="order" property="basicFare" />
-<jsp:setProperty name="order" property="addFare" />
+<%-- <jsp:setProperty name="order" property="basicFare" />
+<jsp:setProperty name="order" property="addFare" /> --%>
 <jsp:setProperty name="order" property="regDate" />
 <jsp:setProperty name="order" property="option1" />
 <jsp:setProperty name="order" property="option2" />
@@ -73,13 +73,13 @@
 				if (order.getFixedCarNumber() == null) {
 				    order.setFixedCarNumber("");
 				}
-				System.out.println(order.getCarNumber() + ": CarNumber");
-				System.out.println(order.getDriverName() + ": DriverName");
-				System.out.println(order.getDriverPhoneNum() + ": DriverPhoneNum");
+				int basicFare = Integer.parseInt(request.getParameter("basicFare").replaceAll(",", ""));
+				int addFare = Integer.parseInt(request.getParameter("addFare").replaceAll(",", ""));
+				
 				int result = orderDAO.updateOrder( order.getOrderNumber(), order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
-													order.getCarNumber(), order.getDriverName(), order.getDriverPhoneNum(), order.getBasicFare(), order.getAddFare(), order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
+													order.getCarNumber(), order.getDriverName(), order.getDriverPhoneNum(), basicFare, addFare, order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
 				if( result == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );

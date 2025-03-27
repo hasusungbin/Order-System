@@ -138,7 +138,8 @@
                     </div>
                     <label class="col-sm-2 control-label">시/도:</label>
                     <div class="col-sm-4">
-                        <select id="departureCities" name="departureCities" class="form-control" required>
+                        <select id="departureCities" name="departureCities" class="form-control">
+                        	<option value="">--선택--</option>
 	                        <option value="서울특별시">서울특별시</option>
 	                        <option value="경기도">경기도</option>
 	                        <option value="인천광역시">인천광역시</option>

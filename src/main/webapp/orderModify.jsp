@@ -447,7 +447,7 @@ function deleteSelectedOrders() {
 			                    <td><%= carNumber != null ? carNumber : "" %></td>
 			                    <td><%= order.getDriverName() != null ? order.getDriverName() : "" %></td>
 			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
-			                    <td><%= order.getBasicFare() + order.getAddFare() %></td>
+			                    <td><%= String.format("%,d", order.getBasicFare() + order.getAddFare()) %></td>
 			                    <td><%= order.getUserName() %></td>
 			                    <td><%= order.getRegDate() %></td>
 			                    <td><%= order.getDestinationAddress() != null ? order.getDestinationAddress() : "" %></td>

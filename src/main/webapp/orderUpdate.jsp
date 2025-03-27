@@ -50,6 +50,28 @@
         fixedCarSelect.addEventListener('change', validateCarInput);
     });
 </script>
+<script>
+	function formatAmount(input) {
+	    let value = input.value.replaceAll(',', '').replace(/\D/g, '');
+	    input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	}
+</script>
+<script>
+  // 스크롤 감지
+  $(window).scroll(function () {
+    if ($(this).scrollTop() > 200) {
+      $('#scrollTopBtn').fadeIn();
+    } else {
+      $('#scrollTopBtn').fadeOut();
+    }
+  });
+
+  // 버튼 클릭 시 맨 위로 이동
+  $('#scrollTopBtn').click(function (e) {
+    e.preventDefault();
+    $('html, body').animate({ scrollTop: 0 }, 600);
+  });
+</script>
 <title>로지스톡 운송 오더 시스템</title>
 </head>
 <body>
@@ -467,7 +489,7 @@
 	<div class="container">
         <div class="panel panel-primary">
             <div class="panel-heading">옵션 수정</div>
-            <div class="panel-body">
+            <div class="panel-body" style="position: relative;">
 	            <div class="form-group row">
                 	<label class="col-sm-2 control-label">이착지 주소:</label>
 	                	<div class="col-sm-3">
@@ -484,6 +506,10 @@
 						        <%= "착불".equals(order.getOption4()) ? "checked" : "" %> >
 						</div>
 	            </div>
+	            <a href="#" class="btn btn-primary btn-sm" id="scrollTopBtn"
+					       style="display:none; position: absolute; bottom: 30px; right: 30px; z-index: 999;">
+					        ↑ 맨 위로
+					    </a>
             </div>
         </div>
 	</div>
@@ -512,11 +538,11 @@
 	            <div class="form-group row">
 	            	<label class="col-sm-2 control-label">기본운임: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="basicFare" class="form-control" value="<%= order.getBasicFare() == 0 ? "" : order.getBasicFare() %>">            	
+	                    <input type="text" name="basicFare" class="form-control" value="<%= String.format("%,d", order.getBasicFare()) == null ? "" : String.format("%,d", order.getBasicFare()) %>" oninput="formatAmount(this)">            	
                 	</div>
 	                <label class="col-sm-2 control-label">추가운임: </label>
                 	<div class="col-sm-3">
-	                    <input type="text" name="addFare" class="form-control" value="<%= order.getAddFare() == 0 ? "" : order.getAddFare() %>">            	
+	                    <input type="text" name="addFare" class="form-control" value="<%= String.format("%,d", order.getAddFare()) == null ? "" : String.format("%,d", order.getAddFare()) %>" oninput="formatAmount(this)">            	
                 	</div>
                 	<div class="text-center">
 		                <button type="submit" class="btn btn-primary">저장</button>
