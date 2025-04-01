@@ -203,28 +203,31 @@
 	                    	List<User> userList = userDAO.getUserList();
                         %>
                        <div class="col-sm-3">
-                           <select id="userName" name="userName" class="form-control" required>
-                           	<%
-							        if ("sales".equals(userType2)) { // 본인 이름만 선택 가능
-							    %>
-							        <option value="<%= userName2 %>"><%= userName2 %></option>
-							    <%
-							        } else if ("manager".equals(userType)) { // 같은 userCompany에 속한 sales 계정 선택 가능
-							            for (String salesUser : salesUserList) {
-							    %>
-							        <option value="<%= salesUser %>"><%= salesUser %></option>
-							    <%
-							            }
-							        } else if( "admin".equals(userType) ) {
-							        	for( int i = 0; i < userList.size(); i++ ) {
-							    %>
-							    	<option><%= userList.get(i).getUserName() %></option>
-							    <%
-							       		}
-							        }
-							    %>
-                           </select>
-                       </div>
+    <select id="userName" name="userName" class="form-control" required>
+        <%
+            String selectedUserName = order.getUserName(); // 선택된 사용자명
+            
+            if ("sales".equals(userType2)) {
+        %>
+            <option value="<%= userName2 %>" <%= userName2.equals(selectedUserName) ? "selected" : "" %>><%= userName2 %></option>
+        <%
+            } else if ("manager".equals(userType)) {
+                for (String salesUser : salesUserList) {
+        %>
+            <option value="<%= salesUser %>" <%= salesUser.equals(selectedUserName) ? "selected" : "" %>><%= salesUser %></option>
+        <%
+                }
+            } else if ("admin".equals(userType)) {
+                for (int i = 0; i < userList.size(); i++) {
+                    String user = userList.get(i).getUserName();
+        %>
+            <option value="<%= user %>" <%= user.equals(selectedUserName) ? "selected" : "" %>><%= user %></option>
+        <%
+                }
+            }
+        %>
+    </select>
+</div>
                        <label class="col-sm-2 control-label">연락처:</label>
                        <div class="col-sm-3">
                            <input type="text" name="userPhoneNumber" class="form-control" placeholder="-없이 입력해주세요." value="<%= order.getUserPhoneNumber() != null ? order.getUserPhoneNumber() : "" %>">

@@ -85,6 +85,11 @@ function deleteSelectedOrders() {
     form.submit();
 }
 </script>
+<script>
+  $(document).ready(function () {
+    $('.dropdown-toggle').dropdown();
+  });
+</script>
 
 	<%
 		String userID = null;
@@ -199,7 +204,6 @@ function deleteSelectedOrders() {
 				<li><a href="arrivalModify.jsp">출/도착지 등록</a></li>
 				<li><a href="carInfoModify.jsp">고정차량 등록</a></li>
 			</ul>
-	
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle"
