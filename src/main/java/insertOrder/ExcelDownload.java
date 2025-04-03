@@ -23,8 +23,8 @@ public class ExcelDownload extends HttpServlet {
         OrderDAO orderDAO = new OrderDAO();
 
         // ✅ 검색 조건 파라미터 받기
+        String startDate = request.getParameter("startDate");
         String endDate = request.getParameter("endDate");
-        String endDate2 = request.getParameter("endDate2");
         String refNumber = request.getParameter("refNumber");
         String userName = request.getParameter("userName");
         String departureName = request.getParameter("departureName");
@@ -41,7 +41,7 @@ public class ExcelDownload extends HttpServlet {
         List<List<Order>> allPagedLists = new ArrayList<>();
 
         while (true) {
-            List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, endDate, endDate2, refNumber, userName, departureName, departureCities, arrivalName, arrivalCities, orderNumber);
+            List<Order> orderList = orderDAO.getPagedList(pageNumber, pageSize, startDate, endDate, refNumber, userName, departureName, departureCities, arrivalName, arrivalCities, orderNumber);
             if (orderList.isEmpty()) {
                 break;
             }
@@ -60,7 +60,7 @@ public class ExcelDownload extends HttpServlet {
         // ✅ 엑셀 파일 생성
         Workbook workbook = new XSSFWorkbook();
         String[] columns = {
-            "오더번호", "운송요청일", "도착지 도착일시" , "참조번호", "출발지명", "출발지 주소",
+            "오더번호", "운송요청일", "도착지 도착일시" , "참조번호", "규격", "중량", "출발지명", "출발지 주소",
             "도착지명", "도착지 주소", "화물톤급", "차량종류", "상하차 방식", "차량번호",
             "기사명", "기사연락처", "운송비금액", "담당자명", "등록일", "이착지 주소",
             "옵션1", "옵션2", "옵션3", "옵션4"
@@ -102,26 +102,28 @@ public class ExcelDownload extends HttpServlet {
                 row.createCell(1).setCellValue(order.getOrderDate().toString().substring(0, 16));
                 row.createCell(2).setCellValue(order.getEndDate().toString().substring(0, 16));
                 row.createCell(3).setCellValue(order.getRefNumber() != null ? order.getRefNumber() : "");
-                row.createCell(4).setCellValue(order.getDepartureName() != null ? order.getDepartureName() : "");
-                row.createCell(5).setCellValue(order.getDepartureCities() + " " + order.getDepartureTown());
-                row.createCell(6).setCellValue(order.getArrivalName() != null ? order.getArrivalName() : "");
-                row.createCell(7).setCellValue(order.getArrivalCities() + " " + order.getDepartureTown());
-                row.createCell(8).setCellValue(order.getCarWeight());
-                row.createCell(9).setCellValue(order.getKindOfCar());
-                row.createCell(10).setCellValue(order.getUpDown());
-                row.createCell(11).setCellValue(order.getCarNumber() != null ? order.getCarNumber() : "");
-                row.createCell(12).setCellValue(order.getDriverName() != null ? order.getDriverName() : "");
-                row.createCell(13).setCellValue(order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "");
-                row.createCell(14).setCellValue(order.getBasicFare() + order.getAddFare());
-                row.createCell(15).setCellValue(order.getUserName() != null ? order.getUserName() : "");
-                row.createCell(16).setCellValue(order.getRegDate().toString().substring(0, 10));
-                row.createCell(17).setCellValue(order.getDestinationAddress() != null ? order.getDestinationAddress() : "");
-                row.createCell(18).setCellValue(order.getOption1() != null ? order.getOption1() : "");
-                row.createCell(19).setCellValue(order.getOption2() != null ? order.getOption2() : "");
-                row.createCell(20).setCellValue(order.getOption3() != null ? order.getOption3() : "");
-                row.createCell(21).setCellValue(order.getOption4() != null ? order.getOption4() : "");
+                row.createCell(4).setCellValue(order.getStandard() != null ? order.getStandard() : "");
+                row.createCell(5).setCellValue(order.getWeight() != null ? order.getWeight() : "");
+                row.createCell(6).setCellValue(order.getDepartureName() != null ? order.getDepartureName() : "");
+                row.createCell(7).setCellValue(order.getDepartureCities() + " " + order.getDepartureTown());
+                row.createCell(8).setCellValue(order.getArrivalName() != null ? order.getArrivalName() : "");
+                row.createCell(9).setCellValue(order.getArrivalCities() + " " + order.getDepartureTown());
+                row.createCell(10).setCellValue(order.getCarWeight());
+                row.createCell(11).setCellValue(order.getKindOfCar());
+                row.createCell(12).setCellValue(order.getUpDown());
+                row.createCell(13).setCellValue(order.getCarNumber() != null ? order.getCarNumber() : "");
+                row.createCell(14).setCellValue(order.getDriverName() != null ? order.getDriverName() : "");
+                row.createCell(15).setCellValue(order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "");
+                row.createCell(16).setCellValue(order.getBasicFare() + order.getAddFare());
+                row.createCell(17).setCellValue(order.getUserName() != null ? order.getUserName() : "");
+                row.createCell(18).setCellValue(order.getRegDate().toString().substring(0, 10));
+                row.createCell(19).setCellValue(order.getDestinationAddress() != null ? order.getDestinationAddress() : "");
+                row.createCell(20).setCellValue(order.getOption1() != null ? order.getOption1() : "");
+                row.createCell(21).setCellValue(order.getOption2() != null ? order.getOption2() : "");
+                row.createCell(22).setCellValue(order.getOption3() != null ? order.getOption3() : "");
+                row.createCell(23).setCellValue(order.getOption4() != null ? order.getOption4() : "");
                 if (includeUserCompany) {
-                    row.createCell(22).setCellValue(order.getUserCompany() != null ? order.getUserCompany() : "");
+                    row.createCell(24).setCellValue(order.getUserCompany() != null ? order.getUserCompany() : "");
                 }
             }
 

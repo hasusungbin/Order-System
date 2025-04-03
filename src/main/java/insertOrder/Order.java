@@ -42,6 +42,8 @@ public class Order {
 	private String option4;
 	private String destinationAddress;
 	private String userCompany;
+	private String standard;
+	private String weight;
 	
 	public Order() {
 	}
@@ -348,6 +350,22 @@ public class Order {
 
 	public void setUserCompany(String userCompany) {
 		this.userCompany = userCompany;
+	}
+
+	public String getStandard() {
+		return standard;
+	}
+
+	public void setStandard(String standard) {
+		this.standard = standard;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
 	}
 	
 	

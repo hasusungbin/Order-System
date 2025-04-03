@@ -36,12 +36,12 @@
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             var today = new Date().toISOString().split('T')[0];
+            document.getElementById("startDate").value = today;
             document.getElementById("endDate").value = today;
-            document.getElementById("endDate2").value = today;
             
             // ✅ 값 변경이 자동 제출을 발생시키지 않도록 수정
+            document.getElementById("startDate").addEventListener('change', (event) => event.preventDefault());
             document.getElementById("endDate").addEventListener('change', (event) => event.preventDefault());
-            document.getElementById("endDate2").addEventListener('change', (event) => event.preventDefault());
         });
 </script>
 <title>로지스톡 운송 오더 시스템</title>
@@ -108,8 +108,8 @@ function deleteSelectedOrders() {
 	    int pageNumber = (pageNumberStr != null) ? Integer.parseInt(pageNumberStr) : 1;
 	    int pageSize = 10;
 	    
-		String endDate = request.getParameter("endDate");
-	    String endDate2 = request.getParameter("endDate2");
+		String startDate = request.getParameter("startDate");
+	    String endDate = request.getParameter("endDate");
 	    String refNumber = request.getParameter("refNumber");
 	    String userName = request.getParameter("userName");
 	    String departureName = request.getParameter("departureName");
@@ -154,12 +154,12 @@ function deleteSelectedOrders() {
 	    
 	    if (isSearchClicked) {
 	        totalCount = orderDAO.getTotalCount( 
-	            endDate, endDate2, refNumber, userName, departureName,
+	            startDate, endDate, refNumber, userName, departureName,
 	            arrivalName, arrivalCities, orderNumber
 	        );
 	        totalPages = (int) Math.ceil((double) totalCount / pageSize);
 			orderList = orderDAO.getPagedList(
-		            pageNumber, pageSize, endDate, endDate2, refNumber, userName,
+		            pageNumber, pageSize, startDate, endDate, refNumber, userName,
 		            departureName, departureCities, arrivalName, arrivalCities, orderNumber, userType, userCompany
 		        );	
 	    }			
@@ -226,11 +226,11 @@ function deleteSelectedOrders() {
             <div class="panel-body">
                 <form id="searchForm" action="./orderModify.jsp">
                     <div class="form-group row">
-					    <label class="col-sm-2 col-form-label" style="font-size:14px;"><a class="text-danger">* 도착지 도착일시:</a></label>
+					    <label class="col-sm-2 col-form-label" style="font-size:14px;"><a class="text-danger">* 오더 등록일:</a></label>
 					    <div class="col-sm-8 d-flex align-items-center" style="gap: 10px;">
-					        <input type="date" name="endDate" id="endDate" class="form-control" required style="max-width: 180px;">
+					        <input type="date" name="startDate" id="startDate" class="form-control" required style="max-width: 180px;">
 					        <span>~</span>
-					        <input type="date" name="endDate2" id="endDate2" class="form-control" required style="max-width: 180px;">
+					        <input type="date" name="endDate" id="endDate" class="form-control" required style="max-width: 180px;">
 					    </div>
 					</div>
                     <div class="form-group row">
@@ -369,8 +369,8 @@ function deleteSelectedOrders() {
             </div>
         </div>
         <%
-		    boolean hasSearchData = (endDate != null && !endDate.isEmpty()) || 
-		                            (endDate2 != null && !endDate2.isEmpty()) || 
+		    boolean hasSearchData = (startDate != null && !startDate.isEmpty()) || 
+		                            (endDate != null && !endDate.isEmpty()) || 
 		                            (refNumber != null && !refNumber.isEmpty()) || 
 		                            (userName != null && !userName.isEmpty()) || 
 		                            (departureName != null && !departureName.isEmpty()) || 
@@ -398,6 +398,8 @@ function deleteSelectedOrders() {
                         	<th>오더 등록일</th>
                             <th>도착지 도착일시</th>
                             <th>참조번호</th>
+                            <th>규격</th>
+                            <th>중량</th>
                             <th>출발지명</th>
                             <th>출발지 주소</th>
                             <th>도착지명</th>
@@ -410,6 +412,7 @@ function deleteSelectedOrders() {
                             <th>기사연락처</th>
                             <th>운송비 금액</th>
                             <th>담당자명</th>
+                            <th>기타</th>
                             <th>등록일</th>
                             <th>이착지 주소</th>
                             <th>옵션1</th>
@@ -441,6 +444,8 @@ function deleteSelectedOrders() {
 			                    <td><%= order.getOrderDate() %></td>
 			                    <td><%= order.getEndDate() %></td>
 			                    <td><%= order.getRefNumber() %></td>
+			                    <td><%= order.getStandard() != null ? order.getStandard() : "" %></td>
+			                    <td><%= order.getWeight() != null ? order.getWeight() : "" %></td>
 			                    <td><%= order.getDepartureName() %></td>
 			                    <td><%= order.getDepartureCities() + " " + order.getDepartureTown() %></td>
 			                    <td><%= order.getArrivalName() %></td>
@@ -453,6 +458,7 @@ function deleteSelectedOrders() {
 			                    <td><%= order.getDriverPhoneNum() != null ? order.getDriverPhoneNum() : "" %></td>
 			                    <td><%= String.format("%,d", order.getBasicFare() + order.getAddFare()) %></td>
 			                    <td><%= order.getUserName() %></td>
+			                    <td><%= order.getEtc() != null ? order.getEtc() : "" %></td>
 			                    <td><%= order.getRegDate() %></td>
 			                    <td><%= order.getDestinationAddress() != null ? order.getDestinationAddress() : "" %></td>
 			                    <td><%= order.getOption1() != null ? order.getOption1() : "" %></td>

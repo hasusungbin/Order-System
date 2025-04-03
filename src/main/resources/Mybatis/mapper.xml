@@ -54,6 +54,7 @@
         co.carWeight,
         co.kindOfCar,
         co.upDown,
+		co.etc,
         co.carNumber,
         co.driverName,
         co.driverPhoneNum,
@@ -67,6 +68,8 @@
         co.option3,
         co.option4,
         co.userCompany,
+		co.standard,
+		co.weight,
         ci.driverName AS carinfoDriverName, -- ✅ carinfo 테이블의 driverName 추가
 		ci.driverPhoneNumber as carinfoDriverPhoneNumber
     FROM 
@@ -77,9 +80,9 @@
         1=1
         
     <!-- ✅ 운송요청일 (출발일 ~ 도착일) -->
-    <if test="endDate != null and endDate2 != null">
-        AND co.endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
-                            AND CONCAT(#{endDate2}, ' 23:59:59')
+    <if test="startDate != null and endDate != null">
+        AND co.orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00')
+                            AND CONCAT(#{endDate}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
@@ -168,14 +171,16 @@
 		option2,
 		option3,
 		option4,
-		userCompany
+		userCompany,
+		standard,
+		weight
 	FROM cargoorder
 	WHERE 1=1
     
     <!-- ✅ 운송요청일 (도착일) -->
     <if test="endDate != null">
-        AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
-                         AND CONCAT(#{endDate2}, ' 23:59:59')
+        AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00')
+                         AND CONCAT(#{endDate}, ' 23:59:59')
     </if>
     
     <!-- ✅ 참조번호 -->
@@ -240,8 +245,8 @@
         SELECT COUNT(*) FROM cargoorder
         WHERE 1=1
 		<if test="endDate != null">
-			AND endDate BETWEEN CONCAT(#{endDate}, ' 00:00:00')
-							AND CONCAT(#{endDate2}, ' 23:59:59')
+			AND orderDate BETWEEN CONCAT(#{startDate}, ' 00:00:00')
+							AND CONCAT(#{endDate}, ' 23:59:59')
 		</if>
         <if test="refNumber != null">
             AND refNumber = #{refNumber}
@@ -358,7 +363,9 @@
 			<if test="option2 != null"> option2 = #{option2}, </if>
 			<if test="option3 != null"> option3 = #{option3}, </if>
 			<if test="option4 != null"> option4 = #{option4}, </if>
-			<if test="destinationAddress != null"> destinationAddress = #{destinationAddress} </if>
+			<if test="destinationAddress != null"> destinationAddress = #{destinationAddress}, </if>
+			<if test="standard != null"> standard = #{standard}, </if>
+			<if test="weight != null"> weight = #{weight} </if>
 		</set>
         WHERE orderNumber = #{orderNumber}
     </update>

@@ -48,7 +48,8 @@
 	String option4 = request.getParameter("option4");
 	String destinationAddress = request.getParameter("destinationAddress");
 	String userCompany = request.getParameter("userCompany");
-	System.out.println(userCompany + ": 유저 회사");
+	String standard = request.getParameter("standard");
+	String weight = request.getParameter("weight");
 	
 	try (SqlSession sqlSession = MybatisUtil.getSession()) {
 	    OrderDAO orderDAO = new OrderDAO(sqlSession);
@@ -61,8 +62,9 @@
 			        fixedCarNumber != null ? fixedCarNumber : carInfo.getCarNumber(), upDown, item, etc, startDate, endDate, departureName, arrivalName,
 			        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
 			        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
-			        arrivalManagerPhoneNum, carInfo.getDriverName(), carInfo.getDriverPhoneNumber(), option1, option2, option3, option4, destinationAddress, userCompany
-			    );
+			        arrivalManagerPhoneNum, carInfo.getDriverName(), carInfo.getDriverPhoneNumber(), option1, option2, option3, option4, destinationAddress,
+			        userCompany, standard, weight
+			    ); 
 			    if (result1 <= 0) {
 			        sqlSession.rollback(); // ✅ 실패 시 rollback
 			        throw new Exception("오더 작성 실패");
@@ -73,7 +75,8 @@
 			        upDown, item, etc, startDate, endDate, departureName, arrivalName,
 			        departureCities, arrivalCities, departureTown, arrivalTown, departureDetailedAddress,
 			        arrivalDetailedAddress, departureManager, arrivalManager, departureManagerPhoneNum,
-			        arrivalManagerPhoneNum, option1, option2, option3, option4, destinationAddress, userCompany
+			        arrivalManagerPhoneNum, option1, option2, option3, option4, destinationAddress, userCompany,
+			        standard, weight
 			    );
 			    if (result2 <= 0) {
 			        sqlSession.rollback(); // ✅ 실패 시 rollback
@@ -84,7 +87,6 @@
 	
 	    // === Arrival 처리 ===
 	    ArrivalDAO arrivalDAO = new ArrivalDAO(sqlSession);
-    	System.out.println("도착지 들어옴");
         Arrival arrival = new Arrival();
         arrival.setArrivalName(arrivalName);
         arrival.setArrivalCities(arrivalCities);
@@ -101,7 +103,6 @@
 	
 	    // === Departure 처리 ===
 	    DepartureDAO departureDAO = new DepartureDAO(sqlSession);
-    	System.out.println("출발지 들어옴");
         Departure departure = new Departure();
         departure.setDepartureName(departureName);
         departure.setDepartureCities(departureCities);

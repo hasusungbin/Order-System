@@ -359,9 +359,19 @@
                             <input type="text" name="refNumber" class="form-control">
                         </div>
                     <label class="col-sm-2 control-label">품목:</label>
-                       <div class="col-sm-5">
+                       <div class="col-sm-3">
                        	<input type="text" name="item" class="form-control">
                        </div>
+                </div>
+                <div class="form-group row">
+                	<label class="col-sm-2 control-label">규격:</label>
+                		<div class="col-sm-3">
+                            <input type="text" name="standard" class="form-control">
+                        </div>
+                    <label class="col-sm-2 control-label">중량:</label>
+                    	<div class="col-sm-3">
+                            <input type="text" name="weight" class="form-control">
+                        </div>
                 </div>
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기타:</label>

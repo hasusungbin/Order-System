@@ -148,7 +148,7 @@ public class OrderDAO {
 	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
 	        String driverName, String driverPhoneNum,
 	        String option1, String option2, String option3, String option4, String destinationAddress,
-	        String userCompany) {
+	        String userCompany, String standard, String weight) {
 
 	    int affectedRows = 0;
 	    SqlSession sqlSession = null;
@@ -179,8 +179,8 @@ public class OrderDAO {
 	                "departureCities, arrivalCities, departureTown, arrivalTown, " +
 	                "departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, " +
 	                "departureManagerPhoneNum, arrivalManagerPhoneNum, driverName, driverPhoneNum, option1, option2, option3, option4, " +
-	                "destinationAddress, userCompany) " +
-	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	                "destinationAddress, userCompany, standard, weight) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	        // ✅ PreparedStatement 생성
 	        pstmt = conn.prepareStatement(sql);
@@ -218,6 +218,8 @@ public class OrderDAO {
 	        pstmt.setString(31, option4);
 	        pstmt.setString(32, destinationAddress);
 	        pstmt.setString(33, userCompany);
+	        pstmt.setString(34, standard);
+	        pstmt.setString(35, weight);
 
 	        // ✅ 쿼리 실행
 	        affectedRows = pstmt.executeUpdate();
@@ -260,7 +262,7 @@ public class OrderDAO {
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
 	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
 	        String option1, String option2, String option3, String option4, String destinationAddress,
-	        String userCompany) {
+	        String userCompany, String standard, String weight ) {
 
 	    int affectedRows = 0;
 	    SqlSession sqlSession = null;
@@ -291,8 +293,8 @@ public class OrderDAO {
 	                "departureCities, arrivalCities, departureTown, arrivalTown, " +
 	                "departureDetailedAddress, arrivalDetailedAddress, departureManager, arrivalManager, " +
 	                "departureManagerPhoneNum, arrivalManagerPhoneNum, option1, option2, option3, option4, " +
-	                "destinationAddress, userCompany) " +
-	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	                "destinationAddress, userCompany, standard, weight) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	        // ✅ PreparedStatement 생성
 	        pstmt = conn.prepareStatement(sql);
@@ -327,6 +329,8 @@ public class OrderDAO {
 	        pstmt.setString(28, option4);
 	        pstmt.setString(29, destinationAddress);
 	        pstmt.setString(30, userCompany);
+	        pstmt.setString(31, standard);
+	        pstmt.setString(32, weight);
 
 	        // ✅ 쿼리 실행
 	        affectedRows = pstmt.executeUpdate();
@@ -381,14 +385,14 @@ public class OrderDAO {
 			}
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber ) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber ) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
+	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
-	            params.put("endDate2", endDate2);
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
@@ -401,7 +405,7 @@ public class OrderDAO {
 	        }
 	}
 	
-	public List<Order> getPagedList( int pageNumber, int pageSize, String endDate, String endDate2, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
+	public List<Order> getPagedList( int pageNumber, int pageSize, String startDate, String endDate, String refNumber, String userName, String departureName, String departureCities, String arrivalName, String arrivalCities, String orderNumber, String userType, String userCompany) {
 		 try ( SqlSession session = MybatisUtil.getSession() ) {
 			 Map<String, Object> params = new HashMap<>();
 	            int offset = (pageNumber - 1) * pageSize;
@@ -409,8 +413,8 @@ public class OrderDAO {
 	            String userID = getUserID();
 	            params.put("offset", offset);
 	            params.put("pageSize", pageSize);
+	            params.put("startDate", startDate);
 	            params.put("endDate", endDate);
-	            params.put("endDate2", endDate2);
 	            params.put("refNumber", refNumber);
 	            params.put("userName", userName);
 	            params.put("departureName", departureName);
@@ -426,11 +430,11 @@ public class OrderDAO {
 	        }
 	}
 	
-	public int getTotalCount( String endDate, String endDate2, String refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
+	public int getTotalCount( String startDate, String endDate, String refNumber, String userName, String departureName, String arrivalName, String arrivalCities, String orderNumber ) {
         try ( SqlSession session = MybatisUtil.getSession() ) {
         	Map<String, Object> params = new HashMap<>();
-        	params.put("endDate", endDate);
-            params.put("endDate2", endDate2);
+        	params.put("startDate", startDate);
+            params.put("endDate", endDate);
             params.put("refNumber", refNumber);
             params.put("userName", userName);
             params.put("departureName", departureName);
@@ -458,7 +462,8 @@ public class OrderDAO {
 	        String departureDetailedAddress, String arrivalDetailedAddress, String departureManager,
 	        String arrivalManager, String departureManagerPhoneNum, String arrivalManagerPhoneNum,
 	        String carNumber, String driverName, String driverPhoneNum, int basicFare, int addFare,
-	        String option1, String option2, String option3, String option4, String destinationAddress) {
+	        String option1, String option2, String option3, String option4, String destinationAddress,
+	        String standard, String weight ) {
 
 	    int affectedRows = 0;
 	    SqlSession sqlSession = null;
@@ -504,6 +509,8 @@ public class OrderDAO {
 	        params.put("option3", option3);
 	        params.put("option4", option4);
 	        params.put("destinationAddress", destinationAddress);
+	        params.put("standard", standard);
+	        params.put("weight", weight);
 
 	        // ✅ 업데이트 실행
 	        affectedRows = sqlSession.update("OrderDAO.updateOrder", params);

@@ -151,7 +151,6 @@
 	</script>
 <form action="updateAction.jsp" method="post" name="f">
 		<%
-			
             String orderNumber = request.getParameter("orderNumber");
             Order order = orderDAO.getOrderById( orderNumber );
         %>
@@ -300,16 +299,26 @@
 							</select>
                        </div>
                    </div>
-                   <div class="form-group row">
-                    	<label class="col-sm-2 control-label">참조번호:</label>
-                        <div class="col-sm-3">
-                            <input type="text" name="refNumber" class="form-control" value="<%= order.getRefNumber() != null ? order.getRefNumber() : "" %>">
-                        </div>
-                    	<label class="col-sm-2 control-label">품목:</label>
-                       <div class="col-sm-5">
-                       		<input type="text" name="item" class="form-control" value="<%= order.getItem() != null ? order.getItem() : "" %>">
+               	<div class="form-group row">
+                   	<label class="col-sm-2 control-label">참조번호:</label>
+                       <div class="col-sm-3">
+                           <input type="text" name="refNumber" class="form-control" value="<%= order.getRefNumber() != null ? order.getRefNumber() : "" %>">
                        </div>
-                </div>
+                   	<label class="col-sm-2 control-label">품목:</label>
+                      <div class="col-sm-3">
+                      		<input type="text" name="item" class="form-control" value="<%= order.getItem() != null ? order.getItem() : "" %>">
+                      </div>
+               	</div>
+               	<div class="form-group row">
+                   	<label class="col-sm-2 control-label">규격:</label>
+                       <div class="col-sm-3">
+                           <input type="text" name="standard" class="form-control" value="<%= order.getStandard() != null ? order.getStandard() : "" %>">
+                       </div>
+                   	<label class="col-sm-2 control-label">중량:</label>
+                      <div class="col-sm-3">
+                      		<input type="text" name="weight" class="form-control" value="<%= order.getWeight() != null ? order.getWeight() : "" %>">
+                      </div>
+               	</div>
                 <div class="form-group row">
                 	<label class="col-sm-2 control-label">기타:</label>
                         <div class="col-sm-10">

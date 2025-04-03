@@ -15,6 +15,7 @@
 <jsp:setProperty name="order" property="fixedCarNumber" />
 <jsp:setProperty name="order" property="upDown" />
 <jsp:setProperty name="order" property="item" />
+<jsp:setProperty name="order" property="etc" />
 <jsp:setProperty name="order" property="startDate" />
 <jsp:setProperty name="order" property="endDate" />
 <jsp:setProperty name="order" property="departureName" />
@@ -41,7 +42,8 @@
 <jsp:setProperty name="order" property="option3" />
 <jsp:setProperty name="order" property="option4" />
 <jsp:setProperty name="order" property="destinationAddress" />
-
+<jsp:setProperty name="order" property="standard" />
+<jsp:setProperty name="order" property="weight" />
 
 <!DOCTYPE html>
 <html>
@@ -79,7 +81,7 @@
 				int result = orderDAO.updateOrder( order.getOrderNumber(), order.getKindOfCar(), order.getUserName(), order.getOrderDate(), order.getCarWeight(), order.getRefNumber(), order.getUserPhoneNumber(), order.getFixedCarNumber(), order.getUpDown(), order.getItem(), order.getEtc(), 
 													order.getStartDate(), order.getEndDate(), order.getDepartureName(), order.getArrivalName(), order.getDepartureCities(), order.getArrivalCities(), order.getDepartureTown(), order.getArrivalTown(), 
 													order.getDepartureDetailedAddress(), order.getArrivalDetailedAddress(), order.getDepartureManager(), order.getArrivalManager(), order.getDepartureManagerPhoneNum(), order.getArrivalManagerPhoneNum(),
-													order.getCarNumber(), order.getDriverName(), order.getDriverPhoneNum(), basicFare, addFare, order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress() );
+													order.getCarNumber(), order.getDriverName(), order.getDriverPhoneNum(), basicFare, addFare, order.getOption1(), order.getOption2(), order.getOption3(), order.getOption4(), order.getDestinationAddress(), order.getStandard(), order.getWeight() );
 				if( result == -1 ) {
 					PrintWriter script = response.getWriter();
 					script.println( "<script>" );
